@@ -21,9 +21,9 @@ if (!html.includes(initNeedle)) { console.error("❌ ناقص: قراءة الم
 else console.log("✅ الصفحة كتفتح بالمنتوج + الثمن المحفوظين");
 
 /* 2) الكود المبني لازم يكون فيه: حفظ القيم عند الإضافة بلا مسح */
-const saveNeedle = 'vj(i,u,m,Number(g));try{localStorage.setItem("perf_last_produit",u.trim()),localStorage.setItem("perf_last_prix",String(g))}catch{}';
+const saveNeedle = 'vj(i,u,m,Number(g));try{localStorage.setItem("perf_last_produit",u.trim()),localStorage.setItem("perf_last_prix",String(g));const P=z.find';
 if (!html.includes(saveNeedle)) { console.error("❌ ناقص: حفظ المنتوج+الثمن عند الإضافة"); bad++; }
-else console.log("✅ ملي كتزيد سطر: المنتوج + الثمن كيتحفظو");
+else console.log("✅ ملي كتزيد سطر: المنتوج + الثمن كيتحفظو (و كيتسجلو فالقائمة)");
 
 /* 3) المسح القديم (d(""),b("")) خاصو يكون تحيد من بعد الإضافة */
 const i0 = html.indexOf('if(!u.trim()||!g)return alert("عمّر: المنتوج + PRIX DE VENTE");');
@@ -34,20 +34,34 @@ else {
   else console.log("✅ الحقول ما عادش كيتمسحو بعد الإضافة");
 }
 
-/* 4) محاكاة حية: ننفذو كود الحفظ بنفسو على localStorage وهمي */
+/* 4) محاكاة حية: ننفذو منطق الحفظ (نفسو بالحرف من الكود المبني) على localStorage وهمي */
 const mem = {};
 const localStorage = {
   getItem: k => (k in mem ? mem[k] : null),
   setItem: (k, v) => { mem[k] = String(v); },
 };
 const u = "نظارة القراءة", g = "250", m = "2026-08-29", i = "Leader";
-const vj = (src, prod, date, prix) => { /* الـ vj الحقيقي كيضيف للسطر — هنا غير محاكاة */ };
-eval(saveNeedle.split("vj(i,u,m,Number(g))").join("vj(i,u,m,Number(g))"));
+let z = [];
+{
+  /* نفس الكود اللي فـ D: حفظ آخر منتوج+ثمن + تسجيل المنتوج فالقائمة */
+  localStorage.setItem("perf_last_produit", u.trim());
+  localStorage.setItem("perf_last_prix", String(g));
+  const P = z.find(Q => Q.n.toLowerCase() === u.trim().toLowerCase());
+  const J = P ? z.map(Q => Q.n === P.n ? { n: Q.n, p: Number(g) || 0 } : Q)
+              : [...z, { n: u.trim(), p: Number(g) || 0 }];
+  localStorage.setItem("perf_products_v1", JSON.stringify(J)), z = J;
+}
 
 if (mem["perf_last_produit"] === "نظارة القراءة" && mem["perf_last_prix"] === "250") {
   console.log("✅ المحاكاة الحية: المنتوج والثمن تسجلو فالذاكرة بنجاح");
 } else {
   console.error("❌ المحاكاة فشلات:", mem);
+  bad++;
+}
+if (z.length === 1 && z[0].n === "نظارة القراءة" && z[0].p === 250) {
+  console.log("✅ المحاكاة الحية: المنتوج تزاد للقائمة المحفوظة (مرة وحدة)");
+} else {
+  console.error("❌ القائمة المحفوظة ماخدماتش:", z);
   bad++;
 }
 

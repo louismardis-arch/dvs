@@ -43389,7 +43389,14 @@ function Fj() {
     } catch {
       return ""
     }
-  }), y = Rj(), w = ee.useMemo(() => {
+  }), y = Rj(), [z, kz] = ee.useState(() => {
+    try {
+      const J = JSON.parse(localStorage.getItem("perf_products_v1") || "[]");
+      return Array.isArray(J) ? J : []
+    } catch {
+      return []
+    }
+  }), [pf, Pf] = ee.useState(""), [pd, Pd] = ee.useState(""), w = ee.useMemo(() => {
     const S = new Map;
     return e.forEach(E => {
       E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
@@ -43430,11 +43437,20 @@ function Fj() {
       bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
       gain: L * S.prix - (O !== null ? L * O : 0) - re - ie - H - L * qc
     }
-  }, v = ee.useMemo(() => n.filter(S => S.source === i).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, i, e, a, y]), A = ee.useMemo(() => n.map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, e, a, y]), D = () => {
+  }, v = ee.useMemo(() => n.filter(S => S.source === i && (!pf || S.date >= pf) && (!pd || S.date <= pd)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, i, e, a, y, pf, pd]), A = ee.useMemo(() => n.filter(S => (!pf || S.date >= pf) && (!pd || S.date <= pd)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, e, a, y, pf, pd]), D = () => {
     if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
     vj(i, u, m, Number(g));
   try {
-    localStorage.setItem("perf_last_produit", u.trim()), localStorage.setItem("perf_last_prix", String(g))
+    localStorage.setItem("perf_last_produit", u.trim()), localStorage.setItem("perf_last_prix", String(g));
+    const P = z.find(Q => Q.n.toLowerCase() === u.trim().toLowerCase());
+    const J = P ? z.map(Q => Q.n === P.n ? {
+      n: Q.n,
+      p: Number(g) || 0
+    } : Q) : [...z, {
+      n: u.trim(),
+      p: Number(g) || 0
+    }];
+    localStorage.setItem("perf_products_v1", JSON.stringify(J)), kz(J)
   } catch {}
   }, T = S => ({
     total: S.reduce((E, C) => E + C.total, 0),
@@ -43750,7 +43766,11 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: ["📦 Produit", s.jsx("input", {
               list: "perf-products",
               value: u,
-              onChange: S => d(S.target.value),
+              onChange: S => {
+                d(S.target.value);
+                const P = z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase());
+                P && P.p > 0 && !g && b(String(P.p))
+              },
               placeholder: "نظارة القراءة...",
               className: X + " mt-0.5 w-full"
             })]
@@ -43783,10 +43803,35 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
           })]
         }), s.jsx("datalist", {
           id: "perf-products",
-          children: w.map(S => s.jsx("option", {
+          children: [...new Set([...z.map(S => S.n), ...w])].map(S => s.jsx("option", {
             value: S
           }, S))
-        })]
+        })], s.jsxs("div", {
+          className: "mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm",
+          children: [s.jsx("span", {
+            className: "text-[11px] font-bold text-slate-500",
+            children: "📅 فيلتر الأيام:"
+          }), s.jsx("input", {
+            type: "date",
+            value: pf,
+            onChange: S => Pf(S.target.value),
+            className: X + " w-auto"
+          }), s.jsx("span", {
+            className: "text-[10px] text-slate-400",
+            children: "→ إلى"
+          }), s.jsx("input", {
+            type: "date",
+            value: pd,
+            onChange: S => Pd(S.target.value),
+            className: X + " w-auto"
+          }), (pf || pd) && s.jsx("button", {
+            onClick: () => {
+              Pf(""), Pd("")
+            },
+            className: "rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-200",
+            children: "✕ مسح الفيلتر"
+          })]
+        })
       }), s.jsxs("div", {
         className: "mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
         children: [s.jsxs("div", {
