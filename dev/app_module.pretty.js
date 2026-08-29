@@ -43377,7 +43377,19 @@ const Mj = e => e.ship,
 function Fj() {
   const {
     orders: e
-  } = Xt(), n = Nj(), a = xx(), [i, c] = ee.useState(_l[0].key), f = new Date().toISOString().slice(0, 10), [u, d] = ee.useState(""), [m, h] = ee.useState(f), [g, b] = ee.useState(""), y = Rj(), w = ee.useMemo(() => {
+  } = Xt(), n = Nj(), a = xx(), [i, c] = ee.useState(_l[0].key), f = new Date().toISOString().slice(0, 10), [u, d] = ee.useState(() => {
+    try {
+      return localStorage.getItem("perf_last_produit") || ""
+    } catch {
+      return ""
+    }
+  }), [m, h] = ee.useState(f), [g, b] = ee.useState(() => {
+    try {
+      return localStorage.getItem("perf_last_prix") || ""
+    } catch {
+      return ""
+    }
+  }), y = Rj(), w = ee.useMemo(() => {
     const S = new Map;
     return e.forEach(E => {
       E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
@@ -43420,7 +43432,10 @@ function Fj() {
     }
   }, v = ee.useMemo(() => n.filter(S => S.source === i).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, i, e, a, y]), A = ee.useMemo(() => n.map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, e, a, y]), D = () => {
     if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
-    vj(i, u, m, Number(g)), d(""), b("")
+    vj(i, u, m, Number(g));
+  try {
+    localStorage.setItem("perf_last_produit", u.trim()), localStorage.setItem("perf_last_prix", String(g))
+  } catch {}
   }, T = S => ({
     total: S.reduce((E, C) => E + C.total, 0),
     conf: S.reduce((E, C) => E + C.conf, 0),
