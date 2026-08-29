@@ -43392,17 +43392,43 @@ function Fj() {
   }), y = Rj(), [z, kz] = ee.useState(() => {
     try {
       const J = JSON.parse(localStorage.getItem("perf_products_v1") || "[]");
-      return Array.isArray(J) ? J : []
-    } catch {
-      return []
-    }
+      if (Array.isArray(J) && J.length) return J.map(Q => ({
+        n: Q.n,
+        p: Q.p,
+        s: Q.s || ""
+      }))
+    } catch {}
+    try {
+      const rows = zl ?? ko(),
+        mp = new Map;
+      rows.forEach(r => {
+        const sn = (r.source || "").trim(),
+          pn = (r.produit || "").trim();
+        if (!sn || !pn) return;
+        const key = sn.toLowerCase() + "|" + pn.toLowerCase(),
+          cur = mp.get(key);
+        if (!cur || (r.date || "") >= (cur.date || "")) mp.set(key, {
+          n: pn,
+          p: Number(r.prix) || 0,
+          s: sn
+        })
+      });
+      const arr = [...mp.values()];
+      if (arr.length) {
+        localStorage.setItem("perf_products_v1", JSON.stringify(arr));
+        return arr
+      }
+    } catch {}
+    return []
   }), [pf, Pf] = ee.useState(""), [pd, Pd] = ee.useState(""), w = ee.useMemo(() => {
     const S = new Map;
     return e.forEach(E => {
       E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
     }), [...S.entries()].sort((E, C) => C[1] - E[1]).map(([E]) => E)
-  }, [e]), N = S => {
-    const E = e.filter(G => G.originLead.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.dateCreation === S.date),
+  }, [e]), N = Q => {
+    const prod = Q.n.trim().toLowerCase(),
+      src = Q.s.trim().toLowerCase(),
+      E = e.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.originLead.trim().toLowerCase() === src) && (!pf || G.dateCreation >= pf) && (!pd || G.dateCreation <= pd)),
       C = E.filter(G => G.livraison === "Livrée"),
       L = C.length,
       F = E.filter(G => G.livraison === "Retour").length,
@@ -43410,14 +43436,21 @@ function Fj() {
       oe = E.filter(G => G.statut === "Confirmé").length,
       K = E.length,
       V = Math.max(0, K - L - F - Y),
-      H = a.filter(G => G.source.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.date === S.date).reduce((G, q) => G + q.amount, 0),
+      H = a.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.source.trim().toLowerCase() === src) && (!pf || G.date >= pf) && (!pd || G.date <= pd)).reduce((G, q) => G + q.amount, 0),
       ae = E.filter(G => G.livraison === "Retour"),
       re = C.reduce((G, q) => G + (q.commission || 0), 0),
       ie = ae.reduce((G, q) => G + (q.commission || 0), 0),
       U = L ? re / L : 0,
-      O = y.get(er(S.produit)) ?? null;
+      O = y.get(er(Q.n)) ?? null,
+      label = pf || pd ? (pf && pd && pf !== pd ? pf + " → " + pd : (pf || pd)) : "كل الأيام";
     return {
-      row: S,
+      row: {
+        id: Q.n,
+        produit: Q.n,
+        date: label,
+        prix: Q.p,
+        source: Q.s
+      },
       total: K,
       conf: oe,
       ann: Y,
@@ -43435,23 +43468,25 @@ function Fj() {
       cplc: oe ? H / oe : null,
       cpll: L ? H / L : null,
       bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
-      gain: L * S.prix - (O !== null ? L * O : 0) - re - ie - H - L * qc
+      gain: L * Q.p - (O !== null ? L * O : 0) - re - ie - H - L * qc
     }
-  }, v = ee.useMemo(() => n.filter(S => S.source === i && (!pf || S.date >= pf) && (!pd || S.date <= pd)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, i, e, a, y, pf, pd]), A = ee.useMemo(() => n.filter(S => (!pf || S.date >= pf) && (!pd || S.date <= pd)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, e, a, y, pf, pd]), D = () => {
+  }, v = ee.useMemo(() => z.filter(Q => Q.s === i).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, i, e, a, y, pf, pd]), A = ee.useMemo(() => z.map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, e, a, y, pf, pd]), D = () => {
     if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
     vj(i, u, m, Number(g));
-  try {
-    localStorage.setItem("perf_last_produit", u.trim()), localStorage.setItem("perf_last_prix", String(g));
-    const P = z.find(Q => Q.n.toLowerCase() === u.trim().toLowerCase());
-    const J = P ? z.map(Q => Q.n === P.n ? {
-      n: Q.n,
-      p: Number(g) || 0
-    } : Q) : [...z, {
-      n: u.trim(),
-      p: Number(g) || 0
-    }];
-    localStorage.setItem("perf_products_v1", JSON.stringify(J)), kz(J)
-  } catch {}
+    try {
+      localStorage.setItem("perf_last_produit", u.trim()), localStorage.setItem("perf_last_prix", String(g));
+      const P = z.find(Q => Q.n.toLowerCase() === u.trim().toLowerCase() && Q.s === i);
+      const J = P ? z.map(Q => Q === P ? {
+        n: Q.n,
+        p: Number(g) || 0,
+        s: i
+      } : Q) : [...z, {
+        n: u.trim(),
+        p: Number(g) || 0,
+        s: i
+      }];
+      localStorage.setItem("perf_products_v1", JSON.stringify(J)), kz(J)
+    } catch {}
   }, T = S => ({
     total: S.reduce((E, C) => E + C.total, 0),
     conf: S.reduce((E, C) => E + C.conf, 0),
@@ -43536,7 +43571,7 @@ function Fj() {
             className: "px-2 py-2 text-center",
             children: s.jsx("span", {
               className: "rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600",
-              children: _l.find(L => L.key === C.row.source)?.label || C.row.source
+              children: _l.find(L => L.key === C.row.source)?.label || C.row.source || "—"
             })
           }), s.jsx("td", {
             className: "max-w-40 truncate px-2 py-2 font-bold text-slate-700",
@@ -43608,9 +43643,17 @@ function Fj() {
             children: s.jsx("input", {
               type: "number",
               value: C.row.prix,
-              onChange: L => bj(C.row.id, {
-                prix: Number(L.target.value) || 0
-              }),
+              onChange: L => {
+                const nv = Number(L.target.value) || 0,
+                  J = z.map(Q => Q.n === C.row.produit && Q.s === C.row.source ? {
+                    ...Q,
+                    p: nv
+                  } : Q);
+                kz(J);
+                try {
+                  localStorage.setItem("perf_products_v1", JSON.stringify(J))
+                } catch {}
+              },
               title: "PRIX DE VENTE — قابل للتعديل",
               className: "w-16 rounded-lg border border-slate-200 px-1 py-1 text-center text-[11px] font-bold text-slate-700 outline-none focus:border-indigo-400"
             })
@@ -43632,7 +43675,15 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
           }), s.jsx("td", {
             className: "px-2 py-2 text-center",
             children: s.jsx("button", {
-              onClick: () => confirm("مسح السطر؟") && yj(C.row.id),
+              onClick: () => {
+                if (confirm("مسح المنتوج من القائمة؟")) {
+                  const J = z.filter(Q => !(Q.n === C.row.produit && Q.s === C.row.source));
+                  kz(J);
+                  try {
+                    localStorage.setItem("perf_products_v1", JSON.stringify(J))
+                  } catch {}
+                }
+              },
               className: "grid h-6 w-6 place-items-center rounded-lg text-slate-300 transition hover:bg-red-50 hover:text-red-600",
               children: "✕"
             })
@@ -43646,7 +43697,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
         children: "📊"
       }), s.jsx("p", {
         className: "text-xs font-bold text-slate-500",
-        children: "ما كاين حتى سطر — زيد المنتوج + التاريخ + PRIX DE VENTE من الفورم"
+        children: "ما كاين حتى منتوج — زيد المنتوج + الثمن من الفورم فوق (مرة وحدة فقط)"
       })]
     })]
   });
@@ -43666,7 +43717,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: "Dashboard performance"
           }), s.jsx("p", {
             className: "text-[11px] text-slate-500",
-            children: "كانحطو غير: المنتوج + التاريخ + PRIX DE VENTE — الباقي كامل أوتوماتيك من CRM (طلبيات + مصروفات 💸)"
+            children: "المنتوج كيتكتب مرة وحدة فقط — اختار الفترة من فيلتر الأيام وشوف حساباتها (الباقي أوتوماتيك من CRM)"
           })]
         })]
       }), s.jsx("nav", {
@@ -43754,13 +43805,13 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: "＋"
           }), s.jsxs("b", {
             className: "text-sm font-extrabold text-slate-800",
-            children: ["زيد سطر فـ ", _l.find(S => S.key === i)?.label]
+            children: ["زيد منتوج فـ ", _l.find(S => S.key === i)?.label]
           }), s.jsx("span", {
             className: "text-[10px] font-semibold text-indigo-500",
-            children: "— غير 3 حوايج، الباقي أوتوماتيك ⚡"
+            children: "— المنتوج كيتكتب مرة وحدة فقط ⚡"
           })]
         }), s.jsxs("div", {
-          className: "grid gap-2 sm:grid-cols-2 lg:grid-cols-4",
+          className: "grid gap-2 sm:grid-cols-3",
           children: [s.jsxs("label", {
             className: "text-[10px] font-bold text-slate-500",
             children: ["📦 Produit", s.jsx("input", {
@@ -43768,18 +43819,10 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
               value: u,
               onChange: S => {
                 d(S.target.value);
-                const P = z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase());
+                const P = z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase() && Q.s === i) || z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase());
                 P && P.p > 0 && !g && b(String(P.p))
               },
               placeholder: "نظارة القراءة...",
-              className: X + " mt-0.5 w-full"
-            })]
-          }), s.jsxs("label", {
-            className: "text-[10px] font-bold text-slate-500",
-            children: ["📅 Date", s.jsx("input", {
-              type: "date",
-              value: m,
-              onChange: S => h(S.target.value),
               className: X + " mt-0.5 w-full"
             })]
           }), s.jsxs("label", {
@@ -43806,32 +43849,32 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
           children: [...new Set([...z.map(S => S.n), ...w])].map(S => s.jsx("option", {
             value: S
           }, S))
-        })], s.jsxs("div", {
-          className: "mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm",
-          children: [s.jsx("span", {
-            className: "text-[11px] font-bold text-slate-500",
-            children: "📅 فيلتر الأيام:"
-          }), s.jsx("input", {
-            type: "date",
-            value: pf,
-            onChange: S => Pf(S.target.value),
-            className: X + " w-auto"
-          }), s.jsx("span", {
-            className: "text-[10px] text-slate-400",
-            children: "→ إلى"
-          }), s.jsx("input", {
-            type: "date",
-            value: pd,
-            onChange: S => Pd(S.target.value),
-            className: X + " w-auto"
-          }), (pf || pd) && s.jsx("button", {
-            onClick: () => {
-              Pf(""), Pd("")
-            },
-            className: "rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-200",
-            children: "✕ مسح الفيلتر"
-          })]
-        })
+        })]
+      }), s.jsxs("div", {
+        className: "mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm",
+        children: [s.jsx("span", {
+          className: "text-[11px] font-bold text-slate-500",
+          children: "📅 فيلتر الأيام:"
+        }), s.jsx("input", {
+          type: "date",
+          value: pf,
+          onChange: S => Pf(S.target.value),
+          className: X + " w-auto"
+        }), s.jsx("span", {
+          className: "text-[10px] text-slate-400",
+          children: "→ إلى"
+        }), s.jsx("input", {
+          type: "date",
+          value: pd,
+          onChange: S => Pd(S.target.value),
+          className: X + " w-auto"
+        }), (pf || pd) && s.jsx("button", {
+          onClick: () => {
+            Pf(""), Pd("")
+          },
+          className: "rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-200",
+          children: "✕ مسح الفيلتر"
+        })]
       }), s.jsxs("div", {
         className: "mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
         children: [s.jsxs("div", {
@@ -43844,7 +43887,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: _l.find(S => S.key === i)?.label
           }), s.jsx("span", {
             className: "ms-auto text-[10px] text-slate-400",
-            children: "⚡ طلبيات CRM (نفس المصدر+المنتوج+النهار) + مصروفات 💸 CRM"
+            children: "⚡ حسابات الفترة المختارة من فيلتر الأيام — كل منتوج كيبان مرة وحدة"
           })]
         }), s.jsx(_, {
           list: v
@@ -43861,7 +43904,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: "GLOBAL — كل المصادر"
           }), s.jsxs("span", {
             className: "rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold",
-            children: [A.length, " سطر"]
+            children: [A.length, " منتوج"]
           }), s.jsxs("span", {
             className: "ms-auto flex flex-wrap gap-3 text-[10px] font-bold",
             children: [s.jsxs("span", {

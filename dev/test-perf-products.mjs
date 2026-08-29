@@ -20,9 +20,9 @@ let bad = 0;
 const checks = [
   ['perf_products_v1', "قائمة المنتوجات المحفوظة موجودة"],
   ['P&&P.p>0&&!g&&b(String(P.p))', "التعبئة الأوتوماتيكية للثمن عند اختيار منتوج"],
-  ['const J=P?z.map(Q=>Q.n===P.n?{n:Q.n,p:Number(g)||0}:Q):[...z,{n:u.trim(),p:Number(g)||0}]', "تسجيل المنتوج الجديد فالقائمة عند الإضافة"],
-  ['S.source===i&&(!pf||S.date>=pf)&&(!pd||S.date<=pd)', "فيلتر الأيام فالجدول ديال المصدر"],
-  ['A=ee.useMemo(()=>n.filter(S=>(!pf||S.date>=pf)&&(!pd||S.date<=pd))', "فيلتر الأيام فالجدول العام"],
+  ['const J=P?z.map(Q=>Q===P?{n:Q.n,p:Number(g)||0,s:i}:Q):[...z,{n:u.trim(),p:Number(g)||0,s:i}]', "تسجيل المنتوج الجديد فالقائمة عند الإضافة"],
+  ['v=ee.useMemo(()=>z.filter(Q=>Q.s===i).map(N)', "الجدول ديال المصدر: سطر واحد لكل منتوج"],
+  ['A=ee.useMemo(()=>z.map(N)', "الجدول العام: سطر واحد لكل منتوج"],
   ['فيلتر الأيام:', "شريط فيلتر الأيام فالواجهة"],
 ];
 for (const [needle, label] of checks) {
