@@ -36181,7 +36181,7 @@ function m_() {
         K = E.filter(ie => ie.livraison === "Retour").length,
         V = E.filter(ie => ie.livraison === "Expédier vers" || ie.livraison === "Expédié").length,
         H = E.filter(ie => ie.livraison === "Out Of Stock").length,
-        ae = E.reduce((ie, U) => ie + (U.upsell || 0), 0),
+        ae = E.filter(ie => ie.livraison === "Livrée").reduce((ie, U) => ie + (U.upsell || 0), 0),
         re = E.filter(ie => ie.livraison === "Livrée").reduce((ie, U) => ie + U.prix, 0);
       return {
         a: S,
@@ -42551,7 +42551,7 @@ function gj() {
   }, k = ee.useMemo(() => n.map(R => {
     const _ = e.filter(oe => oe.agent.toLowerCase() === R.toLowerCase() && (!f || oe.dateCreation >= f) && (!d || oe.dateCreation <= d)),
       S = _.filter(oe => oe.livraison === "Livrée").length,
-      E = _.reduce((oe, K) => oe + (K.upsell || 0), 0),
+      E = _.filter(oe => oe.livraison === "Livrée").reduce((oe, K) => oe + (K.upsell || 0), 0),
       C = S >= hd,
       L = C ? mj : hj,
       F = S * L + E * L + (C ? Z2 : 0),
@@ -42589,7 +42589,7 @@ function gj() {
             children: "Salaire — سالير الفريق"
           }), s.jsx("p", {
             className: "text-[11px] text-slate-500",
-            children: "Livrée × 8 DH + UPSEL × 8 DH · من 151 Livrée: × 5 DH + بونص 1000 DH — محسوب أوتوماتيك من طلبيات CRM"
+            children: "Livrée × 8 DH + UPSEL Livrée × 8 DH · من 151 Livrée: × 5 DH + بونص 1000 DH — محسوب أوتوماتيك من طلبيات CRM"
           })]
         }), s.jsxs("span", {
           className: "ms-auto rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700",
@@ -43003,9 +43003,9 @@ function gj() {
         })]
       }), s.jsxs("p", {
         className: "mt-3 text-center text-[10px] leading-5 text-slate-400",
-        children: ["💡 المعادلة: Livrée × 8 + UPSEL × 8 · إلا وصلات ", s.jsx("b", {
+        children: ["💡 المعادلة: Livrée × 8 + UPSEL Livrée × 8 · إلا وصلات ", s.jsx("b", {
           children: "151 Livrée"
-        }), " → Livrée × 5 + UPSEL × 5 + ", s.jsx("b", {
+        }), " → Livrée × 5 + UPSEL Livrée × 5 + ", s.jsx("b", {
           children: "1000 DH"
         }), " بونص"]
       })]
