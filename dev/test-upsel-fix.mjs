@@ -2,10 +2,13 @@
 /**
  * ✅ تست تلقائي لإصلاح خانة UPSEL (صفحة Salaire + suivi confirmation)
  * ---------------------------------------------------------------
- * القاعدة الجديدة: UPSEL كيتحسب غير من الطلبيات اللي Livraison = "Livrée".
+ * القاعدة: UPSEL كيتحسب غير من الطلبيات اللي Livraison = "Livrée".
+ * Retour / Annulé / Expédié / Expédier vers / Out Of Stock → ما كيتحسبوش.
+ *
+ * هاد التست ما كيختبرش نسخة مكتوبة باليد — كيستخرج الكود الحقيقي
+ * المبني من index.html ويعاود تنفيذه بنفسو على داطا مختلطة.
  *
  * التشغيل:  node dev/test-upsel-fix.mjs
- * النجاح:   process.exit(0)  |  الفشل: process.exit(1) + رسالة
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -14,7 +17,7 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const html = readFileSync(join(root, "index.html"), "utf8");
 
-/* 1) تأكد أن الكود المبني فيه الإصلاح بالضبط */
+/* 1) الكود المبني لازم يكون فيه الإصلاح */
 const checks = [
   ['E=_.filter(oe=>oe.livraison==="Livrée").reduce((oe,K)=>oe+(K.upsell||0),0)', "Salaire: UPSEL محسوب غير من Livrée"],
   ['ae=E.filter(ie=>ie.livraison==="Livrée").reduce((ie,U)=>ie+(U.upsell||0),0)', "suivi confirmation: UPSEL محسوب غير من Livrée"],
@@ -25,34 +28,32 @@ for (const [needle, label] of checks) {
   else console.log("✅", label);
 }
 
-/* 2) محاكاة الحساب بنفس المعادلة على داطا تجريبية */
-const hj = 8, mj = 5, hd = 151, Z2 = 1000; // ثوابت صفحة Salaire
+/* 2) استخراج الكود الحقيقي ديال حساب السالير وتنفيذه */
+const i = html.indexOf('<script type="module" crossorigin>');
+const j = html.indexOf('</script>', i);
+const js = html.slice(i + '<script type="module" crossorigin>'.length, j);
+const start = js.indexOf('n.map(R=>{const _=e.filter');
+const end = js.indexOf('}).sort((R,_)=>_.salaire-R.salaire)', start);
+if (start < 0 || end < 0) { console.error("❌ ما قدرناش نستخرجو كود حساب السالير"); process.exit(1); }
+const arrow = js.slice(start + 'n.map('.length, end);
+const wrap = new Function(`function wrap(n,e,f,d,hj,mj,hd,Z2){ return n.map(${arrow}}); } return wrap;`)();
+
+/* داطا مختلطة: Livrée + Retour + Expédié + Annulé */
 const orders = [
-  { agent: "sara", livraison: "Livrée",    upsell: 5 },  // كيتحسب
-  { agent: "sara", livraison: "Livrée",    upsell: 2 },  // كيتحسب
-  { agent: "sara", livraison: "Retour",    upsell: 10 }, // ❌ ما يتحسبش
-  { agent: "sara", livraison: "Expédié",   upsell: 3 },  // ❌ ما يتحسبش
-  { agent: "sara", livraison: "Annulé",    upsell: 7 },  // ❌ ما يتحسبش
-  { agent: "sara", livraison: "Livrée",    upsell: 0 },  // كيتحسب = 0
+  { agent: "TEST-UPSEL", dateCreation: "2026-08-29", livraison: "Livrée",  upsell: 5 },
+  { agent: "TEST-UPSEL", dateCreation: "2026-08-29", livraison: "Livrée",  upsell: 2 },
+  { agent: "TEST-UPSEL", dateCreation: "2026-08-29", livraison: "Retour",  upsell: 100 },
+  { agent: "TEST-UPSEL", dateCreation: "2026-08-29", livraison: "Expédié", upsell: 50 },
+  { agent: "TEST-UPSEL", dateCreation: "2026-08-29", livraison: "Annulé",  upsell: 30 },
 ];
-const R = "sara", f = "", d = "";
-const _ = orders.filter(oe => oe.agent.toLowerCase() === R.toLowerCase() && (!f || oe.dateCreation >= f) && (!d || oe.dateCreation <= d));
-const S = _.filter(oe => oe.livraison === "Livrée").length;
-const E = _.filter(oe => oe.livraison === "Livrée").reduce((oe, K) => oe + (K.upsell || 0), 0);
-const C = S >= hd, L = C ? mj : hj, F = S * L + E * L + (C ? Z2 : 0);
+const out = wrap(["TEST-UPSEL"], orders, "", "", 8, 5, 151, 1000)[0];
 
-const expectS = 3, expectE = 7, expectF = 3 * 8 + 7 * 8; // 80 DH
-const oldE = orders.reduce((oe, K) => oe + (K.upsell || 0), 0); // القيمة القديمة الخاطئة = 27
+console.log("── تنفيذ الكود الحقيقي من index.html على داطا مختلطة:");
+console.log(`عدد Livrée: ${out.liv} (المتوقع 2)`);
+console.log(`UPSEL المحسوب: ${out.upsell} (المتوقع 7 = 5+2 فقط — Retour/Expédié/Annulé = 180 ماشي محسوبين)`);
+console.log(`Salaire: ${out.salaire} DH (المتوقع 72 = 2×8 + 7×8)`);
 
-console.log("── محاكاة ─────────────────────────────");
-console.log(`Livrée: ${S} (المتوقع ${expectS})`);
-console.log(`UPSEL (Livrée فقط): ${E} (المتوقع ${expectE} | القديم كان كيجمع ${oldE})`);
-console.log(`Salaire: ${F} DH (المتوقع ${expectF} DH)`);
-
-if (S !== expectS || E !== expectE || F !== expectF) {
-  console.error("❌ نتيجة التست ماشي هي المتوقعة!");
-  process.exit(1);
-}
-console.log("✅ كلشي صحيح: UPSEL كيتحسب غير من الطلبيات اللي Livrée.");
-if (bad) { console.error(`❌ ${bad} مشكل فالكود المبني`); process.exit(1); }
+const ok = out.liv === 2 && out.upsell === 7 && out.salaire === 72 && bad === 0;
+if (!ok) { console.error("❌❌❌ كاين مشكل فالكود!"); process.exit(1); }
+console.log("✅✅✅ الكود المبني كيحسب غير UPSEL ديال LIVRÉE — مؤكد بالتجربة الحية");
 process.exit(0);
