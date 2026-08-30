@@ -43478,7 +43478,7 @@ function Fj() {
       bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
       gain: L * Q.p - (O !== null ? L * O : 0) - re - ie - H - L * qc
     }
-  }, v = ee.useMemo(() => z.filter(Q => Q.s === i).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, i, e, a, y]), A = ee.useMemo(() => z.map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, e, a, y]), D = () => {
+  }, v = ee.useMemo(() => z.filter(Q => Q.s === i && ir(Q.d)).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, i, e, a, y, ir]), A = ee.useMemo(() => z.filter(Q => ir(Q.d)).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, e, a, y, ir]), D = () => {
     if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
     vj(i, u, m, Number(g));
     try {
@@ -43707,7 +43707,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
         children: "📊"
       }), s.jsx("p", {
         className: "text-xs font-bold text-slate-500",
-        children: "ما كاين حتى منتوج — زيد المنتوج + الثمن من الفورم فوق (مرة وحدة فقط)"
+        children: "ما كاين حتى منتوج فهاد الفترة — بدل الفيلتر (الكل ولا Custom) ولا زيد منتوج جديد من الفورم فوق"
       })]
     })]
   });
@@ -43886,7 +43886,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: _l.find(S => S.key === i)?.label
           }), s.jsx("span", {
             className: "ms-auto text-[10px] text-slate-400",
-            children: "⚡ الحسابات من تاريخ الانطلاق ديال المنتوج + الفترة المختارة فالفيلتر"
+            children: "⚡ كيبانو غير المنتوجات اللي تاريخها داخل الفترة المختارة — والحسابات من تاريخ الانطلاق ديال المنتوج"
           })]
         }), s.jsx(_, {
           list: v

@@ -21,13 +21,17 @@ let bad = 0;
 
 /* 1) الكود المبني فيه الميزات؟ */
 const checks = [
-  ['v=ee.useMemo(()=>z.filter(Q=>Q.s===i).map(N)', "الجدول كيبني من قائمة المنتوجات (سطر واحد لكل منتوج)"],
-  ['A=ee.useMemo(()=>z.map(N)', "الجدول GLOBAL كيبني من قائمة المنتوجات"],
+  ['v=ee.useMemo(()=>z.filter(Q=>Q.s===i&&ir(Q.d)).map(N)', "الجدول كيبني من قائمة المنتوجات + الظهور حسب التاريخ"],
+  ['A=ee.useMemo(()=>z.filter(Q=>ir(Q.d)).map(N)', "الجدول GLOBAL كيبني من قائمة المنتوجات + الظهور حسب التاريخ"],
   ['{inRange:ir}=Tn()', "Dashboard مربوط بالفيلتر العالمي ديال CRM (رقم 1)"],
   ['&&ir(G.dateCreation)', "حساب الطلبيات كيستعمل الفيلتر العالمي"],
   ['&&ir(G.date)', "حساب المصروفات كيستعمل الفيلتر العالمي"],
   ['children:"📅 فيلتر الأيام:"}),s.jsx(yp,{})', "label فيلتر الأيام + نفس أزرار فيلتر CRM بجانبو (رقم 2)"],
   ['label=Q.d||"كل الأيام"', "عمود التاريخ كيعرض تاريخ الانطلاق ديال المنتوج"],
+  ['z.filter(Q=>Q.s===i&&ir(Q.d))', "الجدول كيبين غير المنتوجات اللي تاريخها داخل الفترة المختارة"],
+  ['[z,i,e,a,y,ir]', "ir فالdeps — الجداول كيعاودو يحسبو ملي يتبدل الفيلتر (إصلاح الفيلتر)"],
+  ['z.filter(Q=>ir(Q.d))', "الجدول العام: نفس قاعدة الظهور"],
+  ['[z,e,a,y,ir]', "ir فالdeps ديال الجدول العام"],
   ['(!Q.d||G.dateCreation>=Q.d)', "الحساب كيبدا من تاريخ الانطلاق ديال المنتوج"],
   ['📅 تاريخ الانطلاق', "خانة تاريخ الانطلاق موجودة فالفورم"],
   ['bp="afrizon_period_v2"', "مفتاح الفترة جديد (الكل غادي يبدا بالافتراضي الجديد)"],
@@ -109,6 +113,22 @@ console.log("── عدد السطور فالجدول (قائمة المنتو�
 if (v.length !== 2) { console.error("❌ السطور ماشي بحساب المنتوجات!"); bad++; }
 else console.log("✅ المنتوج كيبان مرة وحدة فسطر واحد — التاريخ كيتحدد بالفيلتر فقط");
 
+/* حالة 4ب: منتوج بتاريخ قديم (01/08) — خاصو يبان غير فالكل ولا Custom */
+const zOld = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-01" }];
+const irToday2 = s => s.slice(0, 10) === "2026-08-30";
+const irYest2 = s => s.slice(0, 10) === "2026-08-29";
+const irAll2 = () => true;
+const irCustom2 = s => { const v = s.slice(0, 10); return v >= "2026-08-01" && v <= "2026-08-30"; };
+const visToday = zOld.filter(Q => Q.s === "Leader" && irToday2(Q.d)).length;
+const visYest = zOld.filter(Q => Q.s === "Leader" && irYest2(Q.d)).length;
+const visAll = zOld.filter(Q => Q.s === "Leader" && irAll2(Q.d)).length;
+const visCustom = zOld.filter(Q => Q.s === "Leader" && irCustom2(Q.d)).length;
+console.log("── منتوج بتاريخ 01/08 (اليوم هو 30/08):");
+console.log(`  الفيلتر اليوم: ${visToday} سطر (المتوقع 0) | أمس: ${visYest} (المتوقع 0) | الكل: ${visAll} (المتوقع 1) | Custom 01→30: ${visCustom} (المتوقع 1)`);
+if (visToday !== 0 || visYest !== 0 || visAll !== 1 || visCustom !== 1) {
+  console.error("❌ الظهور ديال المنتوج القديم ماشي صحيح!"); bad++;
+} else console.log("✅ منتوج بتاريخ قديم كيبان غير فالكل ولا فـ Custom — ماشي فاليوم/أمس");
+
 /* حالة 5: نفس المنتوج كيتزاد مرة وحدة — الإضافة التانية كتحدّث الثمن فقط */
 let cat = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-29" }];
 {
@@ -120,5 +140,5 @@ if (cat.length === 1 && cat[0].p === 260 && cat[0].d === "2026-09-01") console.l
 else { console.error("❌ الإضافة المتكررة كتزيد سطور!"); bad++; }
 
 if (bad) { console.error(`❌❌❌ ${bad} مشكل`); process.exit(1); }
-console.log("✅✅✅ v3.1 خدامة: فيلتر CRM العالمي فـ Dashboard + الافتراضي اليوم + المنتوج مرة وحدة");
+console.log("✅✅✅ v3.3 خدامة: الفيلتر كيعاود يحسب + المنتوج كيبان غير فالفترة ديال تاريخو (الكل/Custom)");
 process.exit(0);
