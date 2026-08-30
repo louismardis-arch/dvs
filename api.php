@@ -39,7 +39,7 @@ $SECRET = 'c6e04cb5de9088be01a685abc243995a80426eba45de2060';
 $KEYS = array(
   "afrizon_users_v1","afrizon_orders_v5","afrizon_agent_names_v1",
   "afrizon_chat_v1","afrizon_worktimes_v1","afrizon_remarques_v1",
-  "afrizon_avances_v1","afrizon_adspend_v1","afrizon_perfrows_v1",
+  "afrizon_avances_v1","afrizon_adspend_v1","afrizon_perfrows_v1","afrizon_livraison_v1",
   "afrizon_history_v1","afrizon_villes_v2","afrizon_catalog_v1",
   "sheet_pièce","afrizon_team_photos_v1","tabs_list_v1","custom_sheets_v1",
 );
