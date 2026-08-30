@@ -43433,10 +43433,8 @@ function Fj() {
     return e.forEach(E => {
       E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
     }), [...S.entries()].sort((E, C) => C[1] - E[1]).map(([E]) => E)
-  }, [e]), N = Q => {
-    const prod = Q.n.trim().toLowerCase(),
-      src = Q.s.trim().toLowerCase(),
-      E = e.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.originLead.trim().toLowerCase() === src) && ir(G.dateCreation) && (!Q.d || G.dateCreation >= Q.d)),
+  }, [e]), N = S => {
+    const E = e.filter(G => G.originLead.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.dateCreation === S.date),
       C = E.filter(G => G.livraison === "Livrée"),
       L = C.length,
       F = E.filter(G => G.livraison === "Retour").length,
@@ -43444,21 +43442,14 @@ function Fj() {
       oe = E.filter(G => G.statut === "Confirmé").length,
       K = E.length,
       V = Math.max(0, K - L - F - Y),
-      H = a.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.source.trim().toLowerCase() === src) && ir(G.date) && (!Q.d || G.date >= Q.d)).reduce((G, q) => G + q.amount, 0),
+      H = a.filter(G => G.source.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.date === S.date).reduce((G, q) => G + q.amount, 0),
       ae = E.filter(G => G.livraison === "Retour"),
       re = C.reduce((G, q) => G + (q.commission || 0), 0),
       ie = ae.reduce((G, q) => G + (q.commission || 0), 0),
       U = L ? re / L : 0,
-      O = y.get(er(Q.n)) ?? null,
-      label = Q.d || "كل الأيام";
+      O = y.get(er(S.produit)) ?? null;
     return {
-      row: {
-        id: Q.n,
-        produit: Q.n,
-        date: label,
-        prix: Q.p,
-        source: Q.s
-      },
+      row: S,
       total: K,
       conf: oe,
       ann: Y,
@@ -43476,9 +43467,9 @@ function Fj() {
       cplc: oe ? H / oe : null,
       cpll: L ? H / L : null,
       bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
-      gain: L * Q.p - (O !== null ? L * O : 0) - re - ie - H - L * qc
+      gain: L * S.prix - (O !== null ? L * O : 0) - re - ie - H - L * qc
     }
-  }, v = ee.useMemo(() => z.filter(Q => Q.s === i && ir(Q.d)).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, i, e, a, y, ir]), A = ee.useMemo(() => z.filter(Q => ir(Q.d)).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, e, a, y, ir]), D = () => {
+  }, v = ee.useMemo(() => n.filter(S => S.source === i && ir(S.date)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, i, e, a, y, ir]), A = ee.useMemo(() => n.filter(S => ir(S.date)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, e, a, y, ir]), D = () => {
     if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
     vj(i, u, m, Number(g));
     try {
@@ -43653,17 +43644,9 @@ function Fj() {
             children: s.jsx("input", {
               type: "number",
               value: C.row.prix,
-              onChange: L => {
-                const nv = Number(L.target.value) || 0,
-                  J = z.map(Q => Q.n === C.row.produit && Q.s === C.row.source ? {
-                    ...Q,
-                    p: nv
-                  } : Q);
-                kz(J);
-                try {
-                  localStorage.setItem("perf_products_v1", JSON.stringify(J))
-                } catch {}
-              },
+              onChange: L => bj(C.row.id, {
+                prix: Number(L.target.value) || 0
+              }),
               title: "PRIX DE VENTE — قابل للتعديل",
               className: "w-16 rounded-lg border border-slate-200 px-1 py-1 text-center text-[11px] font-bold text-slate-700 outline-none focus:border-indigo-400"
             })
@@ -43685,15 +43668,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
           }), s.jsx("td", {
             className: "px-2 py-2 text-center",
             children: s.jsx("button", {
-              onClick: () => {
-                if (confirm("مسح المنتوج من القائمة؟")) {
-                  const J = z.filter(Q => !(Q.n === C.row.produit && Q.s === C.row.source));
-                  kz(J);
-                  try {
-                    localStorage.setItem("perf_products_v1", JSON.stringify(J))
-                  } catch {}
-                }
-              },
+              onClick: () => confirm("مسح السطر؟") && yj(C.row.id),
               className: "grid h-6 w-6 place-items-center rounded-lg text-slate-300 transition hover:bg-red-50 hover:text-red-600",
               children: "✕"
             })
@@ -43707,7 +43682,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
         children: "📊"
       }), s.jsx("p", {
         className: "text-xs font-bold text-slate-500",
-        children: "ما كاين حتى منتوج فهاد الفترة — بدل الفيلتر (الكل ولا Custom) ولا زيد منتوج جديد من الفورم فوق"
+        children: "ما كاين حتى حساب فهاد الفترة — بدل الفيلتر (الكل ولا Custom) ولا زيد حساب جديد من الفورم فوق"
       })]
     })]
   });
@@ -43727,7 +43702,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: "Dashboard performance"
           }), s.jsx("p", {
             className: "text-[11px] text-slate-500",
-            children: "المنتوج كيتكتب مرة وحدة بتاريخ الانطلاق ديالو — وفيلتر الأيام كيعرض حسابات أي فترة بغيتي (الباقي أوتوماتيك من CRM)"
+            children: "زيد حساب (منتوج + تاريخ + ثمن) — كل سطر كيبان بالتاريخ ديالو، والفيلتر كيعرض الفترة اللي بغيتي (الباقي أوتوماتيك من CRM)"
           })]
         })]
       }), s.jsx("nav", {
@@ -43815,10 +43790,10 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: "＋"
           }), s.jsxs("b", {
             className: "text-sm font-extrabold text-slate-800",
-            children: ["زيد منتوج فـ ", _l.find(S => S.key === i)?.label]
+            children: ["زيد حساب فـ ", _l.find(S => S.key === i)?.label]
           }), s.jsx("span", {
             className: "text-[10px] font-semibold text-indigo-500",
-            children: "— المنتوج مرة وحدة + تاريخ الانطلاق ⚡"
+            children: "— المنتوج كيتكتب مرة وحدة وكل حساب بالتاريخ ديالو ⚡"
           })]
         }), s.jsxs("div", {
           className: "grid gap-2 sm:grid-cols-2 lg:grid-cols-4",
@@ -43830,14 +43805,14 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
               onChange: S => {
                 d(S.target.value);
                 const P = z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase() && Q.s === i) || z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase());
-                P && P.p > 0 && !g && b(String(P.p)), P && P.d && h(P.d)
+                P && P.p > 0 && !g && b(String(P.p))
               },
               placeholder: "نظارة القراءة...",
               className: X + " mt-0.5 w-full"
             })]
           }), s.jsxs("label", {
             className: "text-[10px] font-bold text-slate-500",
-            children: ["📅 تاريخ الانطلاق", s.jsx("input", {
+            children: ["📅 التاريخ", s.jsx("input", {
               type: "date",
               value: m,
               onChange: S => h(S.target.value),
@@ -43886,7 +43861,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: _l.find(S => S.key === i)?.label
           }), s.jsx("span", {
             className: "ms-auto text-[10px] text-slate-400",
-            children: "⚡ كيبانو غير المنتوجات اللي تاريخها داخل الفترة المختارة — والحسابات من تاريخ الانطلاق ديال المنتوج"
+            children: "⚡ كل سطر = حساب بتاريخو — الفيلتر كيعرض الفترة المختارة (اليوم/أمس/الأسبوع/الشهر/الكل/Custom)"
           })]
         }), s.jsx(_, {
           list: v

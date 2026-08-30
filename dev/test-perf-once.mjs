@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * ✅ تست تلقائي لـ v3.1 — Dashboard performance: فيلتر CRM العالمي + منتوج مرة وحدة
+ * ✅ تست تلقائي لـ v3.4 — Dashboard performance: كل فيلتر كيخدم حقيقي
  * ---------------------------------------------------------------
  * المطلوب:
- * 1) المنتوج كيبان مرة وحدة فسطر واحد (ماشي سطر لكل نهار)
- * 2) فيلتر الأيام (من → إلى) هو لي كيحدد الفترة ديال الحسابات
+ * • اليوم → حسابات اليوم فقط | أمس → أمس فقط | الأسبوع → الأسبوع |
+ *   الشهر → الشهر | Custom → الفترة | الكل → ليست كاملة، كل سطر
+ *   حساب بالتاريخ ديالو
+ * • GLOBAL (كل المصادر): كل الحسابات المدخلة كيبانو، كل واحد بالتاريخ ديالو
  *
- * هاد التست كيستخرج الكود الحقيقي المبني من index.html
- * وكينفذه بنفسو على داطا ديال عدة أيام.
+ * هاد التست كيستخرج الكود الحقيقي المبني من index.html وكينفذه بنفسو.
  *
  * التشغيل:  node dev/test-perf-once.mjs
  */
@@ -21,42 +22,40 @@ let bad = 0;
 
 /* 1) الكود المبني فيه الميزات؟ */
 const checks = [
-  ['v=ee.useMemo(()=>z.filter(Q=>Q.s===i&&ir(Q.d)).map(N)', "الجدول كيبني من قائمة المنتوجات + الظهور حسب التاريخ"],
-  ['A=ee.useMemo(()=>z.filter(Q=>ir(Q.d)).map(N)', "الجدول GLOBAL كيبني من قائمة المنتوجات + الظهور حسب التاريخ"],
-  ['{inRange:ir}=Tn()', "Dashboard مربوط بالفيلتر العالمي ديال CRM (رقم 1)"],
-  ['&&ir(G.dateCreation)', "حساب الطلبيات كيستعمل الفيلتر العالمي"],
-  ['&&ir(G.date)', "حساب المصروفات كيستعمل الفيلتر العالمي"],
-  ['children:"📅 فيلتر الأيام:"}),s.jsx(yp,{})', "label فيلتر الأيام + نفس أزرار فيلتر CRM بجانبو (رقم 2)"],
-  ['label=Q.d||"كل الأيام"', "عمود التاريخ كيعرض تاريخ الانطلاق ديال المنتوج"],
-  ['z.filter(Q=>Q.s===i&&ir(Q.d))', "الجدول كيبين غير المنتوجات اللي تاريخها داخل الفترة المختارة"],
-  ['[z,i,e,a,y,ir]', "ir فالdeps — الجداول كيعاودو يحسبو ملي يتبدل الفيلتر (إصلاح الفيلتر)"],
-  ['z.filter(Q=>ir(Q.d))', "الجدول العام: نفس قاعدة الظهور"],
-  ['[z,e,a,y,ir]', "ir فالdeps ديال الجدول العام"],
-  ['(!Q.d||G.dateCreation>=Q.d)', "الحساب كيبدا من تاريخ الانطلاق ديال المنتوج"],
-  ['📅 تاريخ الانطلاق', "خانة تاريخ الانطلاق موجودة فالفورم"],
-  ['bp="afrizon_period_v2"', "مفتاح الفترة جديد (الكل غادي يبدا بالافتراضي الجديد)"],
-  ['n.period||"today"', "الافتراضي ديال الفيلتر = اليوم (رقم 3: غير طلبيات اليوم كيبانو)"],
+  ['v=ee.useMemo(()=>n.filter(S=>S.source===i&&ir(S.date)).map(N)', "جدول المصدر: السطور المدخلة + الفيلتر، كل سطر بالتاريخ ديالو"],
+  ['A=ee.useMemo(()=>n.filter(S=>ir(S.date)).map(N)', "GLOBAL: كل المصادر، كل سطر حساب بالتاريخ ديالو"],
+  ['N=S=>{const E=e.filter(G=>G.originLead', "الحساب كيرجع للنموذج ديال السطور (كل حساب بتاريخو)"],
+  ['G.dateCreation===S.date', "إحصائيات كل سطر كتحسب بتاريخو الخاص بالضبط"],
+  ['{inRange:ir}=Tn()', "Dashboard مربوط بالفيلتر العالمي ديال CRM"],
+  ['children:"📅 فيلتر الأيام:"}),s.jsx(yp,{})', "نفس شكل فيلتر CRM بجانب label فيلتر الأيام"],
+  ['n.period||"today"', "الافتراضي ديال الفيلتر = اليوم"],
+  ['onChange:L=>bj(C.row.id,{prix:Number(L.target.value)||0})', "تعديل الثمن على السطر مباشرة"],
+  ['confirm("مسح السطر؟")&&yj(C.row.id)', "مسح السطر مباشرة"],
 ];
 for (const [needle, label] of checks) {
-  if (label === "—") continue;
   if (!html.includes(needle)) { console.error("❌ ناقص:", label); bad++; }
   else console.log("✅", label);
 }
 
-/* 2) استخراج الكود الحقيقي ديال N وتنفيذه */
+/* 2) استخراج الكود الحقيقي ديال N (حساب السطر) وتنفيذه */
 const i = html.indexOf('<script type="module" crossorigin>');
 const j = html.indexOf('</script>', i);
 const js = html.slice(i + '<script type="module" crossorigin>'.length, j);
-const start = js.indexOf('N=Q=>{');
+const start = js.indexOf('N=S=>{');
 const end = js.indexOf('}},v=ee.useMemo', start);
 if (start < 0 || end < 0) { console.error("❌ ما قدرناش نستخرجو كود الحساب"); process.exit(1); }
-const body = js.slice(start + 'N=Q=>{'.length, end);
+const body = js.slice(start + 'N=S=>{'.length, end);
 const wrap = new Function(
-  "Q", "e", "a", "y", "ir", "er", "qc",
-  "function wrap(Q,e,a,y,ir,er,qc){" + body + "};" + "} return wrap;"
+  "S", "e", "a", "y", "er", "qc",
+  "function wrap(S,e,a,y,er,qc){" + body + "}" + "}" + "return wrap;"
 )();
 
-/* داطا: نفس المنتوج عبر 3 أيام (المستخدم كتبو مرة وحدة فقط) */
+/* داطا تجريبية: 3 حسابات مدخلة (3 تواريخ) + طلبيات + مصروف */
+const rows = [
+  { id: 1, source: "Leader", produit: "مكمل مرض السكري", date: "2026-08-28", prix: 250 },
+  { id: 2, source: "Leader", produit: "مكمل مرض السكري", date: "2026-08-29", prix: 250 },
+  { id: 3, source: "Leader", produit: "مكمل مرض السكري", date: "2026-08-30", prix: 250 },
+];
 const orders = [
   { produit: "مكمل مرض السكري", originLead: "Leader", dateCreation: "2026-08-28", statut: "Confirmé", livraison: "Livrée", commission: 35 },
   { produit: "مكمل مرض السكري", originLead: "Leader", dateCreation: "2026-08-29", statut: "Confirmé", livraison: "Livrée", commission: 35 },
@@ -66,79 +65,63 @@ const orders = [
 const adspend = [
   { source: "Leader", produit: "مكمل مرض السكري", date: "2026-08-29", amount: 50 },
 ];
-const Q = { n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-29" }; // انطلق فـ 29
-const er = s => s.trim().toLowerCase(); // نفس helper ديال التطبيق
+const er = s => s.trim().toLowerCase();
 const qc = 10;
-const noCosts = new Map(); // y.get(...) = null (ما كاينش فالـ pièce)
+const noCosts = new Map();
 
-/* حالة 1: الفيلتر العالمي = نهار واحد (29) — بحال "اليوم" ولا Custom */
-const ir29 = s => s.slice(0, 10) === "2026-08-29";
-let r1 = wrap(Q, orders, adspend, noCosts, ir29, er, qc);
-console.log("── فيلتر 2026-08-29 فقط:");
-console.log(`  total order: ${r1.total} (المتوقع 2)`);
-console.log(`  Livré: ${r1.liv} (المتوقع 1) | Retour: ${r1.ret} (المتوقع 1) | Annulé: ${r1.ann} (المتوقع 0)`);
-console.log(`  المصروف: ${r1.spend} (المتوقع 50)`);
-console.log(`  التاريخ المعروض: "${r1.row.date}" (المتوقع "2026-08-29")`);
-if (r1.total !== 2 || r1.liv !== 1 || r1.ret !== 1 || r1.ann !== 0 || r1.spend !== 50) {
-  console.error("❌ فيلتر النهار الواحد ما خدمش مزيان"); bad++;
-} else console.log("✅ فيلتر النهار الواحد خدام: كيبان غير حسابات داك النهار");
+const calc = (S) => wrap(S, orders, adspend, noCosts, er, qc);
+const rowsFor = (ir) => rows.filter(S => S.source === "Leader" && ir(S.date)).map(calc).sort((S, E) => E.row.date.localeCompare(S.row.date));
 
-/* حالة 2: الفيلتر = "الكل" → من تاريخ الانطلاق (29) حتى اليوم */
-const irAll = () => true;
-let r2 = wrap(Q, orders, adspend, noCosts, irAll, er, qc);
-console.log("── بلا فيلتر (من تاريخ الانطلاق 29):");
-console.log(`  total order: ${r2.total} (المتوقع 3 — طلبية الـ28 قبل الانطلاق ما كتحسبش) | Livré: ${r2.liv} (المتوقع 1) | التاريخ: "${r2.row.date}"`);
-if (r2.total !== 3 || r2.liv !== 1 || r2.row.date !== "2026-08-29") {
-  console.error("❌ حالة تاريخ الانطلاق ما خدماش مزيان"); bad++;
-} else console.log("✅ الحسابات كيبداو من تاريخ الانطلاق ديال المنتوج — والمنتوج باقي سطر واحد");
-
-/* حالة 2ب: منتوج بلا تاريخ انطلاق + "الكل" = كل الأيام */
-let r2b = wrap({ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "" }, orders, adspend, noCosts, irAll, er, qc);
-console.log(`  بلا تاريخ انطلاق: total ${r2b.total} (المتوقع 4) | التاريخ: "${r2b.row.date}" (المتوقع "كل الأيام")`);
-if (r2b.total !== 4 || r2b.row.date !== "كل الأيام") { console.error("❌ حالة بلا تاريخ انطلاق"); bad++; }
-else console.log("✅ منتوج بلا تاريخ انطلاق كيجمع كل الأيام");
-
-/* حالة 3: الافتراضي = اليوم (رقم 3) — طلبيات أمس والتواريخ لي فاتو ما كيبانوش */
+/* فيلتر اليوم (30) */
 const irToday = s => s.slice(0, 10) === "2026-08-30";
-let rToday = wrap({ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "" }, orders, adspend, noCosts, irToday, er, qc);
-console.log("── الفيلتر الافتراضي (اليوم 2026-08-30):");
-console.log(`  total order: ${rToday.total} (المتوقع 1 — غير طلبيات النهار) | التاريخ: "${rToday.row.date}"`);
-if (rToday.total !== 1) { console.error("❌ الافتراضي ديال اليوم ما خدمش: طلبيات قديمة باقية كيبانو"); bad++; }
-else console.log("✅ الافتراضي = اليوم: غير طلبيات نفس النهار كيبانو — القدام كيبانو غير بالفيلتر");
-
-/* حالة 4: سطر واحد لكل منتوج — مهما كان عدد الأيام */
-const z = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-29" }, { n: "نظارة القراءة", p: 120, s: "Leader", d: "2026-08-30" }];
-const v = z.filter(Q2 => Q2.s === "Leader");
-console.log("── عدد السطور فالجدول (قائمة المنتوجات):", v.length, "— رغم أن الداطا فيها 3 أيام");
-if (v.length !== 2) { console.error("❌ السطور ماشي بحساب المنتوجات!"); bad++; }
-else console.log("✅ المنتوج كيبان مرة وحدة فسطر واحد — التاريخ كيتحدد بالفيلتر فقط");
-
-/* حالة 4ب: منتوج بتاريخ قديم (01/08) — خاصو يبان غير فالكل ولا Custom */
-const zOld = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-01" }];
-const irToday2 = s => s.slice(0, 10) === "2026-08-30";
-const irYest2 = s => s.slice(0, 10) === "2026-08-29";
-const irAll2 = () => true;
-const irCustom2 = s => { const v = s.slice(0, 10); return v >= "2026-08-01" && v <= "2026-08-30"; };
-const visToday = zOld.filter(Q => Q.s === "Leader" && irToday2(Q.d)).length;
-const visYest = zOld.filter(Q => Q.s === "Leader" && irYest2(Q.d)).length;
-const visAll = zOld.filter(Q => Q.s === "Leader" && irAll2(Q.d)).length;
-const visCustom = zOld.filter(Q => Q.s === "Leader" && irCustom2(Q.d)).length;
-console.log("── منتوج بتاريخ 01/08 (اليوم هو 30/08):");
-console.log(`  الفيلتر اليوم: ${visToday} سطر (المتوقع 0) | أمس: ${visYest} (المتوقع 0) | الكل: ${visAll} (المتوقع 1) | Custom 01→30: ${visCustom} (المتوقع 1)`);
-if (visToday !== 0 || visYest !== 0 || visAll !== 1 || visCustom !== 1) {
-  console.error("❌ الظهور ديال المنتوج القديم ماشي صحيح!"); bad++;
-} else console.log("✅ منتوج بتاريخ قديم كيبان غير فالكل ولا فـ Custom — ماشي فاليوم/أمس");
-
-/* حالة 5: نفس المنتوج كيتزاد مرة وحدة — الإضافة التانية كتحدّث الثمن فقط */
-let cat = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-29" }];
-{
-  const P = cat.find(Q2 => Q2.n.toLowerCase() === "مكمل مرض السكري" && Q2.s === "Leader");
-  cat = P ? cat.map(Q2 => Q2 === P ? { n: Q2.n, p: 260, s: "Leader", d: "2026-09-01" } : Q2)
-          : [...cat, { n: "مكمل مرض السكري", p: 260, s: "Leader", d: "2026-09-01" }];
+const vToday = rowsFor(irToday);
+console.log("── فيلتر اليوم (30/08):");
+console.log(`  السطور: ${vToday.map(r => r.row.date).join(", ")} (المتوقع: 2026-08-30 فقط)`);
+if (vToday.length !== 1 || vToday[0].row.date !== "2026-08-30") { console.error("❌ اليوم ما عطاش اليوم فقط!"); bad++; }
+else {
+  const r = vToday[0];
+  if (r.total !== 1 || r.ann !== 1) { console.error(`❌ حسابات النهار: total=${r.total} (المتوقع 1), ann=${r.ann} (المتوقع 1)`); bad++; }
+  else console.log("✅ اليوم كيعطي حسابات اليوم فقط (total 1, annulé 1)");
 }
-if (cat.length === 1 && cat[0].p === 260 && cat[0].d === "2026-09-01") console.log("✅ إعادة إضافة نفس المنتوج بتاريخ جديد: كتحدّث الثمن والتاريخ (بلا سطر جديد)");
-else { console.error("❌ الإضافة المتكررة كتزيد سطور!"); bad++; }
+
+/* فيلتر أمس (29) */
+const irYest = s => s.slice(0, 10) === "2026-08-29";
+const vYest = rowsFor(irYest);
+console.log("── فيلتر أمس (29/08):");
+const rY = vYest[0];
+console.log(`  السطور: ${vYest.map(r => r.row.date).join(", ")} | total ${rY.total} (المتوقع 2) | liv ${rY.liv} (1) | ret ${rY.ret} (1) | spend ${rY.spend} (50)`);
+if (vYest.length !== 1 || rY.total !== 2 || rY.liv !== 1 || rY.ret !== 1 || rY.spend !== 50) { console.error("❌ أمس ما عطاش أمس فقط!"); bad++; }
+else console.log("✅ أمس كيعطي حسابات أمس فقط");
+
+/* فيلتر الكل: ليست كاملة، كل سطر بالتاريخ ديالو */
+const irAll = () => true;
+const vAll = rowsFor(irAll);
+console.log("── فيلتر الكل:");
+console.log(`  السطور: ${vAll.map(r => r.row.date).join(" | ")} (المتوقع 3 سطور: 30 → 29 → 28)`);
+const totals = vAll.map(r => r.total).join(",");
+console.log(`  حسابات كل سطر بالتاريخ ديالو: total = [${totals}] (المتوقع 1,2,1)`);
+const sum = vAll.reduce((S, E) => S + E.total, 0);
+const sumLiv = vAll.reduce((S, E) => S + E.liv, 0);
+console.log(`  المجموع الكامل: total ${sum} (المتوقع 4) | livré ${sumLiv} (المتوقع 2)`);
+if (vAll.length !== 3 || vAll.map(r => r.total).join(",") !== "1,2,1" || sum !== 4 || sumLiv !== 2) { console.error("❌ الكل ما عطاش ليست كاملة بالتواريخ!"); bad++; }
+else console.log("✅ الكل كيعطي ليست كاملة — كل حساب بالتاريخ ديالو + المجاميع صحيحة");
+
+/* فيلتر Custom (28 → 29) */
+const irCustom = s => { const v = s.slice(0, 10); return v >= "2026-08-28" && v <= "2026-08-29"; };
+const vCus = rowsFor(irCustom);
+console.log("── Custom (28 → 29):");
+console.log(`  السطور: ${vCus.map(r => r.row.date).join(", ")} (المتوقع 29, 28)`);
+if (vCus.length !== 2) { console.error("❌ Custom ما خدمش!"); bad++; }
+else console.log("✅ Custom كيعطي الفترة المختارة فقط");
+
+/* GLOBAL: كل المصادر — كل سطر بالتاريخ ديالو */
+const rowsGlobal = [...rows, { id: 4, source: "TikTok", produit: "نظارة القراءة", date: "2026-08-30", prix: 120 }];
+const vGlob = rowsGlobal.filter(S => irAll(S.date)).map(calc).sort((S, E) => E.row.date.localeCompare(S.row.date));
+console.log("── GLOBAL — كل المصادر (فيلتر الكل):");
+console.log(`  السطور: ${vGlob.length} (المتوقع 4 — كل الحسابات بكل التواريخ)`);
+if (vGlob.length !== 4) { console.error("❌ GLOBAL ما عطاش كاملين الحسابات بالتواريخ!"); bad++; }
+else console.log("✅ GLOBAL كيعرض كل الحسابات المدخلة، كل واحد بالتاريخ ديالو");
 
 if (bad) { console.error(`❌❌❌ ${bad} مشكل`); process.exit(1); }
-console.log("✅✅✅ v3.3 خدامة: الفيلتر كيعاود يحسب + المنتوج كيبان غير فالفترة ديال تاريخو (الكل/Custom)");
+console.log("✅✅✅ v3.4 خدامة: كل فيلتر كيعطي المطلوب حقيقي + الكل/GLOBAL كيعطيو ليست كاملة بالتواريخ");
 process.exit(0);
