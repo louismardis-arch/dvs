@@ -43395,7 +43395,8 @@ function Fj() {
       if (Array.isArray(J) && J.length) return J.map(Q => ({
         n: Q.n,
         p: Q.p,
-        s: Q.s || ""
+        s: Q.s || "",
+        d: Q.d || ""
       }))
     } catch {}
     try {
@@ -43407,11 +43408,16 @@ function Fj() {
         if (!sn || !pn) return;
         const key = sn.toLowerCase() + "|" + pn.toLowerCase(),
           cur = mp.get(key);
-        if (!cur || (r.date || "") >= (cur.date || "")) mp.set(key, {
+        if (!cur) mp.set(key, {
           n: pn,
           p: Number(r.prix) || 0,
-          s: sn
-        })
+          s: sn,
+          d: r.date || ""
+        });
+        else {
+          if ((r.date || "") >= (cur.date || "")) cur.p = Number(r.prix) || 0;
+          if (!cur.d || (r.date || "" && (r.date || "") < cur.d)) cur.d = r.date || ""
+        }
       });
       const arr = [...mp.values()];
       if (arr.length) {
@@ -43428,7 +43434,7 @@ function Fj() {
   }, [e]), N = Q => {
     const prod = Q.n.trim().toLowerCase(),
       src = Q.s.trim().toLowerCase(),
-      E = e.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.originLead.trim().toLowerCase() === src) && (!pf || G.dateCreation >= pf) && (!pd || G.dateCreation <= pd)),
+      E = e.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.originLead.trim().toLowerCase() === src) && (!pf || G.dateCreation >= pf) && (!pd || G.dateCreation <= pd) && (!Q.d || G.dateCreation >= Q.d)),
       C = E.filter(G => G.livraison === "Livrée"),
       L = C.length,
       F = E.filter(G => G.livraison === "Retour").length,
@@ -43436,13 +43442,13 @@ function Fj() {
       oe = E.filter(G => G.statut === "Confirmé").length,
       K = E.length,
       V = Math.max(0, K - L - F - Y),
-      H = a.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.source.trim().toLowerCase() === src) && (!pf || G.date >= pf) && (!pd || G.date <= pd)).reduce((G, q) => G + q.amount, 0),
+      H = a.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.source.trim().toLowerCase() === src) && (!pf || G.date >= pf) && (!pd || G.date <= pd) && (!Q.d || G.date >= Q.d)).reduce((G, q) => G + q.amount, 0),
       ae = E.filter(G => G.livraison === "Retour"),
       re = C.reduce((G, q) => G + (q.commission || 0), 0),
       ie = ae.reduce((G, q) => G + (q.commission || 0), 0),
       U = L ? re / L : 0,
       O = y.get(er(Q.n)) ?? null,
-      label = pf || pd ? (pf && pd && pf !== pd ? pf + " → " + pd : (pf || pd)) : "كل الأيام";
+      label = Q.d || (pf || pd ? (pf && pd && pf !== pd ? pf + " → " + pd : (pf || pd)) : "كل الأيام");
     return {
       row: {
         id: Q.n,
@@ -43479,11 +43485,13 @@ function Fj() {
       const J = P ? z.map(Q => Q === P ? {
         n: Q.n,
         p: Number(g) || 0,
-        s: i
+        s: i,
+        d: m
       } : Q) : [...z, {
         n: u.trim(),
         p: Number(g) || 0,
-        s: i
+        s: i,
+        d: m
       }];
       localStorage.setItem("perf_products_v1", JSON.stringify(J)), kz(J)
     } catch {}
@@ -43717,7 +43725,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: "Dashboard performance"
           }), s.jsx("p", {
             className: "text-[11px] text-slate-500",
-            children: "المنتوج كيتكتب مرة وحدة فقط — اختار الفترة من فيلتر الأيام وشوف حساباتها (الباقي أوتوماتيك من CRM)"
+            children: "المنتوج كيتكتب مرة وحدة بتاريخ الانطلاق ديالو — وفيلتر الأيام كيعرض حسابات أي فترة بغيتي (الباقي أوتوماتيك من CRM)"
           })]
         })]
       }), s.jsx("nav", {
@@ -43808,10 +43816,10 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: ["زيد منتوج فـ ", _l.find(S => S.key === i)?.label]
           }), s.jsx("span", {
             className: "text-[10px] font-semibold text-indigo-500",
-            children: "— المنتوج كيتكتب مرة وحدة فقط ⚡"
+            children: "— المنتوج مرة وحدة + تاريخ الانطلاق ⚡"
           })]
         }), s.jsxs("div", {
-          className: "grid gap-2 sm:grid-cols-3",
+          className: "grid gap-2 sm:grid-cols-2 lg:grid-cols-4",
           children: [s.jsxs("label", {
             className: "text-[10px] font-bold text-slate-500",
             children: ["📦 Produit", s.jsx("input", {
@@ -43820,9 +43828,17 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
               onChange: S => {
                 d(S.target.value);
                 const P = z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase() && Q.s === i) || z.find(Q => Q.n.toLowerCase() === S.target.value.trim().toLowerCase());
-                P && P.p > 0 && !g && b(String(P.p))
+                P && P.p > 0 && !g && b(String(P.p)), P && P.d && h(P.d)
               },
               placeholder: "نظارة القراءة...",
+              className: X + " mt-0.5 w-full"
+            })]
+          }), s.jsxs("label", {
+            className: "text-[10px] font-bold text-slate-500",
+            children: ["📅 تاريخ الانطلاق", s.jsx("input", {
+              type: "date",
+              value: m,
+              onChange: S => h(S.target.value),
               className: X + " mt-0.5 w-full"
             })]
           }), s.jsxs("label", {
@@ -43887,7 +43903,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             children: _l.find(S => S.key === i)?.label
           }), s.jsx("span", {
             className: "ms-auto text-[10px] text-slate-400",
-            children: "⚡ حسابات الفترة المختارة من فيلتر الأيام — كل منتوج كيبان مرة وحدة"
+            children: "⚡ الحسابات من تاريخ الانطلاق ديال المنتوج + الفترة المختارة فالفيلتر"
           })]
         }), s.jsx(_, {
           list: v
