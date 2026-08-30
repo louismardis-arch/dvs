@@ -10441,7 +10441,7 @@ function No({
     })]
   })
 }
-const bp = "afrizon_period_v1",
+const bp = "afrizon_period_v2",
   Jc = e => e.toISOString().slice(0, 10);
 
 function I4(e, n, a) {
@@ -10494,7 +10494,7 @@ function H4({
         return {}
       }
     })(),
-    [a, i] = ee.useState(n.period || "all"),
+    [a, i] = ee.useState(n.period || "today"),
     [c, f] = ee.useState(n.from || Jc(new Date)),
     [u, d] = ee.useState(n.to || Jc(new Date));
   ee.useEffect(() => {
@@ -43377,7 +43377,9 @@ const Mj = e => e.ship,
 function Fj() {
   const {
     orders: e
-  } = Xt(), n = Nj(), a = xx(), [i, c] = ee.useState(_l[0].key), f = new Date().toISOString().slice(0, 10), [u, d] = ee.useState(() => {
+  } = Xt(), {
+    inRange: ir
+  } = Tn(), n = Nj(), a = xx(), [i, c] = ee.useState(_l[0].key), f = new Date().toISOString().slice(0, 10), [u, d] = ee.useState(() => {
     try {
       return localStorage.getItem("perf_last_produit") || ""
     } catch {
@@ -43426,7 +43428,7 @@ function Fj() {
       }
     } catch {}
     return []
-  }), [pf, Pf] = ee.useState(""), [pd, Pd] = ee.useState(""), w = ee.useMemo(() => {
+  }), w = ee.useMemo(() => {
     const S = new Map;
     return e.forEach(E => {
       E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
@@ -43434,7 +43436,7 @@ function Fj() {
   }, [e]), N = Q => {
     const prod = Q.n.trim().toLowerCase(),
       src = Q.s.trim().toLowerCase(),
-      E = e.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.originLead.trim().toLowerCase() === src) && (!pf || G.dateCreation >= pf) && (!pd || G.dateCreation <= pd) && (!Q.d || G.dateCreation >= Q.d)),
+      E = e.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.originLead.trim().toLowerCase() === src) && ir(G.dateCreation) && (!Q.d || G.dateCreation >= Q.d)),
       C = E.filter(G => G.livraison === "Livrée"),
       L = C.length,
       F = E.filter(G => G.livraison === "Retour").length,
@@ -43442,13 +43444,13 @@ function Fj() {
       oe = E.filter(G => G.statut === "Confirmé").length,
       K = E.length,
       V = Math.max(0, K - L - F - Y),
-      H = a.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.source.trim().toLowerCase() === src) && (!pf || G.date >= pf) && (!pd || G.date <= pd) && (!Q.d || G.date >= Q.d)).reduce((G, q) => G + q.amount, 0),
+      H = a.filter(G => G.produit.trim().toLowerCase() === prod && (!src || G.source.trim().toLowerCase() === src) && ir(G.date) && (!Q.d || G.date >= Q.d)).reduce((G, q) => G + q.amount, 0),
       ae = E.filter(G => G.livraison === "Retour"),
       re = C.reduce((G, q) => G + (q.commission || 0), 0),
       ie = ae.reduce((G, q) => G + (q.commission || 0), 0),
       U = L ? re / L : 0,
       O = y.get(er(Q.n)) ?? null,
-      label = Q.d || (pf || pd ? (pf && pd && pf !== pd ? pf + " → " + pd : (pf || pd)) : "كل الأيام");
+      label = Q.d || "كل الأيام";
     return {
       row: {
         id: Q.n,
@@ -43476,7 +43478,7 @@ function Fj() {
       bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
       gain: L * Q.p - (O !== null ? L * O : 0) - re - ie - H - L * qc
     }
-  }, v = ee.useMemo(() => z.filter(Q => Q.s === i).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, i, e, a, y, pf, pd]), A = ee.useMemo(() => z.map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, e, a, y, pf, pd]), D = () => {
+  }, v = ee.useMemo(() => z.filter(Q => Q.s === i).map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, i, e, a, y]), A = ee.useMemo(() => z.map(N).sort((S, E) => S.row.produit.localeCompare(E.row.produit)), [z, e, a, y]), D = () => {
     if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
     vj(i, u, m, Number(g));
     try {
@@ -43866,31 +43868,9 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             value: S
           }, S))
         })]
-      }), s.jsxs("div", {
-        className: "mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm",
-        children: [s.jsx("span", {
-          className: "text-[11px] font-bold text-slate-500",
-          children: "📅 فيلتر الأيام:"
-        }), s.jsx("input", {
-          type: "date",
-          value: pf,
-          onChange: S => Pf(S.target.value),
-          className: X + " w-auto"
-        }), s.jsx("span", {
-          className: "text-[10px] text-slate-400",
-          children: "→ إلى"
-        }), s.jsx("input", {
-          type: "date",
-          value: pd,
-          onChange: S => Pd(S.target.value),
-          className: X + " w-auto"
-        }), (pf || pd) && s.jsx("button", {
-          onClick: () => {
-            Pf(""), Pd("")
-          },
-          className: "rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600 hover:bg-slate-200",
-          children: "✕ مسح الفيلتر"
-        })]
+      }), s.jsx("div", {
+        className: "mb-3",
+        children: s.jsx(yp, {})
       }), s.jsxs("div", {
         className: "mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
         children: [s.jsxs("div", {

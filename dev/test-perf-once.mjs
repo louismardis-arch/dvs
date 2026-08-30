@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ✅ تست تلقائي لـ v2.9 — Dashboard performance: منتوج = سطر واحد فقط
+ * ✅ تست تلقائي لـ v3.1 — Dashboard performance: فيلتر CRM العالمي + منتوج مرة وحدة
  * ---------------------------------------------------------------
  * المطلوب:
  * 1) المنتوج كيبان مرة وحدة فسطر واحد (ماشي سطر لكل نهار)
@@ -23,11 +23,15 @@ let bad = 0;
 const checks = [
   ['v=ee.useMemo(()=>z.filter(Q=>Q.s===i).map(N)', "الجدول كيبني من قائمة المنتوجات (سطر واحد لكل منتوج)"],
   ['A=ee.useMemo(()=>z.map(N)', "الجدول GLOBAL كيبني من قائمة المنتوجات"],
-  ['(!pf||G.dateCreation>=pf)&&(!pd||G.dateCreation<=pd)', "الحساب كيخدم بالفترة المختارة فالفيلتر"],
-  ['label=Q.d||(pf||pd?(pf&&pd&&pf!==pd?pf+" → "+pd:(pf||pd)):"كل الأيام")', "عمود التاريخ كيعرض تاريخ الانطلاق ديال المنتوج"],
+  ['{inRange:ir}=Tn()', "Dashboard مربوط بالفيلتر العالمي ديال CRM (رقم 1)"],
+  ['&&ir(G.dateCreation)', "حساب الطلبيات كيستعمل الفيلتر العالمي"],
+  ['&&ir(G.date)', "حساب المصروفات كيستعمل الفيلتر العالمي"],
+  ['children:s.jsx(yp,{})', "نفس مكوّن الفيلتر ديال CRM محطوط فـ Dashboard (رقم 2)"],
+  ['label=Q.d||"كل الأيام"', "عمود التاريخ كيعرض تاريخ الانطلاق ديال المنتوج"],
   ['(!Q.d||G.dateCreation>=Q.d)', "الحساب كيبدا من تاريخ الانطلاق ديال المنتوج"],
   ['📅 تاريخ الانطلاق', "خانة تاريخ الانطلاق موجودة فالفورم"],
-  ['قائمة المنتوجات المحفوظة', "—"],
+  ['bp="afrizon_period_v2"', "مفتاح الفترة جديد (الكل غادي يبدا بالافتراضي الجديد)"],
+  ['n.period||"today"', "الافتراضي ديال الفيلتر = اليوم (رقم 3: غير طلبيات اليوم كيبانو)"],
 ];
 for (const [needle, label] of checks) {
   if (label === "—") continue;
@@ -44,8 +48,8 @@ const end = js.indexOf('}},v=ee.useMemo', start);
 if (start < 0 || end < 0) { console.error("❌ ما قدرناش نستخرجو كود الحساب"); process.exit(1); }
 const body = js.slice(start + 'N=Q=>{'.length, end);
 const wrap = new Function(
-  "Q", "e", "a", "y", "pf", "pd", "er", "qc",
-  "function wrap(Q,e,a,y,pf,pd,er,qc){" + body + "};" + "} return wrap;"
+  "Q", "e", "a", "y", "ir", "er", "qc",
+  "function wrap(Q,e,a,y,ir,er,qc){" + body + "};" + "} return wrap;"
 )();
 
 /* داطا: نفس المنتوج عبر 3 أيام (المستخدم كتبو مرة وحدة فقط) */
@@ -63,8 +67,9 @@ const er = s => s.trim().toLowerCase(); // نفس helper ديال التطبيق
 const qc = 10;
 const noCosts = new Map(); // y.get(...) = null (ما كاينش فالـ pièce)
 
-/* حالة 1: فيلتر = نهار واحد (29) */
-let r1 = wrap(Q, orders, adspend, noCosts, "2026-08-29", "2026-08-29", er, qc);
+/* حالة 1: الفيلتر العالمي = نهار واحد (29) — بحال "اليوم" ولا Custom */
+const ir29 = s => s.slice(0, 10) === "2026-08-29";
+let r1 = wrap(Q, orders, adspend, noCosts, ir29, er, qc);
 console.log("── فيلتر 2026-08-29 فقط:");
 console.log(`  total order: ${r1.total} (المتوقع 2)`);
 console.log(`  Livré: ${r1.liv} (المتوقع 1) | Retour: ${r1.ret} (المتوقع 1) | Annulé: ${r1.ann} (المتوقع 0)`);
@@ -74,28 +79,37 @@ if (r1.total !== 2 || r1.liv !== 1 || r1.ret !== 1 || r1.ann !== 0 || r1.spend !
   console.error("❌ فيلتر النهار الواحد ما خدمش مزيان"); bad++;
 } else console.log("✅ فيلتر النهار الواحد خدام: كيبان غير حسابات داك النهار");
 
-/* حالة 2: بلا فيلتر = من تاريخ الانطلاق (29) حتى اليوم */
-let r2 = wrap(Q, orders, adspend, noCosts, "", "", er, qc);
+/* حالة 2: الفيلتر = "الكل" → من تاريخ الانطلاق (29) حتى اليوم */
+const irAll = () => true;
+let r2 = wrap(Q, orders, adspend, noCosts, irAll, er, qc);
 console.log("── بلا فيلتر (من تاريخ الانطلاق 29):");
 console.log(`  total order: ${r2.total} (المتوقع 3 — طلبية الـ28 قبل الانطلاق ما كتحسبش) | Livré: ${r2.liv} (المتوقع 1) | التاريخ: "${r2.row.date}"`);
 if (r2.total !== 3 || r2.liv !== 1 || r2.row.date !== "2026-08-29") {
   console.error("❌ حالة تاريخ الانطلاق ما خدماش مزيان"); bad++;
 } else console.log("✅ الحسابات كيبداو من تاريخ الانطلاق ديال المنتوج — والمنتوج باقي سطر واحد");
 
-/* حالة 2ب: منتوج بلا تاريخ انطلاق = كل الأيام */
-let r2b = wrap({ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "" }, orders, adspend, noCosts, "", "", er, qc);
+/* حالة 2ب: منتوج بلا تاريخ انطلاق + "الكل" = كل الأيام */
+let r2b = wrap({ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "" }, orders, adspend, noCosts, irAll, er, qc);
 console.log(`  بلا تاريخ انطلاق: total ${r2b.total} (المتوقع 4) | التاريخ: "${r2b.row.date}" (المتوقع "كل الأيام")`);
 if (r2b.total !== 4 || r2b.row.date !== "كل الأيام") { console.error("❌ حالة بلا تاريخ انطلاق"); bad++; }
 else console.log("✅ منتوج بلا تاريخ انطلاق كيجمع كل الأيام");
 
-/* حالة 3: سطر واحد لكل منتوج — مهما كان عدد الأيام */
+/* حالة 3: الافتراضي = اليوم (رقم 3) — طلبيات أمس والتواريخ لي فاتو ما كيبانوش */
+const irToday = s => s.slice(0, 10) === "2026-08-30";
+let rToday = wrap({ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "" }, orders, adspend, noCosts, irToday, er, qc);
+console.log("── الفيلتر الافتراضي (اليوم 2026-08-30):");
+console.log(`  total order: ${rToday.total} (المتوقع 1 — غير طلبيات النهار) | التاريخ: "${rToday.row.date}"`);
+if (rToday.total !== 1) { console.error("❌ الافتراضي ديال اليوم ما خدمش: طلبيات قديمة باقية كيبانو"); bad++; }
+else console.log("✅ الافتراضي = اليوم: غير طلبيات نفس النهار كيبانو — القدام كيبانو غير بالفيلتر");
+
+/* حالة 4: سطر واحد لكل منتوج — مهما كان عدد الأيام */
 const z = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-29" }, { n: "نظارة القراءة", p: 120, s: "Leader", d: "2026-08-30" }];
 const v = z.filter(Q2 => Q2.s === "Leader");
 console.log("── عدد السطور فالجدول (قائمة المنتوجات):", v.length, "— رغم أن الداطا فيها 3 أيام");
 if (v.length !== 2) { console.error("❌ السطور ماشي بحساب المنتوجات!"); bad++; }
 else console.log("✅ المنتوج كيبان مرة وحدة فسطر واحد — التاريخ كيتحدد بالفيلتر فقط");
 
-/* حالة 4: نفس المنتوج كيتزاد مرة وحدة — الإضافة التانية كتحدّث الثمن فقط */
+/* حالة 5: نفس المنتوج كيتزاد مرة وحدة — الإضافة التانية كتحدّث الثمن فقط */
 let cat = [{ n: "مكمل مرض السكري", p: 250, s: "Leader", d: "2026-08-29" }];
 {
   const P = cat.find(Q2 => Q2.n.toLowerCase() === "مكمل مرض السكري" && Q2.s === "Leader");
@@ -106,5 +120,5 @@ if (cat.length === 1 && cat[0].p === 260 && cat[0].d === "2026-09-01") console.l
 else { console.error("❌ الإضافة المتكررة كتزيد سطور!"); bad++; }
 
 if (bad) { console.error(`❌❌❌ ${bad} مشكل`); process.exit(1); }
-console.log("✅✅✅ v3.0 خدامة: المنتوج مرة وحدة + بتاريخ الانطلاق + الفيلتر كيتحكم فالفترة");
+console.log("✅✅✅ v3.1 خدامة: فيلتر CRM العالمي فـ Dashboard + الافتراضي اليوم + المنتوج مرة وحدة");
 process.exit(0);
