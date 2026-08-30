@@ -43868,9 +43868,12 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
             value: S
           }, S))
         })]
-      }), s.jsx("div", {
-        className: "mb-3",
-        children: s.jsx(yp, {})
+      }), s.jsxs("div", {
+        className: "mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm",
+        children: [s.jsx("span", {
+          className: "text-[11px] font-bold text-slate-500",
+          children: "📅 فيلتر الأيام:"
+        }), s.jsx(yp, {})]
       }), s.jsxs("div", {
         className: "mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
         children: [s.jsxs("div", {
