@@ -122,6 +122,51 @@ console.log(`  السطور: ${vGlob.length} (المتوقع 4 — كل الحس
 if (vGlob.length !== 4) { console.error("❌ GLOBAL ما عطاش كاملين الحسابات بالتواريخ!"); bad++; }
 else console.log("✅ GLOBAL كيعرض كل الحسابات المدخلة، كل واحد بالتاريخ ديالو");
 
+
+/* ====== مثالك بالحرف: نفس المنتوج معاود مرتين بالتواريخ ══════ */
+const orders2 = [];
+for (let k = 0; k < 7; k++) orders2.push({ produit: "مكمل مرض السكري", originLead: "Leader", dateCreation: "2026-08-30", statut: "Confirmé", livraison: k < 4 ? "Livrée" : "Retour", commission: 35 });
+for (let k = 0; k < 15; k++) orders2.push({ produit: "مكمل مرض السكري", originLead: "Leader", dateCreation: "2026-09-30", statut: "Confirmé", livraison: k < 10 ? "Livrée" : "Retour", commission: 35 });
+const rows2 = [
+  { id: 1, source: "Leader", produit: "مكمل مرض السكري", date: "2026-08-30", prix: 250 },
+  { id: 2, source: "Leader", produit: "مكمل مرض السكري", date: "2026-09-30", prix: 250 },
+];
+const calc2 = S => wrap(S, orders2, [], noCosts, er, qc);
+const table2 = (ir, source) => rows2.filter(S => S.source === source && ir(S.date)).map(calc2).sort((S, E) => E.row.date.localeCompare(S.row.date));
+
+const irAll2 = () => true;
+const vAll2 = table2(irAll2, "Leader");
+console.log("═══ فيلتر الكل — نفس المنتوج معاود مرتين (مثالك): ═══");
+vAll2.forEach(r => console.log(`  ${r.row.produit}  ${r.row.date}  →  total order: ${r.total}`));
+if (vAll2.length !== 2) { console.error("❌ الكل ما عطاش جوج سطور ديال نفس المنتوج بالتواريخ!"); bad++; }
+else {
+  const r30 = vAll2.find(r => r.row.date === "2026-08-30"), r93 = vAll2.find(r => r.row.date === "2026-09-30");
+  if (!r30 || r30.total !== 7 || !r93 || r93.total !== 15) { console.error("❌ حسابات مثالك ماشي صحيحة!"); bad++; }
+  else console.log("✅ نفس المنتوج كيبان معاود بكل تاريخ وحساب ديالو (7 و 15) — بالضبط بحال المطلوب");
+}
+
+const irWeek2 = s => { const v = s.slice(0, 10); return v >= "2026-08-24" && v <= "2026-08-30"; };
+const vW2 = table2(irWeek2, "Leader");
+console.log("═══ فيلتر الأسبوع (24→30): ═══");
+console.log(`  ${vW2.map(r => r.row.produit + " " + r.row.date).join(" | ") || "(خاوي)"} (المتوقع: مكمل مرض السكري 2026-08-30 فقط)`);
+if (vW2.length !== 1 || vW2[0].total !== 7) { console.error("❌ الأسبوع ما عطاش غير السطر ديال الأسبوع!"); bad++; }
+else console.log("✅ الأسبوع كيعطي غير السطور اللي تاريخها داخل الأسبوع");
+
+const irMonth2 = s => { const v = s.slice(0, 10); return v >= "2026-09-01" && v <= "2026-09-30"; };
+const vM2 = table2(irMonth2, "Leader");
+console.log("═══ فيلتر الشهر (شتنبر): ═══");
+console.log(`  ${vM2.map(r => r.row.produit + " " + r.row.date).join(" | ")} (المتوقع: مكمل مرض السكري 2026-09-30 فقط)`);
+if (vM2.length !== 1 || vM2[0].total !== 15) { console.error("❌ الشهر ما عطاش غير السطر ديال الشهر!"); bad++; }
+else console.log("✅ الشهر كيعطي غير السطور اللي تاريخها داخل الشهر");
+
+/* GLOBAL مع نفس المنتوج معاود: كل المصادر وكل التواريخ */
+const glob2 = [...rows2, { id: 3, source: "TikTok", produit: "نظارة القراءة", date: "2026-08-30", prix: 120 }]
+  .filter(S => irAll2(S.date)).map(calc2).sort((S, E) => E.row.date.localeCompare(S.row.date));
+console.log("═══ GLOBAL — كل المصادر (الكل): ═══");
+glob2.forEach(r => console.log(`  [${r.row.source}] ${r.row.produit}  ${r.row.date}  →  total order: ${r.total}`));
+if (glob2.length !== 3) { console.error("❌ GLOBAL ما عطاش كاملين السطور بالتواريخ!"); bad++; }
+else console.log("✅ GLOBAL كيعطي نفس الشي: المنتوجات كاملين، معاودين بالتواريخ ديالهم");
+
 if (bad) { console.error(`❌❌❌ ${bad} مشكل`); process.exit(1); }
 console.log("✅✅✅ v3.4 خدامة: كل فيلتر كيعطي المطلوب حقيقي + الكل/GLOBAL كيعطيو ليست كاملة بالتواريخ");
 process.exit(0);
