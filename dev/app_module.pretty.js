@@ -33709,11 +33709,6 @@ function t_() {
                 cls: Lt,
                 w: 88
               }), s.jsx(we, {
-                label: "date",
-                field: "dateConfirmation",
-                cls: Lt,
-                w: 88
-              }), s.jsx(we, {
                 label: "Statut",
                 field: "statut",
                 cls: Lt,
@@ -33856,16 +33851,6 @@ function t_() {
                   fkey: "dateCreation",
                   val: se.dateCreation,
                   onChange: Pe => nt(se.id, "dateCreation", Pe),
-                  w: 88,
-                  type: "date",
-                  bg: Fe,
-                  strike: ze
-                }), s.jsx(ba, {
-                  fill: ft,
-                  fidx: be,
-                  fkey: "dateConfirmation",
-                  val: se.dateConfirmation,
-                  onChange: Pe => nt(se.id, "dateConfirmation", Pe),
                   w: 88,
                   type: "date",
                   bg: Fe,
@@ -37203,8 +37188,8 @@ function I2({
         [ae]: ie ? Number(re) || 0 : re
       })
     },
-    oe = ["#", "DATE", "date", "Statut", "Remarques", "Nom & Prénom", "Téléphone", "Ville", "Adresse", "Qte", "Prix", "Produit", "Suivie", "UPSEL", "ORIGIN LEAD", "commision", "🗑️"],
-    K = [34, 105, 105, 90, 180, 150, 120, 120, 190, 45, 60, 220, 110, 55, 95, 75, 38],
+    oe = ["#", "DATE", "Statut", "Remarques", "Nom & Prénom", "Téléphone", "Ville", "Adresse", "Qte", "Prix", "Produit", "Suivie", "UPSEL", "ORIGIN LEAD", "commision", "🗑️"],
+    K = [34, 105, 90, 180, 150, 120, 120, 190, 45, 60, 220, 110, 55, 95, 75, 38],
     V = () => s.jsx("div", {
       className: "flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm",
       children: [
@@ -37511,15 +37496,6 @@ function I2({
                     type: "date",
                     value: H.dateCreation,
                     onChange: G => Y(H.id, "dateCreation", G.target.value),
-                    className: U,
-                    style: O
-                  })
-                }), s.jsx("td", {
-                  className: "border border-slate-400 p-0",
-                  children: s.jsx("input", {
-                    type: "date",
-                    value: H.dateConfirmation,
-                    onChange: G => Y(H.id, "dateConfirmation", G.target.value),
                     className: U,
                     style: O
                   })
