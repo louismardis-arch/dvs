@@ -37269,15 +37269,16 @@ function I2({
             children: [
                 ["orders", "Commandes"],
                 ["total", "📊 Total"],
-                ["remarque", "📝 Remarque"],
-                ["history", "🕘 Historique"]
+                ["remarque", "📝 Remarque"], ...g ? [
+                    ["history", "🕘 Historique"]
+                ] : []
             ].map(([H, ae]) => s.jsx("button", {
                 onClick: () => T(H),
                 className: `px-3 py-[7px] text-xs font-bold transition ${D===H?"bg-emerald-600 text-white shadow-sm":"text-slate-500 hover:bg-slate-50 hover:text-slate-800"}`,
                 children: ae
             }, H))
         });
-    return D === "total" || D === "history" || D === "remarque" ? s.jsxs("div", {
+    return D === "total" || D === "remarque" || (g && D === "history") ? s.jsxs("div", {
         dir: "ltr",
         className: "flex h-full flex-col bg-white text-xs",
         children: [s.jsxs("div", {

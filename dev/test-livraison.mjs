@@ -162,6 +162,14 @@ else { console.error("❌ v3.24: الأيقونة والاسم ديال الزر
 if (html.includes('bg-gradient-to-l from-rose-500 to-red-600')) console.log("✅ v3.24: الزر بتصميم احترافي (تدرج أحمر + ظل + hover)");
 else { console.error("❌ v3.24: التصميم الاحترافي ديال الزر ناقص!"); bad++; }
 
+/* v3.25: صفحة 🕘 Historique محجوبة على اليوزرز — للإدمنز فقط */
+if (html.includes('...g?[["history","🕘 Historique"]]:[]]')) console.log("✅ v3.25: تبويب 🕘 Historique كيبان غير للإدمن (شرط g) فصفحة البنت");
+else { console.error("❌ v3.25: شرط الإدمن ديال Historique ناقص!"); bad++; }
+if (html.includes('(g&&D==="history")')) console.log("✅ v3.25: عرض صفحة Historique محمي (ما كيترندر حتى للبنت)");
+else { console.error("❌ v3.25: حماية العرض ديال Historique ناقصة!"); bad++; }
+if (html.split('🕘 Historique').length - 1 === 2) console.log("✅ v3.25: 🕘 Historique باقية 2 مواضع فقط وكلاهما للإدمن (تبويب صفحة البنت للادمن + زرار الفوتر)");
+else { console.error("❌ v3.25: عدد مواضع Historique ماشي متوقع (خاص يكون 2)!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");
