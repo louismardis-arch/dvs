@@ -33986,11 +33986,10 @@ function t_() {
                                         idx: be,
                                         key: "produit"
                                     }),
-                                    children: [s.jsx("input", {
-                                        list: "catalog-products",
+                                    children: [s.jsx(Pk, {
                                         value: se.produit,
-                                        onChange: Pe => {
-                                            const oa = Pe.target.value;
+                                        list: re,
+                                        onChange: oa => {
                                             nt(se.id, "produit", oa);
                                             const tr = re.find(jn => jn.nom === oa);
                                             tr?.prix && a(se.id, {
@@ -35436,7 +35435,13 @@ function Zv({
     const {
         upd: f,
         del: u
-    } = Xt(), d = Ll(), [m, h] = ee.useState(""), g = (T, k, M) => {
+    } = Xt(), d = Ll(), [m, h] = ee.useState(""), catal0 = ee.useMemo(() => {
+        try {
+            const P = localStorage.getItem("afrizon_catalog_v1");
+            if (P) return JSON.parse(P)
+        } catch {}
+        return []
+    }, []), g = (T, k, M) => {
         const X = ["qte", "prix", "upsell", "commission"].includes(k);
         f(T, {
             [k]: X ? Number(M) || 0 : M
@@ -35656,9 +35661,10 @@ function Zv({
                                 })
                             }), s.jsx("td", {
                                 className: A + " p-0",
-                                children: s.jsx("input", {
+                                children: s.jsx(Pk, {
                                     value: T.produit,
-                                    onChange: _ => g(T.id, "produit", _.target.value),
+                                    list: catal0,
+                                    onChange: _ => g(T.id, "produit", _),
                                     className: X
                                 })
                             }), s.jsx("td", {
@@ -37094,6 +37100,46 @@ function w_() {
     }, []), e
 }
 
+function Pk({
+    value: e,
+    list: n,
+    onChange: a,
+    className: i,
+    style: c
+}) {
+    const o = [...new Set((n || []).map(t => t && t.nom || "").filter(Boolean))].sort(),
+        [f, u] = ee.useState(() => !!e && !o.includes(e));
+    if (f) return s.jsx("input", {
+        value: e,
+        onChange: t => {
+            const v = t.target.value;
+            v === "" ? (u(!1), a("")) : a(v)
+        },
+        className: i,
+        style: c,
+        placeholder: "✏️ اكتبي إسم المنتوج..."
+    });
+    return s.jsx("select", {
+        value: o.includes(e) ? e : "",
+        onChange: t => {
+            const v = t.target.value;
+            v === "__pk__" ? u(!0) : (u(!1), a(v))
+        },
+        className: (i || "") + " cursor-pointer",
+        style: c,
+        children: [s.jsx("option", {
+            value: "",
+            children: "— اختار المنتوج —"
+        }), ...o.map(v => s.jsx("option", {
+            value: v,
+            children: v
+        }, v)), s.jsx("option", {
+            value: "__pk__",
+            children: "✏️ منتوج آخر — اكتبو يدوياً"
+        })]
+    })
+}
+
 function B2(e, n) {
     return {
         bg: e.livraison === "Livrée" ? "#34c759" : e.livraison === "Retour" ? "#ff2b2b" : e.livraison === "Out Of Stock" ? "#3c78d8" : e.livraison === "Expédier vers" ? "#f6b26b" : e.statut === "Rappel" ? "#ffff00" : n % 2 ? "#f8f9fa" : "#ffffff",
@@ -37380,12 +37426,11 @@ function I2({
                             })]
                         }), s.jsxs("label", {
                             className: "col-span-2 text-[10px] font-bold text-slate-400",
-                            children: ["📦 Produit", s.jsx("input", {
-                                list: "catalog-products-agent",
+                            children: ["📦 Produit", s.jsx(Pk, {
                                 value: H.produit,
-                                onChange: U => {
-                                    const O = U.target.value,
-                                        G = N.find(q => q.nom === O);
+                                list: N,
+                                onChange: O => {
+                                    const G = N.find(q => q.nom === O);
                                     G?.prix ? c(H.id, {
                                         produit: O,
                                         prix: Number(G.prix) || 0,
@@ -37588,12 +37633,11 @@ function I2({
                                     })
                                 }), s.jsx("td", {
                                     className: "border border-slate-400 p-0",
-                                    children: s.jsx("input", {
-                                        list: "catalog-products-agent",
+                                    children: s.jsx(Pk, {
                                         value: H.produit,
-                                        onChange: G => {
-                                            const q = G.target.value,
-                                                Q = N.find(ge => ge.nom === q);
+                                        list: N,
+                                        onChange: q => {
+                                            const Q = N.find(ge => ge.nom === q);
                                             Q?.prix ? c(H.id, {
                                                 produit: q,
                                                 prix: Number(Q.prix) || 0,

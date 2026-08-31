@@ -134,6 +134,18 @@ else { console.error("❌ v3.21: حساب الربح لكل منتوج ناقص!
 if (html.split('onClick:()=>kf(Q.n)').length - 1 === 1 && html.split('onClick:()=>kg(Q.n)').length - 1 === 1) console.log("✅ v3.21: الشيتات ديال المنتوجات كليكابل (كيفلترو على المنتوج)");
 else { console.error("❌ v3.21: شيتات المنتوجات ماشي كليكابل!"); bad++; }
 
+/* v3.22: اختيار المنتوج من لائحة PRODUITS (select) بلاصة الكتابة — فكاع صفحات الطلبيات */
+if (html.split('function Pk({value:e').length - 1 === 1) console.log("✅ v3.22: مكوّن Pk (المنتوج picker) معرف فالـ bundle");
+else { console.error("❌ v3.22: مكوّن Pk ناقص!"); bad++; }
+if (html.split('s.jsx(Pk,{value:').length - 1 === 4) console.log("✅ v3.22: Pk مطبق فـ 4 مواضع: COMONDES + Work Team (كارت + جدول) + suivi confirmation");
+else { console.error("❌ v3.22: Pk ماشي مطبق فكاع المواضع (COMONDES/Work Team/suivi)!"); bad++; }
+if (html.includes('— اختار المنتوج —')) console.log("✅ v3.22: select ديال المنتوج فيه خيار البداية (اختار المنتوج)");
+else { console.error("❌ v3.22: select ديال المنتوج ناقص!"); bad++; }
+if (html.includes('✏️ منتوج آخر — اكتبو يدوياً')) console.log("✅ v3.22: خيار الكتابة اليدوية كاين للمنتوجات اللي ماشي فاللائحة");
+else { console.error("❌ v3.22: خيار الكتابة اليدوية ناقص!"); bad++; }
+if (html.includes('catal0=ee.useMemo') && html.includes('afrizon_catalog_v1')) console.log("✅ v3.22: suivi confirmation كتقرا الكاطالوغ ديال PRODUITS (afrizon_catalog_v1)");
+else { console.error("❌ v3.22: suivi confirmation ما كتقراش الكاطالوغ!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");
