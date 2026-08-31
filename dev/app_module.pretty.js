@@ -44317,6 +44317,32 @@ function Fj() {
         },
         v = ee.useMemo(() => G2().filter(S => S.row.source === i && (pf === "all" || S.row.produit.trim().toLowerCase() === pf.trim().toLowerCase())), [z, i, pf, e, a, y, ir]),
         A = ee.useMemo(() => G2().filter(S => gp === "all" || S.row.produit.trim().toLowerCase() === gp.trim().toLowerCase()), [z, gp, e, a, y, ir]),
+        PvA = ee.useMemo(() => {
+            const m = new Map;
+            return v.forEach(S => {
+                const k2 = S.row.produit,
+                    c2 = m.get(k2) || {
+                        n: k2,
+                        gain: 0,
+                        liv: 0,
+                        total: 0
+                    };
+                c2.gain += S.gain, c2.liv += S.liv, c2.total += S.total, m.set(k2, c2)
+            }), [...m.values()].sort((x2, y2) => y2.gain - x2.gain)
+        }, [v]),
+        PvB = ee.useMemo(() => {
+            const m = new Map;
+            return A.forEach(S => {
+                const k2 = S.row.produit,
+                    c2 = m.get(k2) || {
+                        n: k2,
+                        gain: 0,
+                        liv: 0,
+                        total: 0
+                    };
+                c2.gain += S.gain, c2.liv += S.liv, c2.total += S.total, m.set(k2, c2)
+            }), [...m.values()].sort((x2, y2) => y2.gain - x2.gain)
+        }, [A]),
         D = () => {
             if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
             const Pn = u.trim(),
@@ -44743,6 +44769,20 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                     children: ["📈 ربح ", pf, " فـ ", _l.find(S => S.key === i)?.label || i, ": ", ja(k.gain), " DH"]
                 })]
             }), s.jsxs("div", {
+                className: "mb-3 flex flex-wrap items-center gap-1.5",
+                children: [s.jsx("span", {
+                    className: "text-[10px] font-bold text-slate-500",
+                    children: "📈 GAIN/PERTE ديال كل منتوج:"
+                }), ...PvA.map(Q => s.jsx("button", {
+                    onClick: () => kf(Q.n),
+                    className: `rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${pf===Q.n?"border-indigo-500 bg-indigo-600 text-white":Q.gain>=0?"border-emerald-200 bg-emerald-50 text-emerald-700":"border-red-200 bg-red-50 text-red-600"}`,
+                    children: [Q.n, ": ", ja(Q.gain), " DH"]
+                }, Q.n)), pf !== "all" && s.jsx("button", {
+                    onClick: () => kf("all"),
+                    className: "rounded-full border border-slate-300 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500",
+                    children: "✕ رجّع الكل"
+                })]
+            }), s.jsxs("div", {
                 className: "mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
                 children: [s.jsxs("div", {
                     className: "flex items-center gap-2 border-b border-slate-100 bg-slate-50/70 px-4 py-2.5",
@@ -44805,6 +44845,20 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                         }), s.jsxs("span", {
                             children: ["📈 ", ja(M.gain), " DH"]
                         })]
+                    })]
+                }), s.jsx("div", {
+                    className: "flex flex-wrap items-center gap-1.5 border-b border-indigo-100 bg-indigo-50/50 px-4 py-2",
+                    children: [s.jsx("span", {
+                        className: "text-[10px] font-bold text-indigo-700",
+                        children: "📈 GAIN/PERTE ديال كل منتوج:"
+                    }), ...PvB.map(Q => s.jsx("button", {
+                        onClick: () => kg(Q.n),
+                        className: `rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${gp===Q.n?"border-indigo-500 bg-indigo-600 text-white":Q.gain>=0?"border-emerald-200 bg-emerald-50 text-emerald-700":"border-red-200 bg-red-50 text-red-600"}`,
+                        children: [Q.n, ": ", ja(Q.gain), " DH"]
+                    }, Q.n)), gp !== "all" && s.jsx("button", {
+                        onClick: () => kg("all"),
+                        className: "rounded-full border border-slate-300 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500",
+                        children: "✕ رجّع الكل"
                     })]
                 }), s.jsx(_, {
                     list: A,

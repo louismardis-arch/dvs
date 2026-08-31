@@ -126,6 +126,14 @@ else { console.error("❌ v3.20: بادج الربح ناقص!"); bad++; }
 if (html.includes('kf("all")')) console.log("✅ v3.20: ملي كتقلب السورس الفيلتر كيرجع للكل أوتوماتيك");
 else { console.error("❌ v3.20: إعادة تعيين الفيلتر عند تبديل السورس ناقصة!"); bad++; }
 
+/* v3.21: GAIN/PERTE ديال كل منتوج بوحدو (الربح الطوطال ديال كل منتوج للفترة) — ماشي مجموع كاعشي */
+if (html.split('📈 GAIN/PERTE ديال كل منتوج:').length - 1 === 2) console.log("✅ v3.21: لوحة GAIN/PERTE ديال كل منتوج كاينة فالسورس + فـ GLOBAL");
+else { console.error("❌ v3.21: لوحة الربح ديال كل منتوج ناقصة!"); bad++; }
+if (html.includes('PvA=ee.useMemo') && html.includes('PvB=ee.useMemo')) console.log("✅ v3.21: الحساب ديال الربح الطوطال ديال كل منتوج (PvA للسورس + PvB لـ GLOBAL)");
+else { console.error("❌ v3.21: حساب الربح لكل منتوج ناقص!"); bad++; }
+if (html.split('onClick:()=>kf(Q.n)').length - 1 === 1 && html.split('onClick:()=>kg(Q.n)').length - 1 === 1) console.log("✅ v3.21: الشيتات ديال المنتوجات كليكابل (كيفلترو على المنتوج)");
+else { console.error("❌ v3.21: شيتات المنتوجات ماشي كليكابل!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");
