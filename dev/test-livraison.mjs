@@ -47,11 +47,29 @@ const checks = [
   ['wo(v,cities)', "v3.9: أوتوفيل frais من LES VILLES"],
   ['✔ تمن التوصيل أوتوماتيكي من LES VILLES', "v3.9: تأكيد الثمن الأوتوماتيكي"],
   ['useSyncExternalStore', "v3.9: ما بقاش useSyncExternalStore فالـ Liv (المشكل اللول تصلح)"],
+  ['color:"amber"', "v3.9.1: الأزرار بcolor موجود فـ KT (كان orange → كراش reading 'solid')"],
 ];
 for (const [needle, label, neg] of checks) {
   const ok = neg ? !html.slice(html.indexOf('const LVS='), html.indexOf('function Vj(){')).includes(needle) : html.includes(needle);
   if (!ok) { console.error("❌ ناقص فالكود:", label); bad++; }
   else console.log("✅", label);
+}
+
+/* v3.9.1: كل لون مستعمل فـ بلوك Liv خصو يكون موجود فـ KT (الحماية من كراش reading 'solid') */
+{
+  const ktStart = html.indexOf('const KT=');
+  const ktEnd = html.indexOf('};', ktStart) + 2;
+  const ktSrc = html.slice(ktStart, ktEnd);
+  const ktKeys = new Set([...ktSrc.matchAll(/([a-zA-Z_]+):\{solid:/g)].map(m => m[1]));
+  const livStart = html.indexOf('const LVS=');
+  const livEnd = html.indexOf('function Vj(){');
+  const livSrc = html.slice(livStart, livEnd);
+  const used = new Set([...livSrc.matchAll(/color:"([a-zA-Z_]+)"/g)].map(m => m[1]));
+  let colorsOk = true;
+  for (const c of used) {
+    if (!ktKeys.has(c)) { console.error("❌ لون ماشي فـ KT داخل LIVRAISON:", c); bad++; colorsOk = false; }
+  }
+  if (colorsOk) console.log("✅ كل الألوان ديال LIVRAISON موجودة فـ KT:", [...used].join(", "));
 }
 
 /* الحالات التسعة كلهم موجودين */

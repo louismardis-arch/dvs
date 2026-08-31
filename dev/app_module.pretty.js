@@ -44749,7 +44749,7 @@ function Liv() {
                     className: "ms-auto w-64 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
                 }), s.jsx(yt, {
                     icon: "＋",
-                    color: "orange",
+                    color: "amber",
                     onClick: () => F(!o),
                     children: "Commande"
                 })]
@@ -44810,7 +44810,7 @@ function Liv() {
                         className: "flex items-end",
                         children: s.jsx(yt, {
                             icon: "＋",
-                            color: "orange",
+                            color: "amber",
                             className: "w-full justify-center",
                             onClick: save,
                             children: "إضافة"
