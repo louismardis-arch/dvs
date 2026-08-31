@@ -66,6 +66,8 @@ const checks = [
   ['frais = x => (x.livraison === "Retour" || String(x.statut) === "Annulé") ? 0 : (wo(x.ville, cities) ?? 0)', "v3.12: frais = تمن المدينة الحالي — Retour/Annulé = 0 DH"],
   ['"data-frais": frx', "v3.12: خلية الفريز كتعرض frais المحسوب من المدينة (ماشي commission)"],
   ['Th("Frais livraison"', "v3.16: عمود Frais livraison فالجدول"],
+  ['textDecoration: "line-through", textDecorationColor: "#dc2626"', "v3.17: LIVRAISON — سطر Annulé كيتخرق بخط أحمر (ماشي حمر كامل)"],
+  ['const selC = isAnn ? "#64748b" : cc', "v3.17: LIVRAISON — select ديال Annulé محايد"],
   ['"data-tab": k', "v3.16: تبويبات الحالات (data-tab) فوق الجدول"],
   ['الكل', "v3.16: تبويب الكل موجود"],
   ['x_=["","À préparer","Préparé","Expédié","En livraison","Livrée","Refusé","Retour","Annulé","Problème livraison","Out Of Stock","Expédier vers"]', "v3.10: نفس المفردات فصفحة الطلبيات (x_)"],
@@ -87,6 +89,16 @@ for (const st of statuses) {
   if (!livSrc.includes(st)) { console.error("❌ حالة ناقصة:", st); bad++; }
 }
 if (!bad) console.log("✅ الحالات التسعة كاملين:", statuses.join(" | "));
+
+/* v3.17: Commandes — سطر Annulé ما بقاش بحمرة كاملة، ولا strikethrough بخط أحمر */
+if (html.includes('T.statut==="Annulé"?"#fee2e2"')) { console.error("❌ v3.17: الخلفية الحمراء ديال سطر Annulé فـ Commandes باقية!"); bad++; }
+else console.log("✅ v3.17: سطر Annulé فـ Commandes ما بقاش بحمرة كاملة");
+if (html.includes('textDecoration:T.statut==="Annulé"?"line-through":"none"')) console.log("✅ v3.17: سطر Annulé فـ Commandes كيتخرق بخط أحمر (strikethrough)");
+else { console.error("❌ v3.17: strikethrough ديال Commandes ناقص!"); bad++; }
+if (html.includes('tr[data-ann="1"] td{text-decoration:line-through')) console.log("✅ v3.17: CSS الضرب الأحمر ديال الحقول (input/select)");
+else { console.error("❌ v3.17: CSS ديال الضرب الأحمر ناقص!"); bad++; }
+if (html.includes('"data-ann":T.statut==="Annulé"?"1":"0"')) console.log("✅ v3.17: وسم data-ann كيتزاد على سطر Annulé (جدولين: قراءة + تعديل)");
+else { console.error("❌ v3.17: وسم data-ann ناقص!"); bad++; }
 
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }

@@ -35452,7 +35452,7 @@ function Zv({
     }, y = a.filter(T => {
         const k = m.trim().toLowerCase();
         return !k || [T.nom, T.telephone, T.ville, T.produit, T.adresse, T.remarques, T.statut, T.livraison].join(" ").toLowerCase().includes(k)
-    }), w = y.filter(T => T.livraison === "Livrée").reduce((T, k) => T + k.prix, 0), N = y.reduce((T, k) => T + k.qte, 0), v = "border border-slate-300 bg-slate-100 px-2 py-2 text-[11px] font-bold text-slate-700 whitespace-nowrap", A = "border border-slate-200 px-2 py-1.5 text-xs", D = (T, k) => T.livraison === "Livrée" ? "#dcfce7" : T.livraison === "Retour" ? "#fee2e2" : T.livraison === "Out Of Stock" ? "#dbeafe" : T.livraison === "Expédier vers" || T.livraison === "Expédié" ? "#ffedd5" : T.statut === "Annulé" ? "#fee2e2" : T.statut === "Rappel" ? "#fef9c3" : k % 2 ? "#f8fafc" : "#ffffff";
+    }), w = y.filter(T => T.livraison === "Livrée").reduce((T, k) => T + k.prix, 0), N = y.reduce((T, k) => T + k.qte, 0), v = "border border-slate-300 bg-slate-100 px-2 py-2 text-[11px] font-bold text-slate-700 whitespace-nowrap", A = "border border-slate-200 px-2 py-1.5 text-xs", D = (T, k) => T.livraison === "Livrée" ? "#dcfce7" : T.livraison === "Retour" ? "#fee2e2" : T.livraison === "Out Of Stock" ? "#dbeafe" : T.livraison === "Expédier vers" || T.livraison === "Expédié" ? "#ffedd5" : T.statut === "Rappel" ? "#fef9c3" : k % 2 ? "#f8fafc" : "#ffffff";
     return s.jsxs("div", {
         dir: "ltr",
         className: "flex h-full flex-col bg-slate-50",
@@ -35517,8 +35517,12 @@ function Zv({
                             X = "w-full border-0 bg-transparent px-2 py-1.5 text-xs outline-none focus:bg-white/80",
                             R = A + " whitespace-nowrap";
                         return c ? s.jsxs("tr", {
+                            "data-ann": T.statut === "Annulé" ? "1" : "0",
                             style: {
-                                background: M
+                                background: M,
+                                textDecoration: T.statut === "Annulé" ? "line-through" : "none",
+                                textDecorationColor: "#dc2626",
+                                textDecorationThickness: "2px"
                             },
                             children: [s.jsx("td", {
                                 className: A + " text-center text-slate-400",
@@ -35564,8 +35568,12 @@ function Zv({
                                 children: T.remarques || "—"
                             })]
                         }, T.id) : s.jsxs("tr", {
+                            "data-ann": T.statut === "Annulé" ? "1" : "0",
                             style: {
-                                background: M
+                                background: M,
+                                textDecoration: T.statut === "Annulé" ? "line-through" : "none",
+                                textDecorationColor: "#dc2626",
+                                textDecorationThickness: "2px"
                             },
                             children: [s.jsx("td", {
                                 className: A + " text-center text-slate-400",
@@ -45249,6 +45257,15 @@ const LVS = "afrizon_livraison_v1",
 // Retour/Annulé = 0 DH — الألوان inline + كلاسات lvx- محلية
 // ============================================================
 
+
+// ============================================================
+// v3.16 — صفحة LIVRAISON الاحترافية (شكل + مضمون)
+// تصميم جدولي نقي بحال أنظمة إدارة الطلبيات الكبار:
+// هيدر + مؤشرات حية + تبويبات الحالات + جدول أنيق + سطر تفاصيل قابل للتوسيع
+// نفس منطق v3.12: الداطا من orders، الفريز من تمن المدينة (LES VILLES)،
+// Retour/Annulé = 0 DH — الألوان inline + كلاسات lvx- محلية
+// ============================================================
+
 const LvC = {
     "À préparer": "#64748b",
     "Préparé": "#0284c7",
@@ -45505,6 +45522,13 @@ function Liv() {
     const row = x => {
         const st = col(x);
         const cc = LvC[st] || "#64748b";
+        const isAnn = st === "Annulé";
+        const selC = isAnn ? "#64748b" : cc;
+        const annS = isAnn ? {
+            textDecoration: "line-through",
+            textDecorationColor: "#dc2626",
+            textDecorationThickness: "2px"
+        } : null;
         const frx = frais(x);
         const tot = (Number(x.qte) || 0) * (Number(x.prix) || 0);
         const ini = String(x.nom || "?").trim().charAt(0) || "?";
@@ -45534,7 +45558,8 @@ function Liv() {
                                 display: "block",
                                 fontSize: 11.5,
                                 fontWeight: 800,
-                                color: "#475569"
+                                color: "#475569",
+                                ...(annS || {})
                             },
                             children: "#" + (x.idCmd || x.id)
                         }),
@@ -45592,7 +45617,8 @@ function Liv() {
                                             whiteSpace: "nowrap",
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
-                                            maxWidth: 170
+                                            maxWidth: 170,
+                                            ...(annS || {})
                                         },
                                         children: x.nom || "—"
                                     }),
@@ -45603,7 +45629,8 @@ function Liv() {
                                             color: "#94a3b8",
                                             direction: "ltr",
                                             textAlign: "right",
-                                            marginTop: 1
+                                            marginTop: 1,
+                                            ...(annS || {})
                                         },
                                         children: x.telephone
                                     }) : null
@@ -45626,7 +45653,8 @@ function Liv() {
                             display: "inline-flex",
                             alignItems: "center",
                             gap: 5,
-                            whiteSpace: "nowrap"
+                            whiteSpace: "nowrap",
+                            ...(annS || {})
                         },
                         children: [s.jsx("span", {
                             style: {
@@ -45650,7 +45678,8 @@ function Liv() {
                             color: "#334155",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
-                            textOverflow: "ellipsis"
+                            textOverflow: "ellipsis",
+                            ...(annS || {})
                         },
                         children: [x.produit || "—", (Number(x.qte) || 0) > 1 ? s.jsx("span", {
                             style: {
@@ -45673,7 +45702,8 @@ function Liv() {
                         style: {
                             fontSize: 12,
                             fontWeight: 800,
-                            color: "#0f172a"
+                            color: "#0f172a",
+                            ...(annS || {})
                         },
                         children: [NF(tot), " DH"]
                     })
@@ -45691,7 +45721,8 @@ function Liv() {
                         style: {
                             fontSize: 11.5,
                             fontWeight: 800,
-                            color: frx > 0 ? "#b45309" : "#94a3b8"
+                            color: frx > 0 ? "#b45309" : "#94a3b8",
+                            ...(annS || {})
                         },
                         children: [NF(frx), " DH"]
                     })
@@ -45709,9 +45740,9 @@ function Liv() {
                         className: "lvx-sel",
                         title: "بدّل حالة التوصيل",
                         style: {
-                            border: "1px solid " + cc + "55",
-                            background: cc + "0f",
-                            color: cc,
+                            border: "1px solid " + selC + "55",
+                            background: selC + "0f",
+                            color: selC,
                             borderRadius: 8,
                             fontSize: 10.5,
                             fontWeight: 800,

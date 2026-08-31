@@ -87,6 +87,9 @@ function Liv() {
     const row = x => {
         const st = col(x);
         const cc = LvC[st] || "#64748b";
+        const isAnn = st === "Annulé";
+        const selC = isAnn ? "#64748b" : cc;
+        const annS = isAnn ? { textDecoration: "line-through", textDecorationColor: "#dc2626", textDecorationThickness: "2px" } : null;
         const frx = frais(x);
         const tot = (Number(x.qte) || 0) * (Number(x.prix) || 0);
         const ini = String(x.nom || "?").trim().charAt(0) || "?";
@@ -103,7 +106,7 @@ function Liv() {
                 s.jsx("td", {
                     style: { padding: "10px 14px", whiteSpace: "nowrap", verticalAlign: "top" },
                     children: [
-                        s.jsx("b", { style: { display: "block", fontSize: 11.5, fontWeight: 800, color: "#475569" }, children: "#" + (x.idCmd || x.id) }),
+                        s.jsx("b", { style: { display: "block", fontSize: 11.5, fontWeight: 800, color: "#475569", ...(annS || {}) }, children: "#" + (x.idCmd || x.id) }),
                         dt ? s.jsx("span", { style: { display: "block", fontSize: 9.5, fontWeight: 600, color: "#cbd5e1", direction: "ltr", textAlign: "right", marginTop: 2 }, children: dt.split("-").reverse().join("/") }) : null
                     ]
                 }),
@@ -116,8 +119,8 @@ function Liv() {
                             s.jsxs("div", {
                                 style: { minWidth: 0 },
                                 children: [
-                                    s.jsx("div", { style: { fontSize: 11.5, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 170 }, children: x.nom || "—" }),
-                                    x.telephone ? s.jsx("div", { style: { fontSize: 10, fontWeight: 600, color: "#94a3b8", direction: "ltr", textAlign: "right", marginTop: 1 }, children: x.telephone }) : null
+                                    s.jsx("div", { style: { fontSize: 11.5, fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 170, ...(annS || {}) }, children: x.nom || "—" }),
+                                    x.telephone ? s.jsx("div", { style: { fontSize: 10, fontWeight: 600, color: "#94a3b8", direction: "ltr", textAlign: "right", marginTop: 1, ...(annS || {}) }, children: x.telephone }) : null
                                 ]
                             })
                         ]
@@ -125,20 +128,20 @@ function Liv() {
                 }),
                 s.jsx("td", {
                     style: { padding: "10px 14px", verticalAlign: "top" },
-                    children: s.jsxs("span", { title: "فريز هاد المدينة محدد فـ LES VILLES", style: { fontSize: 11.5, fontWeight: 600, color: "#334155", display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }, children: [s.jsx("span", { style: { fontSize: 10, opacity: .85 }, children: "📍" }), x.ville || "—"] })
+                    children: s.jsxs("span", { title: "فريز هاد المدينة محدد فـ LES VILLES", style: { fontSize: 11.5, fontWeight: 600, color: "#334155", display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap", ...(annS || {}) }, children: [s.jsx("span", { style: { fontSize: 10, opacity: .85 }, children: "📍" }), x.ville || "—"] })
                 }),
                 s.jsx("td", {
                     style: { padding: "10px 14px", verticalAlign: "top", maxWidth: 210 },
-                    children: s.jsxs("div", { style: { fontSize: 11.5, fontWeight: 600, color: "#334155", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }, children: [x.produit || "—", (Number(x.qte) || 0) > 1 ? s.jsx("span", { style: { color: "#94a3b8", fontWeight: 700, marginInlineStart: 5 }, children: "×" + x.qte }) : null] })
+                    children: s.jsxs("div", { style: { fontSize: 11.5, fontWeight: 600, color: "#334155", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", ...(annS || {}) }, children: [x.produit || "—", (Number(x.qte) || 0) > 1 ? s.jsx("span", { style: { color: "#94a3b8", fontWeight: 700, marginInlineStart: 5 }, children: "×" + x.qte }) : null] })
                 }),
                 s.jsx("td", {
                     style: { padding: "10px 14px", verticalAlign: "top", textAlign: "center", whiteSpace: "nowrap" },
-                    children: s.jsx("b", { style: { fontSize: 12, fontWeight: 800, color: "#0f172a" }, children: [NF(tot), " DH"] })
+                    children: s.jsx("b", { style: { fontSize: 12, fontWeight: 800, color: "#0f172a", ...(annS || {}) }, children: [NF(tot), " DH"] })
                 }),
                 s.jsx("td", {
                     "data-frais": frx,
                     style: { padding: "10px 14px", verticalAlign: "top", textAlign: "center", whiteSpace: "nowrap" },
-                    children: s.jsx("b", { title: frx > 0 ? "من LES VILLES" : "Retour / Annulé ولا المدينة ماشي فاللائحة = 0 DH", style: { fontSize: 11.5, fontWeight: 800, color: frx > 0 ? "#b45309" : "#94a3b8" }, children: [NF(frx), " DH"] })
+                    children: s.jsx("b", { title: frx > 0 ? "من LES VILLES" : "Retour / Annulé ولا المدينة ماشي فاللائحة = 0 DH", style: { fontSize: 11.5, fontWeight: 800, color: frx > 0 ? "#b45309" : "#94a3b8", ...(annS || {}) }, children: [NF(frx), " DH"] })
                 }),
                 s.jsx("td", {
                     style: { padding: "6px 14px", verticalAlign: "top", whiteSpace: "nowrap" },
@@ -148,7 +151,7 @@ function Liv() {
                         onClick: e => e.stopPropagation(),
                         className: "lvx-sel",
                         title: "بدّل حالة التوصيل",
-                        style: { border: "1px solid " + cc + "55", background: cc + "0f", color: cc, borderRadius: 8, fontSize: 10.5, fontWeight: 800, padding: "5px 26px 5px 10px", outline: "none", cursor: "pointer", maxWidth: 132 },
+                        style: { border: "1px solid " + selC + "55", background: selC + "0f", color: selC, borderRadius: 8, fontSize: 10.5, fontWeight: 800, padding: "5px 26px 5px 10px", outline: "none", cursor: "pointer", maxWidth: 132 },
                         children: LSts.map(v => s.jsx("option", { value: v, children: v }, v))
                     })
                 }),
