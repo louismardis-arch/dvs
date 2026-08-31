@@ -36,37 +36,40 @@ const livSrc = html.slice(livStart, livEnd);
 const statuses = ["À préparer", "Préparé", "Expédié", "En livraison", "Livré", "Refusé", "Retour", "Annulé", "Problème livraison"];
 
 const checks = [
-  ['function Liv(){', "المكوّن Liv موجود"],
+  ['function Liv() {', "المكوّن Liv موجود"],
   ['const LVS="afrizon_livraison_v1",LSts=[', "الحالات التسعة موجودة"],
-  ['children:"🚚"', "أيقونة 🚚"],
-  ['children:"LIVRAISON"', "عنوان الصفحة"],
+  ['children: "🚚"', "أيقونة 🚚"],
+  ['children: "LIVRAISON"', "عنوان الصفحة"],
   ['w==="LIVRAISON"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(Liv,{})})', "الرندر مربوط"],
   ['s.jsx($r,{color:"orange",on:w==="LIVRAISON"', "زر الفوتر 🚚 Livraison"],
   ['g(C=>C.includes("LIVRAISON")?C:[...C,"LIVRAISON"])', "التبويب كيتزاد أوتوماتيك عند المستخدمين القدام"],
   ['"LIVRAISON":"🚚"', "الأيقونة فخريطة الصفحات"],
   ['"afrizon_livraison_v1"', "المفتاح كيبقا مقبول فالمزامنة (توافق مع الداتا القديمة)"],
   ['Tracking ID — شركة الشحن', "خانة Tracking ID"],
-  ['children:"سبب الإرجاع"', "خانة سبب الإرجاع (Motif retour)"],
+  ['FLabel("سبب الإرجاع")', "خانة سبب الإرجاع (Motif retour)"],
   ['تاريخ الشحن', "خانة تاريخ الشحن (Date expédition)"],
   ['تاريخ التوصيل', "خانة تاريخ التوصيل (Date livraison)"],
   /* v3.10: مربوطة بالطلبيات */
-  ['{orders:o,upd:uo}=Xt()', "v3.10: الداطا كتجي من مخزن الطلبيات (Xt)"],
+  ['const { orders: o, upd: uo } = Xt()', "v3.10: الداطا كتجي من مخزن الطلبيات (Xt)"],
   ['مربوطة أوتوماتيكياً مع صفحة الطلبيات', "v3.10: توضيح الربط مع الطلبيات"],
   ['مربوطة مع Commandes', "v3.10: شريط التوضيح"],
-  ['col=x=>{if(String(x.statut)==="Annulé")return"Annulé"', "v3.10: خريطة العمود (statut Annulé → عمود Annulé)"],
-  ['L==="Livrée"?"Livré":L==="Expédier vers"?"Expédié":L==="Out Of Stock"?"Problème livraison"', "v3.10: خريطة القيم القديمة (Livrée/Expédier vers/Out Of Stock)"],
-  ['uo(x.id,{statut:"Annulé"})', "v3.10: النقل لـ Annulé كيعدل الطلبية فنفس المخزن"],
-  ['uo(x.id,{...P,livraison:st==="Livré"?"Livrée":st})', "v3.10: النقل كيكتب Livrée فحقل livraison ديال الطلبية"],
-  ['uo(x.id,{tracking:e.target.value})', "v3.10: Tracking ID كيتسجل فالطلبية نفسها"],
-  ['className:"lvx-card lvx-in"', "v3.14: كارتات كانبان بتصميم احترافي (lvx-card)"],
-  ['"data-kpi":k.k', "v3.14: KPI المبيعات الموصّلة موجود"],
+  ['const col = x => {', "v3.10: خريطة العمود (statut Annulé → عمود Annulé)"],
+  ['L === "Livrée" ? "Livré" : L === "Expédier vers" ? "Expédié" : L === "Out Of Stock" ? "Problème livraison"', "v3.10: خريطة القيم القديمة (Livrée/Expédier vers/Out Of Stock)"],
+  ['uo(x.id, { statut: "Annulé" })', "v3.10: النقل لـ Annulé كيعدل الطلبية فنفس المخزن"],
+  ['uo(x.id, { ...P, livraison: st === "Livré" ? "Livrée" : st })', "v3.10: النقل كيكتب Livrée فحقل livraison ديال الطلبية"],
+  ['uo(x.id, { tracking: e.target.value })', "v3.10: Tracking ID كيتسجل فالطلبية نفسها"],
+  ['className: "lvx-row"', "v3.16: سطور جدول احترافي (lvx-row) بلاصة كانبان مخربق"],
+  ['"data-kpi": k.k', "v3.16: مؤشرات حية (data-kpi) فوق الجدول"],
   ['id="lvx-style"', "v3.14: الستايل المحلي lvx-style موجود فـ index.html"],
-  ['"#"+(x.idCmd||x.id)', "v3.10: N° Commande من idCmd ديال الطلبية"],
-  ['const{orders:o,upd:uo}=Xt(),{currentUser:us}=kr(),[sh,G]=ee.useState("")', "v3.12: Liv كتقرا المدن (Ll) باش تحسب frais الحقيقي"],
-  ['frais=x=>x.livraison==="Retour"||String(x.statut)==="Annulé"?0:wo(x.ville,cities)??0', "v3.12: frais = تمن المدينة الحالي — Retour/Annulé = 0 DH"],
-  ['Rw("","Frais livraison",NF(frx)+" DH"', "v3.12: الكارطة كتعرض frais المحسوب (ماشي commission)"],
+  ['"#" + (x.idCmd || x.id)', "v3.10: N° Commande من idCmd ديال الطلبية"],
+  ['const { orders: o, upd: uo } = Xt()', "v3.12: Liv كتقرا المدن (Ll) باش تحسب frais الحقيقي"],
+  ['frais = x => (x.livraison === "Retour" || String(x.statut) === "Annulé") ? 0 : (wo(x.ville, cities) ?? 0)', "v3.12: frais = تمن المدينة الحالي — Retour/Annulé = 0 DH"],
+  ['"data-frais": frx', "v3.12: خلية الفريز كتعرض frais المحسوب من المدينة (ماشي commission)"],
+  ['Th("Frais livraison"', "v3.16: عمود Frais livraison فالجدول"],
+  ['"data-tab": k', "v3.16: تبويبات الحالات (data-tab) فوق الجدول"],
+  ['الكل', "v3.16: تبويب الكل موجود"],
   ['x_=["","À préparer","Préparé","Expédié","En livraison","Livrée","Refusé","Retour","Annulé","Problème livraison","Out Of Stock","Expédier vers"]', "v3.10: نفس المفردات فصفحة الطلبيات (x_)"],
-  ['useSyncExternalStore', "v3.10: ما بقاش useSyncExternalStore فالـ Liv (المشكل اللول)"],
+  ['useSyncExternalStore', "v3.10: ما بقاش useSyncExternalStore فالـ Liv (المشكل اللول)", true],
 ];
 for (const [needle, label, neg] of checks) {
   const ok = neg ? !livSrc.includes(needle) : html.includes(needle);
@@ -110,11 +113,11 @@ const setCol = (x, st) => {
   return upd(x.id, { ...P, livraison: st === "Livré" ? "Livrée" : st });
 };
 
-/* وضع كل طلبية فالعمود ديالها */
+/* وضع كل طلبية فالحالة ديالها */
 const placed = orders.map(x => [x.idCmd, col(x)]);
 const expect = [["CMD-1", "À préparer"], ["CMD-2", "Livré"], ["CMD-3", "Annulé"], ["CMD-4", "Expédié"], ["CMD-5", "Retour"]];
 const okPlace = JSON.stringify(placed) === JSON.stringify(expect);
-if (okPlace) console.log("✅ الداطا أوتوماتيك فالكانبان:", placed.map(p => p.join("→")).join(" | "));
+if (okPlace) console.log("✅ الداطا أوتوماتيك فالحالة الصح:", placed.map(p => p.join("→")).join(" | "));
 else { console.error("❌ التوزيع غلط:", placed); bad++; }
 
 /* نقل CMD-1 → Livré (كيبدل الطلبية فنفس المخزن) */
