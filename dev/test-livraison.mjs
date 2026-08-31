@@ -114,6 +114,18 @@ else { console.error("❌ v3.19: الفرز المصحح ناقص فـ Dashboard
 if (html.includes('rows.sort((S,E)=>E.date.localeCompare(S.date))')) { console.error("❌ v3.19: السطر القديم ديال الكراش باقي (E.date.localeCompare)!"); bad++; }
 else console.log("✅ v3.19: السطر اللي كان كيضرب صفحة Dashboard performance (E.date.localeCompare) تّمحات");
 
+/* v3.20: فيلتر المنتوج حسب السورس فـ Dashboard performance — الربح الطوطال كيتجمع حسب الفترة والمنتوج */
+if (html.includes('pf==="all"||S.row.produit.trim().toLowerCase()===pf.trim().toLowerCase()')) console.log("✅ v3.20: فيلتر المنتوج فالسورس (pf) مطبق على الحسابات والجدول");
+else { console.error("❌ v3.20: فيلتر المنتوج pf ناقص!"); bad++; }
+if (html.includes('gp==="all"||S.row.produit.trim().toLowerCase()===gp.trim().toLowerCase()')) console.log("✅ v3.20: فيلتر المنتوج فـ GLOBAL (gp) مطبق");
+else { console.error("❌ v3.20: فيلتر GLOBAL gp ناقص!"); bad++; }
+if (html.split('🔍 المنتوج:').length - 1 === 2) console.log("✅ v3.20: كاينين جوج selects ديال المنتوج (السورس + GLOBAL)");
+else { console.error("❌ v3.20: selects ديال المنتوج ناقصين!"); bad++; }
+if (html.split('📈 ربح ').length - 1 === 2) console.log("✅ v3.20: بادج الربح الطوطال ديال المنتوج (فالسورس + فـ GLOBAL)");
+else { console.error("❌ v3.20: بادج الربح ناقص!"); bad++; }
+if (html.includes('kf("all")')) console.log("✅ v3.20: ملي كتقلب السورس الفيلتر كيرجع للكل أوتوماتيك");
+else { console.error("❌ v3.20: إعادة تعيين الفيلتر عند تبديل السورس ناقصة!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");

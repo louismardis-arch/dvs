@@ -44176,7 +44176,7 @@ function Fj() {
         orders: e
     } = Xt(), {
         inRange: ir
-    } = Tn(), n = Nj(), a = xx(), [i, c] = ee.useState(_l[0].key), f = new Date().toISOString().slice(0, 10), [u, d] = ee.useState(() => {
+    } = Tn(), n = Nj(), a = xx(), [i, c] = ee.useState(_l[0].key), [pf, kf] = ee.useState("all"), [gp, kg] = ee.useState("all"), f = new Date().toISOString().slice(0, 10), [u, d] = ee.useState(() => {
         try {
             return localStorage.getItem("perf_last_produit") || ""
         } catch {
@@ -44315,8 +44315,8 @@ function Fj() {
             }
             return rows.sort((S, E) => E.row.date.localeCompare(S.row.date))
         },
-        v = ee.useMemo(() => G2().filter(S => S.row.source === i), [z, i, e, a, y, ir]),
-        A = ee.useMemo(() => G2(), [z, e, a, y, ir]),
+        v = ee.useMemo(() => G2().filter(S => S.row.source === i && (pf === "all" || S.row.produit.trim().toLowerCase() === pf.trim().toLowerCase())), [z, i, pf, e, a, y, ir]),
+        A = ee.useMemo(() => G2().filter(S => gp === "all" || S.row.produit.trim().toLowerCase() === gp.trim().toLowerCase()), [z, gp, e, a, y, ir]),
         D = () => {
             if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
             const Pn = u.trim(),
@@ -44590,7 +44590,9 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                     children: _l.map(S => {
                         const E = J2[S.key] ?? J2.TikTok;
                         return s.jsxs("button", {
-                            onClick: () => c(S.key),
+                            onClick: () => {
+                                c(S.key), kf("all")
+                            },
                             className: `flex h-8 shrink-0 select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${i===S.key?E.on:E.base}`,
                             children: [s.jsx("span", {
                                 className: "text-[12px] leading-none",
@@ -44719,7 +44721,27 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                 children: [s.jsx("span", {
                     className: "text-[11px] font-bold text-slate-500",
                     children: "📅 فيلتر الأيام:"
-                }), s.jsx(yp, {})]
+                }), s.jsx(yp, {}), s.jsxs("label", {
+                    className: "flex items-center gap-1.5",
+                    children: [s.jsx("span", {
+                        className: "text-[11px] font-bold text-slate-500",
+                        children: "🔍 المنتوج:"
+                    }), s.jsx("select", {
+                        value: pf,
+                        onChange: S => kf(S.target.value),
+                        className: "rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] font-bold text-slate-700 outline-none focus:border-indigo-400",
+                        children: [s.jsx("option", {
+                            value: "all",
+                            children: "الكل — كل المنتوجات"
+                        }), ...[...new Set(z.filter(Q => Q.s === i).map(Q => Q.n))].sort().map(Q => s.jsx("option", {
+                            value: Q,
+                            children: Q
+                        }, Q))]
+                    })]
+                }), pf !== "all" && s.jsx("span", {
+                    className: "rounded-full bg-indigo-600 px-3 py-1 text-[10px] font-extrabold text-white",
+                    children: ["📈 ربح ", pf, " فـ ", _l.find(S => S.key === i)?.label || i, ": ", ja(k.gain), " DH"]
+                })]
             }), s.jsxs("div", {
                 className: "mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
                 children: [s.jsxs("div", {
@@ -44750,6 +44772,26 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                     }), s.jsxs("span", {
                         className: "rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold",
                         children: [A.length, " حساب"]
+                    }), s.jsxs("label", {
+                        className: "flex items-center gap-1.5",
+                        children: [s.jsx("span", {
+                            className: "text-[11px] font-bold opacity-90",
+                            children: "🔍 المنتوج:"
+                        }), s.jsx("select", {
+                            value: gp,
+                            onChange: S => kg(S.target.value),
+                            className: "rounded-lg bg-white/20 px-2 py-1 text-[11px] font-bold text-white outline-none",
+                            children: [s.jsx("option", {
+                                value: "all",
+                                children: "الكل — كل المنتوجات"
+                            }), ...[...new Set(z.map(Q => Q.n))].sort().map(Q => s.jsx("option", {
+                                value: Q,
+                                children: Q
+                            }, Q))]
+                        })]
+                    }), gp !== "all" && s.jsx("span", {
+                        className: "rounded-full bg-white/20 px-3 py-1 text-[10px] font-extrabold",
+                        children: ["📈 ربح ", gp, ": ", ja(M.gain), " DH"]
                     }), s.jsxs("span", {
                         className: "ms-auto flex flex-wrap gap-3 text-[10px] font-bold",
                         children: [s.jsxs("span", {
