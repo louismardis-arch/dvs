@@ -35424,7 +35424,7 @@ function or({
     })
 }
 const d_ = ["", "Confirmé", "Annulé", "Rappel", "Suivé", "Appel-1", "Appel-2", "Appel-3", "Appel-4", "Appel-5", "Appel-6", "Whatssap"],
-    x_ = ["", "Livrée", "Retour", "Out Of Stock", "Expédier vers"];
+    x_ = ["", "À préparer", "Préparé", "Expédié", "En livraison", "Livrée", "Refusé", "Retour", "Annulé", "Problème livraison", "Out Of Stock", "Expédier vers"];
 
 function Zv({
     title: e,
@@ -44679,6 +44679,10 @@ const rg = () => s.jsx("div", {
 }); // ============================================================
 // صفحة LIVRAISON الجديدة (v3.6)
 // ============================================================
+// ============================================================
+// صفحة LIVRAISON (v3.10) — مربوطة مع صفحة الطلبيات (Commandes)
+// الداطا كتجي أوتوماتيك من orders (مخزن CRM) — بلا إضافة يدوية
+// ============================================================
 const LVS = "afrizon_livraison_v1",
     LSts = ["À préparer", "Préparé", "Expédié", "En livraison", "Livré", "Refusé", "Retour", "Annulé", "Problème livraison"],
     LCo = [
@@ -44691,107 +44695,32 @@ const LVS = "afrizon_livraison_v1",
         ["Retour", "↩️"],
         ["Annulé", "✖️"],
         ["Problème livraison", "⚠️"]
-    ],
-    lread = () => {
-        try {
-            const e = localStorage.getItem(LVS);
-            if (e) {
-                const n = JSON.parse(e);
-                if (Array.isArray(n)) return n
-            }
-        } catch {}
-        return []
-    };
+    ];
 
 function Liv() {
-    const [list, setList] = ee.useState(lread), [o, F] = ee.useState(!1), [f, W] = ee.useState(() => ({
-        num: "",
-        client: "",
-        tel: "",
-        ville: "",
-        adresse: "",
-        produit: "",
-        qte: 1,
-        prix: 0,
-        frais: 0,
-        livreur: "",
-        statut: "À préparer",
-        dateExp: "",
-        dateLiv: "",
-        motif: "",
-        tracking: ""
-    })), [sh, G] = ee.useState(""), cities = Ll();
-    ee.useEffect(() => {
-        Ms(LVS, () => setList(lread()))
-    }, []);
-    const sv = e => {
-            setList(e);
-            try {
-                localStorage.setItem(LVS, JSON.stringify(e))
-            } catch {}
-            aa(LVS)
+    const {
+        orders: o,
+        upd: uo
+    } = Xt(), {
+            currentUser: us
+        } = kr(), [sh, G] = ee.useState(""),
+        NF = x => Number(x || 0).toLocaleString("fr-FR"),
+        col = x => {
+            if (String(x.statut) === "Annulé") return "Annulé";
+            const L = x.livraison || "";
+            return L === "Livrée" ? "Livré" : L === "Expédier vers" ? "Expédié" : L === "Out Of Stock" ? "Problème livraison" : LSts.includes(L) ? L : "À préparer"
         },
-        S2 = k => v => W(x => ({
-            ...x,
-            [k]: v
-        })),
-        U = (k, l, ph, t) => s.jsxs("label", {
-            className: "text-[10px] font-bold text-slate-500",
-            children: [l, s.jsx("input", {
-                type: t || "text",
-                value: f[k],
-                onChange: e => S2(k)(e.target.value),
-                placeholder: ph || "",
-                className: "mt-0.5 w-full rounded-xl border border-slate-300 bg-white px-2.5 py-[7px] text-xs font-semibold outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-            })]
-        }),
-        tot = (Number(f.qte) || 0) * (Number(f.prix) || 0) + (Number(f.frais) || 0),
-        save = () => {
-            if (!String(f.num).trim() || !String(f.client).trim()) return alert("عمّر: N° Commande + Client");
-            sv([{
-                ...f,
-                num: String(f.num).trim(),
-                client: String(f.client).trim(),
-                tel: String(f.tel).trim(),
-                ville: String(f.ville).trim(),
-                adresse: String(f.adresse).trim(),
-                produit: String(f.produit).trim(),
-                livreur: String(f.livreur).trim(),
-                tracking: String(f.tracking).trim(),
-                motif: String(f.motif).trim(),
-                qte: Number(f.qte) || 0,
-                prix: Number(f.prix) || 0,
-                frais: Number(f.frais) || 0,
-                total: tot,
-                id: Math.max(0, ...list.map(x => x.id || 0)) + 1
-            }, ...list]);
-            F(!1);
-            W({
-                num: "",
-                client: "",
-                tel: "",
-                ville: "",
-                adresse: "",
-                produit: "",
-                qte: 1,
-                prix: 0,
-                frais: 0,
-                livreur: "",
-                statut: "À préparer",
-                dateExp: "",
-                dateLiv: "",
-                motif: "",
-                tracking: ""
+        setCol = (x, st) => {
+            if (st === "Annulé") return uo(x.id, {
+                statut: "Annulé"
+            });
+            const P = x.statut === "Annulé" ? {
+                statut: "Confirmé"
+            } : {};
+            return uo(x.id, {
+                ...P,
+                livraison: st === "Livré" ? "Livrée" : st
             })
-        },
-        upd = (id, p) => {
-            sv(list.map(x => x.id === id ? {
-                ...x,
-                ...p
-            } : x))
-        },
-        del = id => {
-            confirm("مسح هاد الـ commande من LIVRAISON؟") && sv(list.filter(x => x.id !== id))
         },
         R2 = (l, v) => s.jsxs("div", {
             className: "flex items-start justify-between gap-1 text-[10px]",
@@ -44803,208 +44732,170 @@ function Liv() {
                 children: v
             })]
         }),
-        shown = sh ? list.filter(x => [x.num, x.client, x.tel, x.ville, x.produit, x.livreur, x.tracking, x.adresse].join(" ").toLowerCase().includes(sh.toLowerCase())) : list;
-    return s.jsx("div", {
+        shown = sh ? o.filter(x => [x.idCmd, x.nom, x.telephone, x.ville, x.adresse, x.produit, x.agent, x.tracking, x.livreur].join(" ").toLowerCase().includes(sh.toLowerCase())) : o;
+    return s.jsxs("div", {
         dir: "rtl",
         className: "h-full overflow-auto bg-slate-50 p-4 text-sm",
         children: s.jsxs("div", {
             className: "mx-auto max-w-[1600px]",
-            children: [s.jsxs("div", {
-                className: "mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm",
-                children: [s.jsx("span", {
-                    className: "grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 text-xl text-white shadow-md shadow-orange-200",
-                    children: "🚚"
-                }), s.jsxs("div", {
-                    children: [s.jsx("h1", {
-                        className: "text-lg font-extrabold tracking-tight text-slate-800",
-                        children: "LIVRAISON"
-                    }), s.jsx("p", {
-                        className: "text-[11px] text-slate-500",
-                        children: "إدارة التوصيل: كل commande بحالتها + Tracking ID ديال شركة الشحن"
-                    })]
-                }), s.jsx("input", {
-                    value: sh,
-                    onChange: e => G(e.target.value),
-                    placeholder: "🔎 بحث (N° / Client / Téléphone / Tracking)...",
-                    className: "ms-auto w-64 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                }), s.jsx(yt, {
-                    icon: "＋",
-                    color: "amber",
-                    onClick: () => F(!o),
-                    children: "Commande"
-                })]
-            }), o && s.jsxs("div", {
-                className: "mb-4 rounded-2xl border border-orange-200 bg-orange-50/60 p-3",
-                children: [s.jsxs("div", {
-                    className: "mb-2 flex items-center gap-2",
-                    children: [s.jsx("span", {
-                        className: "grid h-8 w-8 place-items-center rounded-lg bg-white text-base text-orange-600 shadow-sm",
-                        children: "＋"
-                    }), s.jsx("b", {
-                        className: "text-sm font-extrabold text-slate-800",
-                        children: "Commande جديدة"
-                    }), s.jsx("span", {
-                        className: "ms-auto rounded-lg bg-white px-2 py-1 text-[10px] font-bold text-orange-600",
-                        children: ["Total: ", tot.toLocaleString("fr-FR"), " DH"]
-                    })]
-                }), s.jsxs("div", {
-                    className: "grid gap-2 sm:grid-cols-2 lg:grid-cols-4",
-                    children: [U("num", "N° Commande", "CMD-001"), U("client", "Client"), U("tel", "Téléphone", "06..."), s.jsxs("label", {
-                        className: "text-[10px] font-bold text-slate-500",
-                        children: ["Ville — تمن التوصيل أوتوماتيكي", s.jsx("datalist", {
-                            id: "liv-villes",
-                            children: cities.map(x => s.jsx("option", {
-                                value: x.nom,
-                                label: (x.prix ?? 0) + " DH"
-                            }, x.nom))
-                        }), s.jsx("input", {
-                            list: "liv-villes",
-                            value: f.ville,
-                            onChange: e => {
-                                const v = e.target.value,
-                                    p = wo(v, cities);
-                                W(x => ({
-                                    ...x,
-                                    ville: v,
-                                    frais: p != null ? String(p) : x.frais
-                                }))
-                            },
-                            placeholder: "اكتب ولا اختار من اللائحة...",
-                            className: "mt-0.5 w-full rounded-xl border border-slate-300 bg-white px-2.5 py-[7px] text-xs font-semibold outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                        }), wo(f.ville, cities) != null && s.jsx("span", {
-                            className: "mt-0.5 block text-[9px] font-bold text-emerald-600",
-                            children: ["✔ تمن التوصيل أوتوماتيكي من LES VILLES: ", wo(f.ville, cities), " DH"]
-                        })]
-                    }), U("adresse", "Adresse"), U("produit", "Produit"), U("qte", "Quantité", "1", "number"), U("prix", "Prix (DH)", "250", "number"), U("frais", "Frais livraison (DH)", "35", "number"), U("livreur", "Livreur"), U("tracking", "Tracking ID", "TRK-..."), U("dateExp", "Date expédition", "", "date"), U("dateLiv", "Date livraison", "", "date"), s.jsxs("label", {
-                        className: "text-[10px] font-bold text-slate-500",
-                        children: ["Statut", s.jsx("select", {
-                            value: f.statut,
-                            onChange: e => S2("statut")(e.target.value),
-                            className: "mt-0.5 w-full rounded-xl border border-slate-300 bg-white px-2.5 py-[7px] text-xs font-semibold outline-none",
-                            children: LSts.map(x => s.jsx("option", {
-                                value: x,
-                                children: x
-                            }, x))
-                        })]
-                    }), U("motif", "Motif retour", ""), s.jsx("div", {
-                        className: "flex items-end",
-                        children: s.jsx(yt, {
-                            icon: "＋",
-                            color: "amber",
-                            className: "w-full justify-center",
-                            onClick: save,
-                            children: "إضافة"
-                        })
-                    })]
-                })]
-            }), s.jsx("div", {
-                className: "flex items-start gap-3 overflow-x-auto pb-3",
-                style: {
-                    scrollbarWidth: "thin"
-                },
-                children: LCo.map(([st, ic]) => {
-                    const col = shown.filter(x => x.statut === st);
-                    return s.jsxs("div", {
-                        className: "w-72 shrink-0 rounded-2xl border border-slate-200 bg-slate-100/70",
-                        children: [s.jsxs("div", {
-                            className: "flex items-center gap-2 rounded-t-2xl border-b bg-white px-3 py-2",
-                            children: [s.jsx("span", {
-                                className: "text-sm",
-                                children: ic
-                            }), s.jsx("b", {
-                                className: "text-xs font-extrabold text-slate-700",
-                                children: st
-                            }), s.jsx("span", {
-                                className: "ms-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600",
-                                children: col.length
+            children: [
+                s.jsxs("div", {
+                    className: "mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm",
+                    children: [
+                        s.jsx("span", {
+                            className: "grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 text-xl text-white shadow-md shadow-orange-200",
+                            children: "🚚"
+                        }),
+                        s.jsxs("div", {
+                            children: [s.jsx("h1", {
+                                className: "text-lg font-extrabold tracking-tight text-slate-800",
+                                children: "LIVRAISON"
+                            }), s.jsx("p", {
+                                className: "text-[11px] text-slate-500",
+                                children: "مربوطة مع صفحة الطلبيات — كل طلبية كتجي هنا أوتوماتيك"
                             })]
-                        }), s.jsx("div", {
-                            className: "space-y-2 p-2",
-                            children: col.map(x => s.jsxs("div", {
-                                className: "rounded-xl border bg-white p-2.5 shadow-sm",
-                                children: [s.jsxs("div", {
-                                    className: "mb-1.5 flex items-center justify-between gap-1",
-                                    children: [s.jsx("b", {
-                                        className: "text-[11px] font-extrabold text-slate-800",
-                                        children: ["#", x.num]
-                                    }), s.jsxs("span", {
-                                        className: "flex items-center gap-1",
-                                        children: [s.jsx("select", {
-                                            value: x.statut,
-                                            onChange: e => upd(x.id, {
-                                                statut: e.target.value
+                        }),
+                        s.jsx("span", {
+                            className: "rounded-full bg-orange-100 px-3 py-1 text-[11px] font-bold text-orange-700",
+                            children: [NF(o.length), " طلبية"]
+                        }),
+                        s.jsx("input", {
+                            value: sh,
+                            onChange: e => G(e.target.value),
+                            placeholder: "🔎 بحث (N° / Client / Téléphone / Ville / Produit)...",
+                            className: "ms-auto w-64 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                        })
+                    ]
+                }),
+                s.jsxs("div", {
+                    className: "mb-4 rounded-xl border border-blue-200 bg-blue-50/60 px-3 py-2 text-[11px] leading-5",
+                    children: ["🔗 هاد الصفحة ", s.jsx("b", {
+                        children: "مربوطة مع Commandes"
+                    }), ": الداطا كتجي أوتوماتيك من الطلبيات — بدّل حالة التوصيل هنا وكيتسجل فـ CRM ديال الجميع (نفس الطلبيات، بلا ما تعاود تزيد والو)."]
+                }),
+                o.length ? s.jsx("div", {
+                    className: "flex items-start gap-3 overflow-x-auto pb-3",
+                    style: {
+                        scrollbarWidth: "thin"
+                    },
+                    children: LCo.map(([st, ic]) => {
+                        const colL = shown.filter(x => col(x) === st);
+                        return s.jsxs("div", {
+                            className: "w-72 shrink-0 rounded-2xl border border-slate-200 bg-slate-100/70",
+                            children: [
+                                s.jsxs("div", {
+                                    className: "flex items-center gap-2 rounded-t-2xl border-b bg-white px-3 py-2",
+                                    children: [s.jsx("span", {
+                                        className: "text-sm",
+                                        children: ic
+                                    }), s.jsx("b", {
+                                        className: "text-xs font-extrabold text-slate-700",
+                                        children: st
+                                    }), s.jsx("span", {
+                                        className: "ms-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600",
+                                        children: colL.length
+                                    })]
+                                }),
+                                s.jsx("div", {
+                                    className: "space-y-2 p-2",
+                                    children: colL.map(x => s.jsxs("div", {
+                                        className: "rounded-xl border bg-white p-2.5 shadow-sm",
+                                        children: [
+                                            s.jsxs("div", {
+                                                className: "mb-1.5 flex items-center justify-between gap-1",
+                                                children: [s.jsx("b", {
+                                                    className: "text-[11px] font-extrabold text-slate-800",
+                                                    children: ["#", x.idCmd || x.id]
+                                                }), s.jsx("select", {
+                                                    value: col(x),
+                                                    onChange: e => setCol(x, e.target.value),
+                                                    className: "rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-1 text-[10px] font-bold text-slate-600 outline-none",
+                                                    children: LSts.map(v => s.jsx("option", {
+                                                        value: v,
+                                                        children: v
+                                                    }, v))
+                                                })]
                                             }),
-                                            className: "rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-1 text-[10px] font-bold text-slate-600 outline-none",
-                                            children: LSts.map(v => s.jsx("option", {
-                                                value: v,
-                                                children: v
-                                            }, v))
-                                        }), s.jsx("button", {
-                                            onClick: () => del(x.id),
-                                            className: "grid h-5 w-5 place-items-center rounded-md text-slate-300 hover:bg-red-50 hover:text-red-600",
-                                            children: "✕"
-                                        })]
-                                    })]
-                                }), R2("Client", x.client), R2("Téléphone", x.tel), R2("Ville", x.ville), R2("Adresse", x.adresse), R2("Produit", x.produit), R2("Quantité", x.qte), R2("Prix", (x.prix || 0).toLocaleString("fr-FR") + " DH"), R2("Frais livraison", (x.frais || 0).toLocaleString("fr-FR") + " DH"), R2("Total", s.jsx("b", {
-                                    className: "text-[11px] text-emerald-600",
-                                    children: [(x.total ?? 0).toLocaleString("fr-FR"), " DH"]
-                                })), R2("Livreur", x.livreur || "—"), s.jsxs("div", {
-                                    className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
-                                    children: [s.jsx("div", {
-                                        className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
-                                        children: "Tracking ID — شركة الشحن"
-                                    }), s.jsx("input", {
-                                        value: x.tracking,
-                                        onChange: e => upd(x.id, {
-                                            tracking: e.target.value
-                                        }),
-                                        placeholder: "TRK-...",
-                                        className: "w-full rounded-lg border border-slate-200 bg-amber-50/50 px-2 py-1.5 text-[11px] font-bold text-amber-700 outline-none focus:border-amber-400"
-                                    })]
-                                }), s.jsxs("div", {
-                                    className: "mt-1.5 grid grid-cols-2 gap-1.5",
-                                    children: [s.jsxs("label", {
-                                        className: "text-[9px] font-bold text-slate-400",
-                                        children: ["Date expédition", s.jsx("input", {
-                                            type: "date",
-                                            value: x.dateExp,
-                                            onChange: e => upd(x.id, {
-                                                dateExp: e.target.value
+                                            R2("Client", x.nom || "—"), R2("Téléphone", x.telephone || "—"), R2("Ville", x.ville || "—"), R2("Adresse", x.adresse || "—"), R2("Produit", x.produit || "—"), R2("Quantité", x.qte), R2("Prix", NF(x.prix) + " DH"), R2("Frais livraison", NF(x.commission) + " DH"), R2("Total", NF((Number(x.qte) || 0) * (Number(x.prix) || 0)) + " DH"),
+                                            (Number(x.upsell) || 0) > 0 && R2("UPSEL", "+" + NF(x.upsell) + " DH"),
+                                            R2("Agent", x.agent || "—"),
+                                            s.jsxs("div", {
+                                                className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
+                                                children: [s.jsx("div", {
+                                                    className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
+                                                    children: "Livreur"
+                                                }), s.jsx("input", {
+                                                    value: x.livreur || "",
+                                                    onChange: e => uo(x.id, {
+                                                        livreur: e.target.value
+                                                    }),
+                                                    placeholder: "اسم اللي كيوصّل...",
+                                                    className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold outline-none focus:border-slate-400"
+                                                })]
                                             }),
-                                            className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
-                                        })]
-                                    }), s.jsxs("label", {
-                                        className: "text-[9px] font-bold text-slate-400",
-                                        children: ["Date livraison", s.jsx("input", {
-                                            type: "date",
-                                            value: x.dateLiv,
-                                            onChange: e => upd(x.id, {
-                                                dateLiv: e.target.value
+                                            s.jsxs("div", {
+                                                className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
+                                                children: [s.jsx("div", {
+                                                    className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
+                                                    children: "Tracking ID — شركة الشحن"
+                                                }), s.jsx("input", {
+                                                    value: x.tracking || "",
+                                                    onChange: e => uo(x.id, {
+                                                        tracking: e.target.value
+                                                    }),
+                                                    placeholder: "TRK-...",
+                                                    className: "w-full rounded-lg border border-slate-200 bg-amber-50/50 px-2 py-1.5 text-[11px] font-bold text-amber-700 outline-none focus:border-amber-400"
+                                                })]
                                             }),
-                                            className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
-                                        })]
-                                    })]
-                                }), (x.motif || st === "Retour" || st === "Problème livraison") && s.jsxs("div", {
-                                    className: "mt-1.5",
-                                    children: [s.jsx("div", {
-                                        className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
-                                        children: "Motif retour"
-                                    }), s.jsx("input", {
-                                        value: x.motif,
-                                        onChange: e => upd(x.id, {
-                                            motif: e.target.value
-                                        }),
-                                        placeholder: "سبب الإرجاع...",
-                                        className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold text-red-600 outline-none focus:border-red-300"
-                                    })]
-                                })]
-                            }, x.id))
-                        })]
-                    }, st)
+                                            s.jsxs("div", {
+                                                className: "mt-1.5 grid grid-cols-2 gap-1.5",
+                                                children: [s.jsxs("label", {
+                                                    className: "text-[9px] font-bold text-slate-400",
+                                                    children: ["Date expédition", s.jsx("input", {
+                                                        type: "date",
+                                                        value: x.dateExp || "",
+                                                        onChange: e => uo(x.id, {
+                                                            dateExp: e.target.value
+                                                        }),
+                                                        className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
+                                                    })]
+                                                }), s.jsxs("label", {
+                                                    className: "text-[9px] font-bold text-slate-400",
+                                                    children: ["Date livraison", s.jsx("input", {
+                                                        type: "date",
+                                                        value: x.dateLiv || "",
+                                                        onChange: e => uo(x.id, {
+                                                            dateLiv: e.target.value
+                                                        }),
+                                                        className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
+                                                    })]
+                                                })]
+                                            }),
+                                            (col(x) === "Retour" || col(x) === "Problème livraison" || x.motif) && s.jsxs("div", {
+                                                className: "mt-1.5",
+                                                children: [s.jsx("div", {
+                                                    className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
+                                                    children: "Motif retour"
+                                                }), s.jsx("input", {
+                                                    value: x.motif || "",
+                                                    onChange: e => uo(x.id, {
+                                                        motif: e.target.value
+                                                    }),
+                                                    placeholder: "سبب الإرجاع...",
+                                                    className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold text-red-600 outline-none focus:border-red-300"
+                                                })]
+                                            })
+                                        ]
+                                    }, x.id))
+                                })
+                            ]
+                        }, st)
+                    })
+                }) : s.jsx("div", {
+                    className: "rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-400",
+                    children: "ما كاين حتى طلبية فالـ CRM — الطلبيات كيجيو أوتوماتيك من صفحة Commandes"
                 })
-            }), s.jsx("div", {
-                className: "h-6"
-            })]
+            ]
         })
     })
 }
