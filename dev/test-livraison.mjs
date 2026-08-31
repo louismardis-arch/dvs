@@ -59,7 +59,9 @@ const checks = [
   ['uo(x.id,{...P,livraison:st==="Livré"?"Livrée":st})', "v3.10: النقل كيكتب Livrée فحقل livraison ديال الطلبية"],
   ['uo(x.id,{tracking:e.target.value})', "v3.10: Tracking ID كيتسجل فالطلبية نفسها"],
   ['children:["#",x.idCmd||x.id]', "v3.10: N° Commande من idCmd ديال الطلبية"],
-  ['R2("Frais livraison",NF(x.commission)+" DH")', "v3.10: Frais livraison = commission ديال الطلبية"],
+  ['const{orders:o,upd:uo}=Xt(),{currentUser:us}=kr(),[sh,G]=ee.useState(""),cities=Ll(),', "v3.12: Liv كتقرا المدن (Ll) باش تحسب frais الحقيقي"],
+  ['frais=x=>(x.livraison==="Retour"||String(x.statut)==="Annulé")?0:(wo(x.ville,cities)??0)', "v3.12: frais = تمن المدينة الحالي — Retour/Annulé = 0 DH"],
+  ['R2("Frais livraison",NF(frx)+" DH")', "v3.12: الكارطة كتعرض frais المحسوب (ماشي commission)"],
   ['x_=["","À préparer","Préparé","Expédié","En livraison","Livrée","Refusé","Retour","Annulé","Problème livraison","Out Of Stock","Expédier vers"]', "v3.10: نفس المفردات فصفحة الطلبيات (x_)"],
   ['useSyncExternalStore', "v3.10: ما بقاش useSyncExternalStore فالـ Liv (المشكل اللول)"],
 ];
@@ -91,6 +93,7 @@ let orders = [
   { id: 2, idCmd: "CMD-2", nom: "Yassine", telephone: "06...", ville: "Tanger", produit: "ساعة", qte: 1, prix: 350, commission: 40, livraison: "Livrée", statut: "Confirmé" },
   { id: 3, idCmd: "CMD-3", nom: "Amal", telephone: "06...", ville: "Fès", produit: "خاتم", qte: 1, prix: 200, commission: 30, livraison: "", statut: "Annulé" },
   { id: 4, idCmd: "CMD-4", nom: "Karim", ville: "Rabat", produit: "نظارة", qte: 1, prix: 190, commission: 30, livraison: "Expédier vers", statut: "Confirmé" },
+  { id: 5, idCmd: "CMD-5", nom: "Ali", ville: "Agadir", produit: "ساعة", qte: 1, prix: 250, commission: 99, livraison: "Retour", statut: "Confirmé" },
 ];
 const col = x => {
   if (String(x.statut) === "Annulé") return "Annulé";
@@ -106,7 +109,7 @@ const setCol = (x, st) => {
 
 /* وضع كل طلبية فالعمود ديالها */
 const placed = orders.map(x => [x.idCmd, col(x)]);
-const expect = [["CMD-1", "À préparer"], ["CMD-2", "Livré"], ["CMD-3", "Annulé"], ["CMD-4", "Expédié"]];
+const expect = [["CMD-1", "À préparer"], ["CMD-2", "Livré"], ["CMD-3", "Annulé"], ["CMD-4", "Expédié"], ["CMD-5", "Retour"]];
 const okPlace = JSON.stringify(placed) === JSON.stringify(expect);
 if (okPlace) console.log("✅ الداطا أوتوماتيك فالكانبان:", placed.map(p => p.join("→")).join(" | "));
 else { console.error("❌ التوزيع غلط:", placed); bad++; }
@@ -131,6 +134,19 @@ const afterT = orders.find(x => x.id === 1);
 if (afterT.tracking === "TRK-777" && afterT.livreur === "Aman") {
   console.log("✅ Tracking ID + Livreur كيتسجلو فالطلبية (نفس مخزن CRM)");
 } else { console.error("❌ Tracking/Livreur ما تسجلوش:", afterT); bad++; }
+
+/* v3.12: frais = تمن المدينة الحالي (Retour/Annulé → 0) */
+const villes = [{ nom: "Agadir", prix: 25 }, { nom: "Tanger", prix: 40 }];
+const erF = s => String(s || "").trim().toLowerCase();
+const woF = (v, c) => { const m = (c || []).find(x => erF(x.nom) === erF(v)); return m ? m.prix : null; };
+const fraisF = x => (x.livraison === "Retour" || String(x.statut) === "Annulé") ? 0 : (woF(x.ville, villes) ?? 0);
+const f1 = fraisF(orders.find(x => x.id === 1));   // Agadir Livrée → 25
+const f2 = fraisF(orders.find(x => x.id === 2));   // Tanger Livrée → 40
+const f5 = fraisF(orders.find(x => x.id === 5));   // Agadir Retour → 0 (واخا commission 99)
+const f3 = fraisF(orders.find(x => x.id === 3));   // Annulé → 0
+if (f1 === 25 && f2 === 40 && f5 === 0 && f3 === 0) {
+  console.log("✅ v3.12: frais حقيقي — Agadir Livrée 25 / Tanger 40 / Retour 0 (واخا commission 99) / Annulé 0");
+} else { console.error("❌ frais v3.12 ما خدمش:", { f1, f2, f5, f3 }); bad++; }
 
 /* Total محسوب من الطلبية: qte×prix */
 const tot = (Number(afterT.qte) || 0) * (Number(afterT.prix) || 0);

@@ -53,6 +53,10 @@ const checks = [
   ["barCol=x=>x>=80?\"bg-emerald-500\"", "v3.11: شريط تقدم التسليم (أخضر/برتقالي/أحمر)"],
   ['children:"—"', "v3.11: شارة تمن التوصيل الناقص"],
   ['inline-flex items-center rounded-full bg-emerald-50', "v3.11: شارة تمن التوصيل"],
+  /* v3.12: حساب حقيقي */
+  ['Z.fr+=(A.livraison==="Retour"||A.statut==="Annulé")?0:Number((a.find(D=>er(D.nom)===er(A.ville))||{prix:0}).prix)||0', "v3.12: رسوم التوصيل = تمن المدينة الحالي (Retour/Annulé → 0)"],
+  ['(A.livraison!=="Retour"&&A.statut!=="Annulé")&&(Z.ca+=(Number(A.qte)||0)*(Number(A.prix)||0)', "v3.12: المبيعات حقيقية (بلا Retour/Annulé)"],
+  ['},[o,so,a])', "v3.12: التحليل كيتعاود يحسب ملي يتبدل تمن المدينة (dep a)"],
 ];
 for (const [needle, label] of checks) {
   if (!html.includes(needle)) { console.error("❌ ناقص:", label); bad++; }
@@ -69,11 +73,12 @@ const erEnd = js.indexOf("const Ap=", erStart);
 const erFn = new Function(js.slice(erStart, erEnd) + "return er;")();
 
 const anStart = js.indexOf("an=ee.useMemo(()=>{const M=new Map");
-const anEnd = js.indexOf("},[o,so])", anStart);
+const anEnd = js.indexOf("},[o,so,a])", anStart);
 if (anStart < 0 || anEnd < 0) { console.error("❌ ما لقيتش حساب التحليل فالكود!"); bad++; }
 else {
   const body = js.slice(anStart + "an=ee.useMemo(()=>".length, anEnd + 1);
-  const makeAn = new Function("o", "so", "er", "function wrap(o){" + body + "}" + "return wrap;")(null, "n", erFn);
+  const makeAn = (o, so, a) => new Function("o", "so", "a", "er", "function wrap(o){" + body + "}" + "return wrap;")(o, so, a, erFn)(o);
+  const villes = [{ nom: "Agadir", prix: 25 }, { nom: "Tanger", prix: 40 }, { nom: "Casablanca", prix: 40 }];
   const orders = [
     { ville: "Agadir", statut: "Confirmé", livraison: "Livrée", qte: 1, prix: 200, commission: 25, upsell: 30 },
     { ville: "Agadir", statut: "Confirmé", livraison: "Livrée", qte: 2, prix: 150, commission: 25, upsell: 0 },
@@ -81,21 +86,23 @@ else {
     { ville: "Casablanca", statut: "Annulé", livraison: "", qte: 1, prix: 100, commission: 40, upsell: 0 },
     { ville: "tanger", statut: "", livraison: "", qte: 1, prix: 250, commission: 40, upsell: 0 },
   ];
-  const an = makeAn(orders);
+  const an = makeAn(orders, "n", villes);
   const ag = an.find(r => r.ville.toLowerCase() === "agadir");
   const ca = an.find(r => r.ville.toLowerCase() === "casablanca");
+  const tg = an.find(r => r.ville.toLowerCase() === "tanger");
   const ok =
     an.length === 3 &&
     ag && ag.n === 3 && ag.conf === 3 && ag.liv === 2 && ag.ret === 1 && ag.ann === 0 &&
-    ag.up === 30 && ag.fr === 75 && ag.ca === 200 + 300 + 180 &&
-    ca && ca.ann === 1 &&
+    ag.up === 30 && ag.fr === 50 && ag.ca === 200 + 300 &&   /* v3.12: Retour ماشي مبيعات + frais حسب تمن المدينة (25×2، Retour=0) */
+    ca && ca.ann === 1 && ca.ca === 0 && ca.fr === 0 &&      /* v3.12: Annulé لا مبيعات لا رسوم */
+    tg && tg.fr === 40 && tg.ca === 250 &&                   /* v3.12: tanger frais = تمنها 40 */
     an[0].ville.toLowerCase() === "agadir"; // ترتيب "n" تنازلي
   if (ok) {
-    console.log(`✅ التحليل الحقيقي: Agadir → 3/3 Confirmé / Livré 2 / Retour 1 / UPSEL 30 / مبيعات ${ag.ca} / رسوم 75 — وCasablanca Annulé 1 — ترتيب تنازلي`);
+    console.log(`✅ التحليل الحقيقي (v3.12): Agadir → 3/3 Confirmé / Livré 2 / Retour 1 / UPSEL 30 / مبيعات ${ag.ca} (بلا Retour) / رسوم ${ag.fr} (25×2، Retour=0) — Casablanca Annulé → 0/0 — tanger رسوم 40 — ترتيب تنازلي`);
   } else { console.error("❌ التحليل ما خدمش:", JSON.stringify(an)); bad++; }
   /* الترتيب بـ ca و liv */
-  const byCa = new Function("o", "so", "er", "function wrap(o){" + body + "}" + "return wrap;")(null, "ca", erFn)(orders);
-  if (byCa[0].ville.toLowerCase() === "agadir") console.log("✅ ترتيب بالأعلى مبيعات كيخدم (Agadir أولاً بـ 680)");
+  const byCa = makeAn(orders, "ca", villes);
+  if (byCa[0].ville.toLowerCase() === "agadir") console.log("✅ ترتيب بالأعلى مبيعات كيخدم (Agadir أولاً بـ 500)");
   else { console.error("❌ ترتيب المبيعات ما خدمش:", byCa.map(r => r.ville)); bad++; }
 }
 

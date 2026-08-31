@@ -40987,11 +40987,13 @@ function $_() {
             A.statut === "Annulé" && A.livraison !== "Livrée" && A.livraison !== "Retour" && Z.ann++;
             A.livraison === "Livrée" && (Z.liv++, Z.up += Number(A.upsell) || 0);
             A.livraison === "Retour" && Z.ret++;
-            Z.ca += (Number(A.qte) || 0) * (Number(A.prix) || 0);
-            Z.fr += Number(A.commission) || 0
+            (A.livraison !== "Retour" && A.statut !== "Annulé") && (Z.ca += (Number(A.qte) || 0) * (Number(A.prix) || 0));
+            Z.fr += (A.livraison === "Retour" || A.statut === "Annulé") ? 0 : Number((a.find(D => er(D.nom) === er(A.ville)) || {
+                prix: 0
+            }).prix) || 0
         });
         return [...M.values()].sort((A, D) => so === "ca" ? D.ca - A.ca : so === "liv" ? D.liv - A.liv : D.n - A.n)
-    }, [o, so]), rows = an.filter(A => !sh.trim() || A.ville.toLowerCase().includes(sh.trim().toLowerCase())), tot = an.reduce((A, D) => A + D.n, 0), tca = an.reduce((A, D) => A + D.ca, 0), tfr = an.reduce((A, D) => A + D.fr, 0), tup = an.reduce((A, D) => A + D.up, 0), tconf = an.reduce((A, D) => A + D.conf, 0), tliv = an.reduce((A, D) => A + D.liv, 0), tret = an.reduce((A, D) => A + D.ret, 0), tann = an.reduce((A, D) => A + D.ann, 0), tenc = tot - tliv - tret - tann, pr = A => {
+    }, [o, so, a]), rows = an.filter(A => !sh.trim() || A.ville.toLowerCase().includes(sh.trim().toLowerCase())), tot = an.reduce((A, D) => A + D.n, 0), tca = an.reduce((A, D) => A + D.ca, 0), tfr = an.reduce((A, D) => A + D.fr, 0), tup = an.reduce((A, D) => A + D.up, 0), tconf = an.reduce((A, D) => A + D.conf, 0), tliv = an.reduce((A, D) => A + D.liv, 0), tret = an.reduce((A, D) => A + D.ret, 0), tann = an.reduce((A, D) => A + D.ann, 0), tenc = tot - tliv - tret - tann, pr = A => {
         const Z = a.find(D => er(D.nom) === er(A.ville));
         return Z ? Z.prix : null
     }, NF = x => Number(x || 0).toLocaleString("fr-FR"), thH = (A, X) => s.jsx("th", {
@@ -44775,6 +44777,11 @@ const rg = () => s.jsx("div", {
 // صفحة LIVRAISON (v3.10) — مربوطة مع صفحة الطلبيات (Commandes)
 // الداطا كتجي أوتوماتيك من orders (مخزن CRM) — بلا إضافة يدوية
 // ============================================================
+// ============================================================
+// صفحة LIVRAISON (v3.12) — مربوطة بصفحة الطلبيات
+// Frais livraison كيتحسب من تمن المدينة الحالي (LES VILLES)
+// Retour / Annulé → 0 DH (ما كنخلصوش شركة التوصيل)
+// ============================================================
 const LVS = "afrizon_livraison_v1",
     LSts = ["À préparer", "Préparé", "Expédié", "En livraison", "Livré", "Refusé", "Retour", "Annulé", "Problème livraison"],
     LCo = [
@@ -44795,7 +44802,7 @@ function Liv() {
         upd: uo
     } = Xt(), {
             currentUser: us
-        } = kr(), [sh, G] = ee.useState(""),
+        } = kr(), [sh, G] = ee.useState(""), cities = Ll(),
         NF = x => Number(x || 0).toLocaleString("fr-FR"),
         col = x => {
             if (String(x.statut) === "Annulé") return "Annulé";
@@ -44814,6 +44821,7 @@ function Liv() {
                 livraison: st === "Livré" ? "Livrée" : st
             })
         },
+        frais = x => (x.livraison === "Retour" || String(x.statut) === "Annulé") ? 0 : (wo(x.ville, cities) ?? 0),
         R2 = (l, v) => s.jsxs("div", {
             className: "flex items-start justify-between gap-1 text-[10px]",
             children: [s.jsx("span", {
@@ -44890,98 +44898,101 @@ function Liv() {
                                 }),
                                 s.jsx("div", {
                                     className: "space-y-2 p-2",
-                                    children: colL.map(x => s.jsxs("div", {
-                                        className: "rounded-xl border bg-white p-2.5 shadow-sm",
-                                        children: [
-                                            s.jsxs("div", {
-                                                className: "mb-1.5 flex items-center justify-between gap-1",
-                                                children: [s.jsx("b", {
-                                                    className: "text-[11px] font-extrabold text-slate-800",
-                                                    children: ["#", x.idCmd || x.id]
-                                                }), s.jsx("select", {
-                                                    value: col(x),
-                                                    onChange: e => setCol(x, e.target.value),
-                                                    className: "rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-1 text-[10px] font-bold text-slate-600 outline-none",
-                                                    children: LSts.map(v => s.jsx("option", {
-                                                        value: v,
-                                                        children: v
-                                                    }, v))
-                                                })]
-                                            }),
-                                            R2("Client", x.nom || "—"), R2("Téléphone", x.telephone || "—"), R2("Ville", x.ville || "—"), R2("Adresse", x.adresse || "—"), R2("Produit", x.produit || "—"), R2("Quantité", x.qte), R2("Prix", NF(x.prix) + " DH"), R2("Frais livraison", NF(x.commission) + " DH"), R2("Total", NF((Number(x.qte) || 0) * (Number(x.prix) || 0)) + " DH"),
-                                            (Number(x.upsell) || 0) > 0 && R2("UPSEL", "+" + NF(x.upsell) + " DH"),
-                                            R2("Agent", x.agent || "—"),
-                                            s.jsxs("div", {
-                                                className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
-                                                children: [s.jsx("div", {
-                                                    className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
-                                                    children: "Livreur"
-                                                }), s.jsx("input", {
-                                                    value: x.livreur || "",
-                                                    onChange: e => uo(x.id, {
-                                                        livreur: e.target.value
-                                                    }),
-                                                    placeholder: "اسم اللي كيوصّل...",
-                                                    className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold outline-none focus:border-slate-400"
-                                                })]
-                                            }),
-                                            s.jsxs("div", {
-                                                className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
-                                                children: [s.jsx("div", {
-                                                    className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
-                                                    children: "Tracking ID — شركة الشحن"
-                                                }), s.jsx("input", {
-                                                    value: x.tracking || "",
-                                                    onChange: e => uo(x.id, {
-                                                        tracking: e.target.value
-                                                    }),
-                                                    placeholder: "TRK-...",
-                                                    className: "w-full rounded-lg border border-slate-200 bg-amber-50/50 px-2 py-1.5 text-[11px] font-bold text-amber-700 outline-none focus:border-amber-400"
-                                                })]
-                                            }),
-                                            s.jsxs("div", {
-                                                className: "mt-1.5 grid grid-cols-2 gap-1.5",
-                                                children: [s.jsxs("label", {
-                                                    className: "text-[9px] font-bold text-slate-400",
-                                                    children: ["Date expédition", s.jsx("input", {
-                                                        type: "date",
-                                                        value: x.dateExp || "",
-                                                        onChange: e => uo(x.id, {
-                                                            dateExp: e.target.value
-                                                        }),
-                                                        className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
+                                    children: colL.map(x => {
+                                        const frx = frais(x);
+                                        return s.jsxs("div", {
+                                            className: "rounded-xl border bg-white p-2.5 shadow-sm",
+                                            children: [
+                                                s.jsxs("div", {
+                                                    className: "mb-1.5 flex items-center justify-between gap-1",
+                                                    children: [s.jsx("b", {
+                                                        className: "text-[11px] font-extrabold text-slate-800",
+                                                        children: ["#", x.idCmd || x.id]
+                                                    }), s.jsx("select", {
+                                                        value: col(x),
+                                                        onChange: e => setCol(x, e.target.value),
+                                                        className: "rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-1 text-[10px] font-bold text-slate-600 outline-none",
+                                                        children: LSts.map(v => s.jsx("option", {
+                                                            value: v,
+                                                            children: v
+                                                        }, v))
                                                     })]
-                                                }), s.jsxs("label", {
-                                                    className: "text-[9px] font-bold text-slate-400",
-                                                    children: ["Date livraison", s.jsx("input", {
-                                                        type: "date",
-                                                        value: x.dateLiv || "",
+                                                }),
+                                                R2("Client", x.nom || "—"), R2("Téléphone", x.telephone || "—"), R2("Ville", x.ville || "—"), R2("Adresse", x.adresse || "—"), R2("Produit", x.produit || "—"), R2("Quantité", x.qte), R2("Prix", NF(x.prix) + " DH"), R2("Frais livraison", NF(frx) + " DH"), R2("Total", NF((Number(x.qte) || 0) * (Number(x.prix) || 0)) + " DH"),
+                                                (Number(x.upsell) || 0) > 0 && R2("UPSEL", "+" + NF(x.upsell) + " DH"),
+                                                R2("Agent", x.agent || "—"),
+                                                s.jsxs("div", {
+                                                    className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
+                                                    children: [s.jsx("div", {
+                                                        className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
+                                                        children: "Livreur"
+                                                    }), s.jsx("input", {
+                                                        value: x.livreur || "",
                                                         onChange: e => uo(x.id, {
-                                                            dateLiv: e.target.value
+                                                            livreur: e.target.value
                                                         }),
-                                                        className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
+                                                        placeholder: "اسم اللي كيوصّل...",
+                                                        className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold outline-none focus:border-slate-400"
                                                     })]
-                                                })]
-                                            }),
-                                            (col(x) === "Retour" || col(x) === "Problème livraison" || x.motif) && s.jsxs("div", {
-                                                className: "mt-1.5",
-                                                children: [s.jsx("div", {
-                                                    className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
-                                                    children: "Motif retour"
-                                                }), s.jsx("input", {
-                                                    value: x.motif || "",
-                                                    onChange: e => uo(x.id, {
-                                                        motif: e.target.value
-                                                    }),
-                                                    placeholder: "سبب الإرجاع...",
-                                                    className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold text-red-600 outline-none focus:border-red-300"
-                                                })]
-                                            })
-                                        ]
-                                    }, x.id))
-                                })
+                                                }),
+                                                s.jsxs("div", {
+                                                    className: "mt-1.5 border-t border-dashed border-slate-200 pt-1.5",
+                                                    children: [s.jsx("div", {
+                                                        className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
+                                                        children: "Tracking ID — شركة الشحن"
+                                                    }), s.jsx("input", {
+                                                        value: x.tracking || "",
+                                                        onChange: e => uo(x.id, {
+                                                            tracking: e.target.value
+                                                        }),
+                                                        placeholder: "TRK-...",
+                                                        className: "w-full rounded-lg border border-slate-200 bg-amber-50/50 px-2 py-1.5 text-[11px] font-bold text-amber-700 outline-none focus:border-amber-400"
+                                                    })]
+                                                }),
+                                                s.jsxs("div", {
+                                                    className: "mt-1.5 grid grid-cols-2 gap-1.5",
+                                                    children: [s.jsxs("label", {
+                                                        className: "text-[9px] font-bold text-slate-400",
+                                                        children: ["Date expédition", s.jsx("input", {
+                                                            type: "date",
+                                                            value: x.dateExp || "",
+                                                            onChange: e => uo(x.id, {
+                                                                dateExp: e.target.value
+                                                            }),
+                                                            className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
+                                                        })]
+                                                    }), s.jsxs("label", {
+                                                        className: "text-[9px] font-bold text-slate-400",
+                                                        children: ["Date livraison", s.jsx("input", {
+                                                            type: "date",
+                                                            value: x.dateLiv || "",
+                                                            onChange: e => uo(x.id, {
+                                                                dateLiv: e.target.value
+                                                            }),
+                                                            className: "mt-0.5 w-full rounded-lg border border-slate-200 px-1.5 py-1 text-[10px] outline-none"
+                                                        })]
+                                                    })]
+                                                }),
+                                                (col(x) === "Retour" || col(x) === "Problème livraison" || x.motif) && s.jsxs("div", {
+                                                    className: "mt-1.5",
+                                                    children: [s.jsx("div", {
+                                                        className: "mb-1 text-[9px] font-bold uppercase tracking-wide text-slate-400",
+                                                        children: "Motif retour"
+                                                    }), s.jsx("input", {
+                                                        value: x.motif || "",
+                                                        onChange: e => uo(x.id, {
+                                                            motif: e.target.value
+                                                        }),
+                                                        placeholder: "سبب الإرجاع...",
+                                                        className: "w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[11px] font-semibold text-red-600 outline-none focus:border-red-300"
+                                                    })]
+                                                })
+                                            ]
+                                        }, x.id);
+                                    })
+                                }),
                             ]
-                        }, st)
+                        }, st);
                     })
                 }) : s.jsx("div", {
                     className: "rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-400",
