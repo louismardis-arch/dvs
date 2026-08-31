@@ -40,6 +40,10 @@ const checks = [
   ["Ville — تمن التوصيل أوتوماتيكي", "حقل المدينة فـ LIVRAISON مع أوتوفيل"],
   ["liv-villes", "datalist المدن فـ LIVRAISON"],
   ["p=wo(v,cities)", "الأوتوفيل كيستعمل نفس نظام LES VILLES"],
+  ["📈 المبيعات حسب المدينة", "v3.9.2: رسم بياني المبيعات حسب المدينة"],
+  ["أعلى 8 مدن — محسوب أوتوماتيك من الطلبيات", "v3.9.2: الرسم محسوب أوتوماتيك (أعلى 8)"],
+  ["chart=[...an].sort((A,D)=>D.ca-A.ca).slice(0,8)", "v3.9.2: ترتيب الرسم بالأعلى مبيعات"],
+  ["bg-gradient-to-l from-blue-500 to-indigo-500", "v3.9.2: أعمدة الرسم بتدرج أزرق"],
 ];
 for (const [needle, label] of checks) {
   if (!html.includes(needle)) { console.error("❌ ناقص:", label); bad++; }

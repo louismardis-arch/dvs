@@ -40997,7 +40997,7 @@ function $_() {
     }, NF = x => Number(x || 0).toLocaleString("fr-FR"), thH = (A, X) => s.jsx("th", {
         className: "border border-slate-400 bg-[" + X + "] px-2 py-1.5 text-[11px] font-bold text-white whitespace-nowrap",
         children: A
-    }), rate = (A, D) => A ? Math.round(A / D * 100) + "%" : "—", rcol = x => x >= 80 ? "text-emerald-700" : x >= 40 ? "text-amber-600" : "text-red-600";
+    }), rate = (A, D) => A ? Math.round(A / D * 100) + "%" : "—", rcol = x => x >= 80 ? "text-emerald-700" : x >= 40 ? "text-amber-600" : "text-red-600", chart = [...an].sort((A, D) => D.ca - A.ca).slice(0, 8), maxCa = Math.max(1, ...chart.map(A => A.ca));
     return s.jsxs("div", {
         dir: "rtl",
         className: "h-full overflow-auto bg-slate-50 p-4 text-sm",
@@ -41076,53 +41076,133 @@ function $_() {
                 })]
             }), s.jsxs("div", {
                 className: "grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5",
-                children: [s.jsxs("div", {
-                    className: "rounded-xl border border-slate-200 bg-white p-3",
-                    children: [s.jsx("p", {
-                        className: "text-[10px] font-bold text-slate-400",
-                        children: "إجمالي الطلبيات"
-                    }), s.jsx("b", {
-                        className: "text-xl font-extrabold text-slate-800",
-                        children: NF(tot)
-                    })]
-                }), s.jsxs("div", {
-                    className: "rounded-xl border border-emerald-200 bg-emerald-50/60 p-3",
-                    children: [s.jsx("p", {
-                        className: "text-[10px] font-bold text-emerald-600",
-                        children: "المبيعات (DH)"
-                    }), s.jsx("b", {
-                        className: "text-xl font-extrabold text-emerald-700",
-                        children: NF(tca)
-                    })]
-                }), s.jsxs("div", {
-                    className: "rounded-xl border border-amber-200 bg-amber-50/60 p-3",
-                    children: [s.jsx("p", {
-                        className: "text-[10px] font-bold text-amber-600",
-                        children: "رسوم التوصيل (DH)"
-                    }), s.jsx("b", {
-                        className: "text-xl font-extrabold text-amber-700",
-                        children: NF(tfr)
-                    })]
-                }), s.jsxs("div", {
-                    className: "rounded-xl border border-violet-200 bg-violet-50/60 p-3",
-                    children: [s.jsx("p", {
-                        className: "text-[10px] font-bold text-violet-600",
-                        children: "UPSEL (DH)"
-                    }), s.jsx("b", {
-                        className: "text-xl font-extrabold text-violet-700",
-                        children: NF(tup)
-                    })]
-                }), s.jsxs("div", {
-                    className: "rounded-xl border border-indigo-200 bg-indigo-50/60 p-3",
-                    children: [s.jsx("p", {
-                        className: "text-[10px] font-bold text-indigo-600",
-                        children: "مدن عندها طلبيات"
-                    }), s.jsx("b", {
-                        className: "text-xl font-extrabold text-indigo-700",
-                        children: an.length
-                    })]
-                })]
+                children: [
+                    s.jsxs("div", {
+                        className: "rounded-xl border border-slate-200 bg-white p-3 shadow-sm",
+                        children: [s.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [s.jsx("span", {
+                                className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-100 text-base",
+                                children: "📦"
+                            }), s.jsx("p", {
+                                className: "truncate text-[10px] font-bold text-slate-500",
+                                children: "إجمالي الطلبيات"
+                            })]
+                        }), s.jsx("b", {
+                            className: "mt-1.5 block text-xl font-extrabold tracking-tight text-slate-800",
+                            children: NF(tot)
+                        })]
+                    }),
+                    s.jsxs("div", {
+                        className: "rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 shadow-sm",
+                        children: [s.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [s.jsx("span", {
+                                className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-emerald-100 text-base",
+                                children: "💰"
+                            }), s.jsx("p", {
+                                className: "truncate text-[10px] font-bold text-emerald-600",
+                                children: "المبيعات (DH)"
+                            })]
+                        }), s.jsxs("b", {
+                            className: "mt-1.5 block text-xl font-extrabold tracking-tight text-emerald-700",
+                            children: [NF(tca), s.jsx("span", {
+                                className: "ms-1 text-xs font-bold text-emerald-400",
+                                children: "DH"
+                            })]
+                        })]
+                    }),
+                    s.jsxs("div", {
+                        className: "rounded-xl border border-amber-200 bg-amber-50/50 p-3 shadow-sm",
+                        children: [s.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [s.jsx("span", {
+                                className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-100 text-base",
+                                children: "🚚"
+                            }), s.jsx("p", {
+                                className: "truncate text-[10px] font-bold text-amber-600",
+                                children: "رسوم التوصيل (DH)"
+                            })]
+                        }), s.jsxs("b", {
+                            className: "mt-1.5 block text-xl font-extrabold tracking-tight text-amber-700",
+                            children: [NF(tfr), s.jsx("span", {
+                                className: "ms-1 text-xs font-bold text-amber-400",
+                                children: "DH"
+                            })]
+                        })]
+                    }),
+                    s.jsxs("div", {
+                        className: "rounded-xl border border-violet-200 bg-violet-50/50 p-3 shadow-sm",
+                        children: [s.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [s.jsx("span", {
+                                className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-violet-100 text-base",
+                                children: "⭐"
+                            }), s.jsx("p", {
+                                className: "truncate text-[10px] font-bold text-violet-600",
+                                children: "UPSEL (DH)"
+                            })]
+                        }), s.jsxs("b", {
+                            className: "mt-1.5 block text-xl font-extrabold tracking-tight text-violet-700",
+                            children: [NF(tup), s.jsx("span", {
+                                className: "ms-1 text-xs font-bold text-violet-400",
+                                children: "DH"
+                            })]
+                        })]
+                    }),
+                    s.jsxs("div", {
+                        className: "rounded-xl border border-indigo-200 bg-indigo-50/50 p-3 shadow-sm",
+                        children: [s.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [s.jsx("span", {
+                                className: "grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-indigo-100 text-base",
+                                children: "🏙️"
+                            }), s.jsx("p", {
+                                className: "truncate text-[10px] font-bold text-indigo-600",
+                                children: "مدن عندها طلبيات"
+                            })]
+                        }), s.jsx("b", {
+                            className: "mt-1.5 block text-xl font-extrabold tracking-tight text-indigo-700",
+                            children: an.length
+                        })]
+                    })
+                ]
             }), s.jsxs("div", {
+                className: "overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
+                children: [
+                    s.jsxs("div", {
+                        className: "flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2",
+                        children: [s.jsxs("b", {
+                            className: "text-sm font-extrabold text-slate-700",
+                            children: ["📈 المبيعات حسب المدينة", s.jsx("span", {
+                                className: "ms-2 text-[10px] font-bold text-slate-400",
+                                children: "أعلى 8 مدن — محسوب أوتوماتيك من الطلبيات"
+                            })]
+                        })]
+                    }),
+                    s.jsxs("div", {
+                        className: "space-y-2 p-3",
+                        children: chart.map(A => s.jsxs("div", {
+                            className: "flex items-center gap-2",
+                            children: [s.jsx("span", {
+                                className: "w-24 shrink-0 truncate text-[11px] font-bold text-slate-600",
+                                children: A.ville
+                            }), s.jsx("div", {
+                                className: "h-5 flex-1 overflow-hidden rounded-full bg-slate-100",
+                                children: s.jsx("div", {
+                                    className: "h-full rounded-full bg-gradient-to-l from-blue-500 to-indigo-500",
+                                    style: {
+                                        width: Math.max(4, Math.round(A.ca / maxCa * 100)) + "%"
+                                    }
+                                })
+                            }), s.jsx("b", {
+                                className: "w-20 shrink-0 text-end text-[11px] font-bold text-slate-700",
+                                children: [NF(A.ca), " DH"]
+                            })]
+                        }, A.ville))
+                    })
+                ]
+            }), , s.jsxs("div", {
                 className: "overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
                 children: [s.jsxs("div", {
                     className: "flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2",
