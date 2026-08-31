@@ -40997,7 +40997,13 @@ function $_() {
     }, NF = x => Number(x || 0).toLocaleString("fr-FR"), thH = (A, X) => s.jsx("th", {
         className: "border border-slate-400 bg-[" + X + "] px-2 py-1.5 text-[11px] font-bold text-white whitespace-nowrap",
         children: A
-    }), rate = (A, D) => A ? Math.round(A / D * 100) + "%" : "—", rcol = x => x >= 80 ? "text-emerald-700" : x >= 40 ? "text-amber-600" : "text-red-600", chart = [...an].sort((A, D) => D.ca - A.ca).slice(0, 8), maxCa = Math.max(1, ...chart.map(A => A.ca));
+    }), rate = (A, D) => A ? Math.round(A / D * 100) + "%" : "—", rcol = x => x >= 80 ? "text-emerald-700" : x >= 40 ? "text-amber-600" : "text-red-600", chart = [...an].sort((A, D) => D.ca - A.ca).slice(0, 8), maxCa = Math.max(1, ...chart.map(A => A.ca)), pc = (v, cl) => v > 0 ? s.jsx("span", {
+        className: "inline-flex min-w-[28px] justify-center rounded-full " + cl + " px-2 py-0.5 text-[11px] font-bold",
+        children: v
+    }) : s.jsx("span", {
+        className: "text-[11px] font-semibold text-slate-300",
+        children: "0"
+    }), barCol = x => x >= 80 ? "bg-emerald-500" : x >= 40 ? "bg-amber-500" : "bg-red-500";
     return s.jsxs("div", {
         dir: "rtl",
         className: "h-full overflow-auto bg-slate-50 p-4 text-sm",
@@ -41240,102 +41246,188 @@ function $_() {
                     children: s.jsxs("table", {
                         className: "w-full border-collapse text-xs",
                         children: [s.jsx("thead", {
-                            children: s.jsxs("tr", {
-                                children: [thH("المدينة", "4a86c8"), thH("تمن التوصيل", "6aa84f"), thH("الطلبيات", "e69138"), thH("Confirmé", "38761d"), thH("Annulé", "990000"), thH("En cours", "45818e"), thH("Livré", "1155cc"), thH("Retour", "674ea7"), thH("المبيعات (DH)", "b45f06"), thH("رسوم التوصيل (DH)", "a64d79"), thH("UPSEL (DH)", "741b47"), thH("التسليم %", "134f5c")]
-                            })
-                        }), s.jsx("tbody", {
-                            children: [rows.map((A, D) => {
-                                const P = pr(A);
-                                return s.jsxs("tr", {
-                                    className: D % 2 === 0 ? "bg-white hover:bg-blue-50/40" : "bg-[#f8f9fa] hover:bg-blue-50/40",
+                                children: [s.jsxs("tr", {
+                                    children: [s.jsx("th", {
+                                        rowSpan: 2,
+                                        className: "border-b-2 border-slate-200 bg-slate-100 px-4 py-2.5 text-start text-[11px] font-extrabold uppercase tracking-wide text-slate-500",
+                                        children: "المدينة"
+                                    }), s.jsx("th", {
+                                        rowSpan: 2,
+                                        className: "border-b-2 border-slate-200 bg-slate-100 px-2 py-2.5 text-center text-[11px] font-extrabold uppercase tracking-wide text-slate-500",
+                                        children: "تمن التوصيل"
+                                    }), s.jsx("th", {
+                                        rowSpan: 2,
+                                        className: "border-b-2 border-slate-200 bg-slate-100 px-2 py-2.5 text-center text-[11px] font-extrabold uppercase tracking-wide text-slate-500",
+                                        children: "الطلبيات"
+                                    }), s.jsx("th", {
+                                        colSpan: 5,
+                                        className: "border-b border-slate-200 bg-slate-100 px-2 py-1.5 text-center text-[10px] font-extrabold uppercase tracking-wider text-slate-400",
+                                        children: "حالة الطلبيات"
+                                    }), s.jsx("th", {
+                                        colSpan: 3,
+                                        className: "border-b border-slate-200 bg-slate-100 px-2 py-1.5 text-center text-[10px] font-extrabold uppercase tracking-wider text-slate-400",
+                                        children: "الأموال (DH)"
+                                    }), s.jsx("th", {
+                                        rowSpan: 2,
+                                        className: "border-b-2 border-slate-200 bg-slate-100 px-2 py-2.5 text-center text-[11px] font-extrabold uppercase tracking-wide text-slate-500",
+                                        children: "التسليم %"
+                                    })]
+                                }), s.jsxs("tr", {
+                                    children: [s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-orange-50 px-2 py-1.5 text-center text-[10px] font-bold text-orange-700",
+                                        children: "Confirmé"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-red-50 px-2 py-1.5 text-center text-[10px] font-bold text-red-700",
+                                        children: "Annulé"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-slate-200/60 px-2 py-1.5 text-center text-[10px] font-bold text-slate-600",
+                                        children: "En cours"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-emerald-50 px-2 py-1.5 text-center text-[10px] font-bold text-emerald-700",
+                                        children: "Livré"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-violet-50 px-2 py-1.5 text-center text-[10px] font-bold text-violet-700",
+                                        children: "Retour"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-emerald-50 px-2 py-1.5 text-center text-[10px] font-bold text-emerald-700",
+                                        children: "المبيعات"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-amber-50 px-2 py-1.5 text-center text-[10px] font-bold text-amber-700",
+                                        children: "رسوم التوصيل"
+                                    }), s.jsx("th", {
+                                        className: "border-b-2 border-slate-200 bg-violet-50 px-2 py-1.5 text-center text-[10px] font-bold text-violet-700",
+                                        children: "UPSEL (DH)"
+                                    })]
+                                })]
+                            }),
+                            s.jsx("tbody", {
+                                children: [rows.map((A, D) => {
+                                    const P = pr(A),
+                                        pct = A.n ? Math.round(A.liv / A.n * 100) : 0;
+                                    return s.jsxs("tr", {
+                                        className: D % 2 === 0 ? "bg-white hover:bg-blue-50/40" : "bg-slate-50/60 hover:bg-blue-50/40",
+                                        children: [s.jsx("td", {
+                                            className: "border-b border-slate-100 px-4 py-2.5",
+                                            children: s.jsxs("div", {
+                                                className: "flex items-center gap-2",
+                                                children: [s.jsx("span", {
+                                                    className: "h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500"
+                                                }), s.jsx("span", {
+                                                    className: "text-[13px] font-extrabold text-slate-800",
+                                                    children: A.ville
+                                                })]
+                                            })
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: P != null ? s.jsx("span", {
+                                                className: "inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700",
+                                                children: [P, " DH"]
+                                            }) : s.jsx("span", {
+                                                className: "inline-flex rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-500",
+                                                children: "—"
+                                            })
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: s.jsx("b", {
+                                                className: "text-[13px] font-extrabold text-slate-800",
+                                                children: A.n
+                                            })
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: pc(A.conf, "bg-orange-100 text-orange-700")
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: pc(A.ann, "bg-red-100 text-red-700")
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: pc(A.n - A.liv - A.ret - A.ann, "bg-slate-200/80 text-slate-600")
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: pc(A.liv, "bg-emerald-100 text-emerald-700")
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: pc(A.ret, "bg-violet-100 text-violet-700")
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: s.jsx("b", {
+                                                className: "text-[12px] font-extrabold text-emerald-700",
+                                                children: NF(A.ca)
+                                            })
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: s.jsx("b", {
+                                                className: "text-[12px] font-extrabold text-amber-700",
+                                                children: NF(A.fr)
+                                            })
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5 text-center",
+                                            children: s.jsx("b", {
+                                                className: "text-[12px] font-extrabold text-violet-700",
+                                                children: NF(A.up)
+                                            })
+                                        }), s.jsx("td", {
+                                            className: "border-b border-slate-100 px-2 py-2.5",
+                                            children: s.jsxs("div", {
+                                                className: "flex flex-col items-center gap-1",
+                                                children: [s.jsx("b", {
+                                                    className: rcol(pct) + " text-[11px] font-extrabold",
+                                                    children: rate(A.liv, A.n)
+                                                }), s.jsx("div", {
+                                                    className: "h-1.5 w-16 overflow-hidden rounded-full bg-slate-100",
+                                                    children: s.jsx("div", {
+                                                        className: "h-full rounded-full " + barCol(pct),
+                                                        style: {
+                                                            width: pct + "%"
+                                                        }
+                                                    })
+                                                })]
+                                            })
+                                        })]
+                                    }, A.ville)
+                                }), s.jsxs("tr", {
+                                    className: "bg-slate-100 font-extrabold",
                                     children: [s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 font-bold text-slate-700 whitespace-nowrap",
-                                        children: A.ville
+                                        className: "border-t-2 border-slate-300 px-4 py-2.5 text-slate-800",
+                                        children: "المجموع"
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold",
-                                        children: P != null ? s.jsx("span", {
-                                            className: "rounded-md bg-emerald-50 px-1.5 py-0.5 text-emerald-700",
-                                            children: [P, " DH"]
-                                        }) : s.jsx("span", {
-                                            className: "rounded-md bg-red-50 px-1.5 py-0.5 text-red-500",
-                                            title: "هاد المدينة ماشي فاللائحة — زيدها فوق",
-                                            children: "—"
-                                        })
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5"
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-slate-700",
-                                        children: A.n
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-slate-800",
+                                        children: NF(tot)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center text-orange-700",
-                                        children: A.conf
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-orange-700",
+                                        children: NF(tconf)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center text-red-600",
-                                        children: A.ann
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-red-700",
+                                        children: NF(tann)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center text-slate-500",
-                                        children: A.n - A.liv - A.ret - A.ann
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-slate-700",
+                                        children: NF(tenc)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-emerald-700",
-                                        children: A.liv
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-emerald-700",
+                                        children: NF(tliv)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center text-red-600",
-                                        children: A.ret
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-violet-700",
+                                        children: NF(tret)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-slate-700",
-                                        children: NF(A.ca)
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-emerald-700",
+                                        children: NF(tca)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-amber-700",
-                                        children: NF(A.fr)
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-amber-700",
+                                        children: NF(tfr)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-violet-700",
-                                        children: NF(A.up)
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center text-violet-700",
+                                        children: NF(tup)
                                     }), s.jsx("td", {
-                                        className: "border border-slate-300 px-2 py-1.5 text-center font-bold",
-                                        children: s.jsx("span", {
-                                            className: rcol(A.n ? Math.round(A.liv / A.n * 100) : 0),
-                                            children: rate(A.liv, A.n)
+                                        className: "border-t-2 border-slate-300 px-2 py-2.5 text-center",
+                                        children: s.jsx("b", {
+                                            className: rcol(tot ? Math.round(tliv / tot * 100) : 0),
+                                            children: rate(tliv, tot)
                                         })
                                     })]
-                                })
-                            }), s.jsxs("tr", {
-                                className: "bg-slate-100 font-extrabold",
-                                children: [s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-slate-700",
-                                    children: "المجموع"
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5"
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-slate-800",
-                                    children: NF(tot)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-orange-700",
-                                    children: NF(tconf)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-red-700",
-                                    children: NF(tann)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-slate-700",
-                                    children: NF(tenc)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-emerald-700",
-                                    children: NF(tliv)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-red-700",
-                                    children: NF(tret)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-slate-800",
-                                    children: NF(tca)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-amber-700",
-                                    children: NF(tfr)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center text-violet-700",
-                                    children: NF(tup)
-                                }), s.jsx("td", {
-                                    className: "border border-slate-400 px-2 py-1.5 text-center",
-                                    children: rate(tliv, tot)
                                 })]
-                            })]
-                        })]
+                            })
+                        ]
                     })
                 }) : s.jsx("div", {
                     className: "p-8 text-center text-slate-400",

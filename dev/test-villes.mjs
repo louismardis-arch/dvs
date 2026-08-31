@@ -43,6 +43,16 @@ const checks = [
   ["أعلى 8 مدن — محسوب أوتوماتيك من الطلبيات", "v3.9.2: الرسم محسوب أوتوماتيك (أعلى 8)"],
   ["chart=[...an].sort((A,D)=>D.ca-A.ca).slice(0,8)", "v3.9.2: ترتيب الرسم بالأعلى مبيعات"],
   ["bg-gradient-to-l from-blue-500 to-indigo-500", "v3.9.2: أعمدة الرسم بتدرج أزرق"],
+  /* v3.11: جدول سهل القراءة */
+  ['children:"حالة الطلبيات"', "v3.11: رأس مجموعة حالة الطلبيات (colSpan 5)"],
+  ['children:"الأموال (DH)"', "v3.11: رأس مجموعة الأموال (colSpan 3)"],
+  ['children:"المدينة"', "v3.11: عمود المدينة"],
+  ["bg-orange-100 text-orange-700", "v3.11: شارات ملونة للعدادات (قراءة سريعة)"],
+  ["bg-emerald-100 text-emerald-700", "v3.11: شارة Livré"],
+  ["bg-violet-100 text-violet-700", "v3.11: شارة Retour"],
+  ["barCol=x=>x>=80?\"bg-emerald-500\"", "v3.11: شريط تقدم التسليم (أخضر/برتقالي/أحمر)"],
+  ['children:"—"', "v3.11: شارة تمن التوصيل الناقص"],
+  ['inline-flex items-center rounded-full bg-emerald-50', "v3.11: شارة تمن التوصيل"],
 ];
 for (const [needle, label] of checks) {
   if (!html.includes(needle)) { console.error("❌ ناقص:", label); bad++; }
