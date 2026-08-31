@@ -46481,13 +46481,20 @@ function Vj() {
             }), m && s.jsx("span", {
                 className: "rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-indigo-600",
                 children: "Admin"
-            }), s.jsx("button", {
+            }), m ? s.jsx("button", {
                 onClick: f,
                 title: "خروج — تسجيل الخروج",
                 className: "grid h-6 w-6 place-items-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-600 hover:scale-110",
                 children: s.jsx(eg, {
                     className: "h-3.5 w-3.5"
                 })
+            }) : s.jsxs("button", {
+                onClick: f,
+                title: "تسجيل الخروج من الحساب",
+                className: "flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-l from-rose-500 to-red-600 px-3.5 py-2 text-[11px] font-extrabold text-white shadow-md shadow-rose-300/60 transition-all duration-150 hover:from-rose-600 hover:to-red-700 hover:shadow-lg hover:scale-[1.03] active:scale-[0.95]",
+                children: [s.jsx(eg, {
+                    className: "h-4 w-4"
+                }), "تسجيل الخروج"]
             })]
         });
     return m ? s.jsxs("div", {

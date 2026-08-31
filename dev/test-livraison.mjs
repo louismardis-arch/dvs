@@ -154,6 +154,14 @@ else { console.error("❌ v3.23: حماية المنتوجات القديمة ن
 if (html.split('✏️ منتوج آخر — اكتبو يدوياً').length - 1 === 1) console.log("✅ v3.23: الخيار اليدوي باقي مرة وحدة فقط (فالفرع ديال الإدمن)");
 else { console.error("❌ v3.23: الخيار اليدوي ماشي فبلاصتو (خاصو يكون غير للإدمن)!"); bad++; }
 
+/* v3.24: زر الخروج الاحترافي ديال البنات (اسم واضح "تسجيل الخروج") */
+if (html.includes('تسجيل الخروج من الحساب')) console.log("✅ v3.24: زر الخروج الاحترافي ديال البنات كاين (title ديالو 'تسجيل الخروج من الحساب')");
+else { console.error("❌ v3.24: زر الخروج الاحترافي ناقص!"); bad++; }
+if (html.split('children:[s.jsx(eg,{className:"h-4 w-4"}),"تسجيل الخروج"]}').length - 1 === 1) console.log("✅ v3.24: الزر فيه أيقونة + الاسم 'تسجيل الخروج' واضح");
+else { console.error("❌ v3.24: الأيقونة والاسم ديال الزر ناقصين!"); bad++; }
+if (html.includes('bg-gradient-to-l from-rose-500 to-red-600')) console.log("✅ v3.24: الزر بتصميم احترافي (تدرج أحمر + ظل + hover)");
+else { console.error("❌ v3.24: التصميم الاحترافي ديال الزر ناقص!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");
