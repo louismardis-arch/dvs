@@ -40937,7 +40937,7 @@ function $_() {
     currentUser: e
   } = kr(), n = e?.role === "admin", a = Ll(), {
     orders: o
-  } = Xt(), [i, c] = ee.useState(""), [f, u] = ee.useState(""), [d, m] = ee.useState(""), [sh, q] = ee.useState(""), [lc, sl] = ee.useState(!1), h = (A, D) => {
+  } = Xt(), [i, c] = ee.useState(""), [f, u] = ee.useState(""), [d, m] = ee.useState(""), [sh, q] = ee.useState(""), [lc, sl] = ee.useState(!1), [so, ss] = ee.useState("n"), h = (A, D) => {
     $u(a.map((T, k) => k === A ? {
       ...T,
       ...D
@@ -40972,28 +40972,31 @@ function $_() {
           ville: V,
           n: 0,
           conf: 0,
+          ann: 0,
           liv: 0,
           ret: 0,
           ca: 0,
-          fr: 0
+          fr: 0,
+          up: 0
         };
         M.set(K, Z)
       }
       Z.n++;
       A.statut === "Confirmé" && Z.conf++;
-      A.livraison === "Livrée" && Z.liv++;
+      A.statut === "Annulé" && A.livraison !== "Livrée" && A.livraison !== "Retour" && Z.ann++;
+      A.livraison === "Livrée" && (Z.liv++, Z.up += Number(A.upsell) || 0);
       A.livraison === "Retour" && Z.ret++;
       Z.ca += (Number(A.qte) || 0) * (Number(A.prix) || 0);
       Z.fr += Number(A.commission) || 0
     });
-    return [...M.values()].sort((A, D) => D.n - A.n)
-  }, [o]), rows = an.filter(A => !sh.trim() || A.ville.toLowerCase().includes(sh.trim().toLowerCase())), tot = an.reduce((A, D) => A + D.n, 0), tca = an.reduce((A, D) => A + D.ca, 0), tfr = an.reduce((A, D) => A + D.fr, 0), pr = A => {
+    return [...M.values()].sort((A, D) => so === "ca" ? D.ca - A.ca : so === "liv" ? D.liv - A.liv : D.n - A.n)
+  }, [o, so]), rows = an.filter(A => !sh.trim() || A.ville.toLowerCase().includes(sh.trim().toLowerCase())), tot = an.reduce((A, D) => A + D.n, 0), tca = an.reduce((A, D) => A + D.ca, 0), tfr = an.reduce((A, D) => A + D.fr, 0), tup = an.reduce((A, D) => A + D.up, 0), tconf = an.reduce((A, D) => A + D.conf, 0), tliv = an.reduce((A, D) => A + D.liv, 0), tret = an.reduce((A, D) => A + D.ret, 0), tann = an.reduce((A, D) => A + D.ann, 0), tenc = tot - tliv - tret - tann, pr = A => {
     const Z = a.find(D => er(D.nom) === er(A.ville));
     return Z ? Z.prix : null
   }, NF = x => Number(x || 0).toLocaleString("fr-FR"), thH = (A, X) => s.jsx("th", {
     className: "border border-slate-400 bg-[" + X + "] px-2 py-1.5 text-[11px] font-bold text-white whitespace-nowrap",
     children: A
-  });
+  }), rate = (A, D) => A ? Math.round(A / D * 100) + "%" : "—", rcol = x => x >= 80 ? "text-emerald-700" : x >= 40 ? "text-amber-600" : "text-red-600";
   return s.jsxs("div", {
     dir: "rtl",
     className: "h-full overflow-auto bg-slate-50 p-4 text-sm",
@@ -41010,7 +41013,7 @@ function $_() {
             children: "LES VILLES — تحليل المدن"
           }), s.jsx("p", {
             className: "text-[11px] text-slate-500",
-            children: "زيد مدينة بالاسم + تمن التوصيل فقط — وتمنها كيتطبق على CRM كامل"
+            children: "زيد مدينة بالاسم + تمن التوصيل فقط — التحليل كيتحسب أوتوماتيك من الطلبيات"
           })]
         }), s.jsx("span", {
           className: "ms-auto rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-600",
@@ -41026,7 +41029,7 @@ function $_() {
         className: "rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-[11px] leading-5",
         children: ["⚡ تمن التوصيل ديال كل مدينة ", s.jsx("b", {
           children: "كيتطبق على CRM كامل"
-        }), ": فـ الطلبيات كيتحط أوتوماتيك فـ commision، وفـ LIVRAISON كيتحط فـ Frais livraison — باش الحسابات تكون مضبوطة."]
+        }), ": فـ الطلبيات كيتحط أوتوماتيك فـ commision، وفـ LIVRAISON كيتحط فـ Frais livraison — وهاد التحليل كيتحسب وحدو من الطلبيات."]
       }), n && s.jsxs("div", {
         className: "rounded-2xl border-2 border-blue-200 bg-gradient-to-b from-blue-50/80 to-white p-4 shadow-sm",
         children: [s.jsxs("div", {
@@ -41071,7 +41074,7 @@ function $_() {
           })]
         })]
       }), s.jsxs("div", {
-        className: "grid grid-cols-2 gap-2 lg:grid-cols-4",
+        className: "grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5",
         children: [s.jsxs("div", {
           className: "rounded-xl border border-slate-200 bg-white p-3",
           children: [s.jsx("p", {
@@ -41100,6 +41103,15 @@ function $_() {
             children: NF(tfr)
           })]
         }), s.jsxs("div", {
+          className: "rounded-xl border border-violet-200 bg-violet-50/60 p-3",
+          children: [s.jsx("p", {
+            className: "text-[10px] font-bold text-violet-600",
+            children: "UPSEL (DH)"
+          }), s.jsx("b", {
+            className: "text-xl font-extrabold text-violet-700",
+            children: NF(tup)
+          })]
+        }), s.jsxs("div", {
           className: "rounded-xl border border-indigo-200 bg-indigo-50/60 p-3",
           children: [s.jsx("p", {
             className: "text-[10px] font-bold text-indigo-600",
@@ -41119,11 +41131,28 @@ function $_() {
               className: "ms-2 text-[10px] font-bold text-slate-400",
               children: [rows.length, " من ", an.length]
             })]
+          }), s.jsxs("label", {
+            className: "ms-auto flex items-center gap-1 text-[10px] font-bold text-slate-500",
+            children: ["ترتيب:", s.jsx("select", {
+              value: so,
+              onChange: A => ss(A.target.value),
+              className: "rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] font-bold text-slate-700 outline-none",
+              children: [s.jsx("option", {
+                value: "n",
+                children: "الأكثر طلبيات"
+              }, 0), s.jsx("option", {
+                value: "ca",
+                children: "الأعلى مبيعات"
+              }, 0), s.jsx("option", {
+                value: "liv",
+                children: "الأكثر تسليم"
+              }, 0)]
+            })]
           }), s.jsx("input", {
             value: sh,
             onChange: A => q(A.target.value),
             placeholder: "🔎 بحث فالمدن...",
-            className: "ms-auto w-52 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs outline-none focus:border-blue-500"
+            className: "w-52 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs outline-none focus:border-blue-500"
           })]
         }), an.length ? rows.length ? s.jsx("div", {
           className: "overflow-x-auto",
@@ -41131,14 +41160,13 @@ function $_() {
             className: "w-full border-collapse text-xs",
             children: [s.jsx("thead", {
               children: s.jsxs("tr", {
-                children: [thH("المدينة", "4a86c8"), thH("تمن التوصيل (DH)", "6aa84f"), thH("الطلبيات", "e69138"), thH("Confirmé", "38761d"), thH("Livré", "cc0000"), thH("Retour", "674ea7"), thH("المبيعات (DH)", "b45f06"), thH("نسبة التسليم", "1155cc")]
+                children: [thH("المدينة", "4a86c8"), thH("تمن التوصيل", "6aa84f"), thH("الطلبيات", "e69138"), thH("Confirmé", "38761d"), thH("Annulé", "990000"), thH("En cours", "45818e"), thH("Livré", "1155cc"), thH("Retour", "674ea7"), thH("المبيعات (DH)", "b45f06"), thH("رسوم التوصيل (DH)", "a64d79"), thH("UPSEL (DH)", "741b47"), thH("التسليم %", "134f5c")]
               })
             }), s.jsx("tbody", {
-              children: rows.map((A, D) => {
-                const P = pr(A),
-                  rt = A.n ? Math.round(A.liv / A.n * 100) : 0;
+              children: [rows.map((A, D) => {
+                const P = pr(A);
                 return s.jsxs("tr", {
-                  className: "odd:bg-white even:bg-[#f8f9fa]",
+                  className: D % 2 === 0 ? "bg-white hover:bg-blue-50/40" : "bg-[#f8f9fa] hover:bg-blue-50/40",
                   children: [s.jsx("td", {
                     className: "border border-slate-300 px-2 py-1.5 font-bold text-slate-700 whitespace-nowrap",
                     children: A.ville
@@ -41159,6 +41187,12 @@ function $_() {
                     className: "border border-slate-300 px-2 py-1.5 text-center text-orange-700",
                     children: A.conf
                   }), s.jsx("td", {
+                    className: "border border-slate-300 px-2 py-1.5 text-center text-red-600",
+                    children: A.ann
+                  }), s.jsx("td", {
+                    className: "border border-slate-300 px-2 py-1.5 text-center text-slate-500",
+                    children: A.n - A.liv - A.ret - A.ann
+                  }), s.jsx("td", {
                     className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-emerald-700",
                     children: A.liv
                   }), s.jsx("td", {
@@ -41168,14 +41202,58 @@ function $_() {
                     className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-slate-700",
                     children: NF(A.ca)
                   }), s.jsx("td", {
+                    className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-amber-700",
+                    children: NF(A.fr)
+                  }), s.jsx("td", {
+                    className: "border border-slate-300 px-2 py-1.5 text-center font-bold text-violet-700",
+                    children: NF(A.up)
+                  }), s.jsx("td", {
                     className: "border border-slate-300 px-2 py-1.5 text-center font-bold",
                     children: s.jsx("span", {
-                      className: rt >= 80 ? "text-emerald-700" : rt >= 40 ? "text-amber-600" : "text-red-600",
-                      children: rt + "%"
+                      className: rcol(A.n ? Math.round(A.liv / A.n * 100) : 0),
+                      children: rate(A.liv, A.n)
                     })
                   })]
                 })
-              })
+              }), s.jsxs("tr", {
+                className: "bg-slate-100 font-extrabold",
+                children: [s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-slate-700",
+                  children: "المجموع"
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5"
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-slate-800",
+                  children: NF(tot)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-orange-700",
+                  children: NF(tconf)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-red-700",
+                  children: NF(tann)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-slate-700",
+                  children: NF(tenc)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-emerald-700",
+                  children: NF(tliv)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-red-700",
+                  children: NF(tret)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-slate-800",
+                  children: NF(tca)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-amber-700",
+                  children: NF(tfr)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center text-violet-700",
+                  children: NF(tup)
+                }), s.jsx("td", {
+                  className: "border border-slate-400 px-2 py-1.5 text-center",
+                  children: rate(tliv, tot)
+                })]
+              })]
             })]
           })
         }) : s.jsx("div", {
