@@ -22,27 +22,35 @@ let bad = 0;
 
 /* 1) الكود المبني فيه الميزات؟ */
 const checks = [
-  ['v=ee.useMemo(()=>n.filter(S=>S.source===i&&ir(S.date)).map(N)', "جدول المصدر: السطور المدخلة + الفيلتر، كل سطر بالتاريخ ديالو"],
-  ['A=ee.useMemo(()=>n.filter(S=>ir(S.date)).map(N)', "GLOBAL: كل المصادر، كل سطر حساب بالتاريخ ديالو"],
+  ['G2=()=>{const rows=[];for(const P of z)', "جدول المصدر: الأيام كيتولدو أوتوماتيك من طلبيات/ADS ديال كل منتوج"],
+  ['A=ee.useMemo(()=>G2()', "GLOBAL: كل المصادر، الأيام كيتولدو أوتوماتيك"],
   ['N=S=>{const E=e.filter(G=>G.originLead', "الحساب كيرجع للنموذج ديال السطور (كل حساب بتاريخو)"],
   ['G.dateCreation===S.date', "إحصائيات كل سطر كتحسب بتاريخو الخاص بالضبط"],
   ['{inRange:ir}=Tn()', "Dashboard مربوط بالفيلتر العالمي ديال CRM"],
   ['children:"📅 فيلتر الأيام:"}),s.jsx(yp,{})', "نفس شكل فيلتر CRM بجانب label فيلتر الأيام"],
   ['n.period||"today"', "الافتراضي ديال الفيلتر = اليوم"],
-  ['onChange:L=>bj(C.row.id,{prix:Number(L.target.value)||0})', "تعديل الثمن على السطر مباشرة"],
-  ['confirm("مسح السطر؟")&&yj(C.row.id)', "مسح السطر مباشرة"],
+  ['onChange:L=>{const Pv=Number(L.target.value)||0,Pr=z.find', "تعديل الثمن كيحدّث المنتوج فاللائحة + فالـ CRM"],
+  ['confirm("مسح المنتوج نهائياً من Dashboard؟")', "مسح المنتوج نهائياً من اللائحة + CRM"],
 ];
 for (const [needle, label] of checks) {
   if (!html.includes(needle)) { console.error("❌ ناقص:", label); bad++; }
   else console.log("✅", label);
 }
 
+/* 1b) v3.15: خانة التاريخ تحيّدات من الفورم + التوليد الأوتوماتيكي موجود */
+if (html.includes('value:m,onChange:S=>h(S.target.value)')) { console.error("❌ خانة 📅 التاريخ باقية فالفورم!"); bad++; }
+else console.log("✅ خانة 📅 التاريخ تحيّدات من الفورم");
+if (html.includes('key:P.s+"|"+P.n+"|"+D')) console.log("✅ الأيام كيتولدو أوتوماتيك من طلبيات/ADS (بلا إدخال يدوي)");
+else { console.error("❌ التوليد الأوتوماتيكي ناقص!"); bad++; }
+if (html.includes('rws.length?rws.forEach(r=>bj(r.id,{prix:Px})):vj(i,Pn,f,Px)')) console.log("✅ المنتوج كيتزاد مرة وحدة فالـ CRM (تحديث إلا كان)");
+else { console.error("❌ منطق الإضافة مرة وحدة ناقص!"); bad++; }
+
 /* 2) استخراج الكود الحقيقي ديال N (حساب السطر) وتنفيذه */
 const i = html.indexOf('<script type="module" crossorigin>');
 const j = html.indexOf('</script>', i);
 const js = html.slice(i + '<script type="module" crossorigin>'.length, j);
 const start = js.indexOf('N=S=>{');
-const end = js.indexOf('}},v=ee.useMemo', start);
+const end = js.indexOf('}},G2=()=>{', start);
 if (start < 0 || end < 0) { console.error("❌ ما قدرناش نستخرجو كود الحساب"); process.exit(1); }
 const body = js.slice(start + 'N=S=>{'.length, end);
 const wrap = new Function(

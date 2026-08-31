@@ -16,22 +16,26 @@ const html = readFileSync(join(root, "index.html"), "utf8");
 let bad = 0;
 
 /* 1) الكود المبني لازم يكون فيه: قراءة القيم المحفوظة عند البدء */
-const initNeedle = '[u,d]=ee.useState(()=>{try{return localStorage.getItem("perf_last_produit")||""}catch{return ""}}),[m,h]=ee.useState(f),[g,b]=ee.useState(()=>{try{return localStorage.getItem("perf_last_prix")||""}catch{return ""}}),y=Rj()';
+const initNeedle = '[u,d]=ee.useState(()=>{try{return localStorage.getItem("perf_last_produit")||""}catch{return ""}}),[g,b]=ee.useState(()=>{try{return localStorage.getItem("perf_last_prix")||""}catch{return ""}}),y=Rj()';
 if (!html.includes(initNeedle)) { console.error("❌ ناقص: قراءة المنتوج+الثمن المحفوظين عند فتح الصفحة"); bad++; }
 else console.log("✅ الصفحة كتفتح بالمنتوج + الثمن المحفوظين");
 
 /* 2) الكود المبني لازم يكون فيه: حفظ القيم عند الإضافة بلا مسح */
-const saveNeedle = 'vj(i,u,m,Number(g));try{localStorage.setItem("perf_last_produit",u.trim()),localStorage.setItem("perf_last_prix",String(g));const P=z.find';
+const saveNeedle = 'D=()=>{if(!u.trim()||!g)return alert("عمّر: المنتوج + PRIX DE VENTE");const Pn=u.trim(),Px=Number(g)||0,rws=n.filter';
 if (!html.includes(saveNeedle)) { console.error("❌ ناقص: حفظ المنتوج+الثمن عند الإضافة"); bad++; }
 else console.log("✅ ملي كتزيد سطر: المنتوج + الثمن كيتحفظو (و كيتسجلو فالقائمة)");
 
-/* 3) المسح القديم (d(""),b("")) خاصو يكون تحيد من بعد الإضافة */
+/* 3) ما بقاش فيه لا خانة تاريخ ولا تكرار ديال المنتوج */
 const i0 = html.indexOf('if(!u.trim()||!g)return alert("عمّر: المنتوج + PRIX DE VENTE");');
 if (i0 < 0) { console.error("❌ ما لقيناش كود الإضافة"); bad++; }
 else {
-  const chunk = html.slice(i0, i0 + 400);
+  const chunk = html.slice(i0, i0 + 600);
   if (chunk.includes('d(""),b("")')) { console.error("❌ الكود باقي كيمسح الحقول بعد الإضافة!"); bad++; }
   else console.log("✅ الحقول ما عادش كيتمسحو بعد الإضافة");
+  if (html.includes('value:m,onChange:S=>h(S.target.value)')) { console.error("❌ خانة التاريخ باقية!"); bad++; }
+  else console.log("✅ v3.15: ما بقاتش خانة 📅 التاريخ — المنتوج مرة وحدة والحسابات أوتوماتيك");
+  if (chunk.includes('rws=n.filter') && chunk.includes('bj(r.id,{prix:Px})')) console.log("✅ v3.15: نفس المنتوج كيتحدّث فبلاصتو (بلا سطر جديد كل مرة)");
+  else { console.error("❌ منطق التحديث بلاصة الإضافة ناقص!"); bad++; }
 }
 
 /* 4) محاكاة حية: ننفذو منطق الحفظ (نفسو بالحرف من الكود المبني) على localStorage وهمي */
@@ -66,5 +70,5 @@ if (z.length === 1 && z[0].n === "نظارة القراءة" && z[0].p === 250) 
 }
 
 if (bad) { console.error(`❌❌❌ ${bad} مشكل`); process.exit(1); }
-console.log("✅✅✅ المنتوج + الثمن كيتحطو مرة وحدة ويبقاو — والتاريخ هو لي كيتبدل");
+console.log("✅✅✅ v3.15: المنتوج + الثمن كيتحطو مرة وحدة ويبقاو — بلا خانة تاريخ، والحسابات اليومية كتطلع أوتوماتيك");
 process.exit(0);

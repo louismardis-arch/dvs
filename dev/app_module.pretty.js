@@ -44174,7 +44174,7 @@ function Fj() {
         } catch {
             return ""
         }
-    }), [m, h] = ee.useState(f), [g, b] = ee.useState(() => {
+    }), [g, b] = ee.useState(() => {
         try {
             return localStorage.getItem("perf_last_prix") || ""
         } catch {
@@ -44217,232 +44217,306 @@ function Fj() {
             }
         } catch {}
         return []
-    }), w = ee.useMemo(() => {
-        const S = new Map;
-        return e.forEach(E => {
-            E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
-        }), [...S.entries()].sort((E, C) => C[1] - E[1]).map(([E]) => E)
-    }, [e]), N = S => {
-        const E = e.filter(G => G.originLead.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.dateCreation === S.date),
-            C = E.filter(G => G.livraison === "Livrée"),
-            L = C.length,
-            F = E.filter(G => G.livraison === "Retour").length,
-            Y = E.filter(G => G.statut === "Annulé" && G.livraison !== "Livrée" && G.livraison !== "Retour").length,
-            oe = E.filter(G => G.statut === "Confirmé").length,
-            K = E.length,
-            V = Math.max(0, K - L - F - Y),
-            H = a.filter(G => G.source.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.date === S.date).reduce((G, q) => G + q.amount, 0),
-            ae = E.filter(G => G.livraison === "Retour"),
-            re = C.reduce((G, q) => G + (q.commission || 0), 0),
-            ie = ae.reduce((G, q) => G + (q.commission || 0), 0),
-            U = L ? re / L : 0,
-            O = y.get(er(S.produit)) ?? null;
-        return {
-            row: S,
-            total: K,
-            conf: oe,
-            ann: Y,
-            liv: L,
-            ret: F,
-            enc: V,
-            achat: O,
-            ship: re,
-            retShip: ie,
-            confRate: K ? oe / K * 100 : null,
-            delRate: L + F ? L / (L + F) * 100 : null,
-            totRate: K ? L / K * 100 : null,
-            spend: H,
-            cpl: K ? H / K : null,
-            cplc: oe ? H / oe : null,
-            cpll: L ? H / L : null,
-            bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
-            gain: L * S.prix - (O !== null ? L * O : 0) - re - ie - H - L * qc
-        }
-    }, v = ee.useMemo(() => n.filter(S => S.source === i && ir(S.date)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, i, e, a, y, ir]), A = ee.useMemo(() => n.filter(S => ir(S.date)).map(N).sort((S, E) => E.row.date.localeCompare(S.row.date)), [n, e, a, y, ir]), D = () => {
-        if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
-        vj(i, u, m, Number(g));
-        try {
-            localStorage.setItem("perf_last_produit", u.trim()), localStorage.setItem("perf_last_prix", String(g));
-            const P = z.find(Q => Q.n.toLowerCase() === u.trim().toLowerCase() && Q.s === i);
-            const J = P ? z.map(Q => Q === P ? {
-                n: Q.n,
-                p: Number(g) || 0,
-                s: i,
-                d: m
-            } : Q) : [...z, {
-                n: u.trim(),
-                p: Number(g) || 0,
-                s: i,
-                d: m
-            }];
-            localStorage.setItem("perf_products_v1", JSON.stringify(J)), kz(J)
-        } catch {}
-    }, T = S => ({
-        total: S.reduce((E, C) => E + C.total, 0),
-        conf: S.reduce((E, C) => E + C.conf, 0),
-        liv: S.reduce((E, C) => E + C.liv, 0),
-        spend: S.reduce((E, C) => E + C.spend, 0),
-        gain: S.reduce((E, C) => E + C.gain, 0)
-    }), k = T(v), M = T(A), X = "rounded-xl border border-slate-300 bg-white px-2.5 py-[7px] text-xs font-semibold outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100", R = "sticky top-0 z-10 border-b border-slate-200 bg-slate-100 px-2 py-2 text-[9px] font-extrabold uppercase tracking-wide text-slate-600 whitespace-nowrap", _ = ({
-        list: S,
-        showSource: E = !1
-    }) => s.jsxs("div", {
-        className: "overflow-x-auto",
-        children: [s.jsxs("table", {
-            className: "w-full border-collapse text-[11px]",
-            dir: "ltr",
-            children: [s.jsx("thead", {
-                children: s.jsxs("tr", {
-                    children: [E && s.jsx("th", {
-                        className: R,
-                        children: "SOURCE"
-                    }), s.jsx("th", {
-                        className: R + " text-start",
-                        children: "Produit"
-                    }), s.jsx("th", {
-                        className: R + " text-start",
-                        children: "Date"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "totale order"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "confirmé"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "Annulé"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "Livré"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "Retour"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "en cours"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "confirmation rate"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "delivre rate"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "TOTAL RATE"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "cost per lead"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "cost per lead confirmé"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "cost per lead livrée"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "BREAK EVENT PRICE"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "PRIX D'achat"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "PRIX DE VENTE"
-                    }), s.jsx("th", {
-                        className: R,
-                        children: "GAIN/PERTE"
-                    }), s.jsx("th", {
-                        className: R
-                    })]
-                })
-            }), s.jsx("tbody", {
-                children: S.map(C => s.jsxs("tr", {
-                    className: "border-b border-slate-100 transition hover:bg-indigo-50/40",
-                    children: [E && s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsx("span", {
-                            className: "rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600",
-                            children: _l.find(L => L.key === C.row.source)?.label || C.row.source || "—"
-                        })
-                    }), s.jsx("td", {
-                        className: "max-w-40 truncate px-2 py-2 font-bold text-slate-700",
-                        title: C.row.produit,
-                        children: C.row.produit
-                    }), s.jsx("td", {
-                        className: "whitespace-nowrap px-2 py-2 font-semibold text-slate-400",
-                        children: C.row.date
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsx("span", {
-                            className: `rounded-lg px-2 py-1 text-xs font-extrabold ${C.total?"bg-blue-50 text-blue-700":"bg-red-50 text-red-500"}`,
-                            children: C.total
-                        })
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-blue-600",
-                        children: C.conf || "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-red-400",
-                        children: C.ann || "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-emerald-600",
-                        children: C.liv || "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-red-500",
-                        children: C.ret || "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-amber-500",
-                        children: C.enc || "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsx("span", {
-                            className: `rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${(C.confRate??0)>=50?"bg-emerald-100 text-emerald-700":"bg-amber-100 text-amber-700"}`,
-                            children: md(C.confRate)
-                        })
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsx("span", {
-                            className: `rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${(C.delRate??0)>=60?"bg-emerald-100 text-emerald-700":(C.delRate??0)>=40?"bg-amber-100 text-amber-700":"bg-red-100 text-red-700"}`,
-                            children: md(C.delRate)
-                        })
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-extrabold text-slate-700",
-                        children: md(C.totRate)
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-red-600",
-                        children: C.spend ? `${ja(C.cpl)} DH` : "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-red-600",
-                        children: C.spend && C.conf ? `${ja(C.cplc)} DH` : "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-bold text-red-600",
-                        children: C.spend && C.liv ? `${ja(C.cpll)} DH` : "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center font-extrabold text-violet-700",
-                        children: C.bep !== null ? `${ja(C.bep)} DH` : "—"
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        title: C.achat !== null ? "تمن الشراء — من صفحة pièce" : "المنتوج ما موجودش فـ صفحة pièce",
-                        children: C.achat !== null ? s.jsxs("span", {
-                            className: "rounded-lg bg-orange-50 px-2 py-1 text-xs font-extrabold text-orange-600",
-                            children: [C.achat, " DH"]
-                        }) : s.jsx("span", {
-                            className: "text-[10px] font-bold text-red-400",
-                            children: "ما كاينش"
-                        })
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsx("input", {
-                            type: "number",
-                            value: C.row.prix,
-                            onChange: L => bj(C.row.id, {
-                                prix: Number(L.target.value) || 0
-                            }),
-                            title: "PRIX DE VENTE — قابل للتعديل",
-                            className: "w-16 rounded-lg border border-slate-200 px-1 py-1 text-center text-[11px] font-bold text-slate-700 outline-none focus:border-indigo-400"
-                        })
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsxs("span", {
-                            title: `الحساب:
+    });
+    ee.useEffect(() => {
+        const mp = new Map;
+        (zl ?? ko()).forEach(r => {
+            const sn = (r.source || "").trim(),
+                pn = (r.produit || "").trim();
+            if (!sn || !pn) return;
+            const key = sn.toLowerCase() + "|" + pn.toLowerCase(),
+                cur = mp.get(key);
+            if (!cur) mp.set(key, {
+                n: pn,
+                p: Number(r.prix) || 0,
+                s: sn,
+                d: r.date || ""
+            });
+            else {
+                if ((r.date || "") >= (cur.date || "")) cur.p = Number(r.prix) || 0;
+                if (!cur.d || (r.date || "" && (r.date || "") < cur.d)) cur.d = r.date || ""
+            }
+        });
+        const arr = [...mp.values()];
+        kz(prev => JSON.stringify(prev) === JSON.stringify(arr) ? prev : arr)
+    }, [n]);
+    const w = ee.useMemo(() => {
+            const S = new Map;
+            return e.forEach(E => {
+                E.produit && S.set(E.produit, (S.get(E.produit) || 0) + 1)
+            }), [...S.entries()].sort((E, C) => C[1] - E[1]).map(([E]) => E)
+        }, [e]),
+        N = S => {
+            const E = e.filter(G => G.originLead.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.dateCreation === S.date),
+                C = E.filter(G => G.livraison === "Livrée"),
+                L = C.length,
+                F = E.filter(G => G.livraison === "Retour").length,
+                Y = E.filter(G => G.statut === "Annulé" && G.livraison !== "Livrée" && G.livraison !== "Retour").length,
+                oe = E.filter(G => G.statut === "Confirmé").length,
+                K = E.length,
+                V = Math.max(0, K - L - F - Y),
+                H = a.filter(G => G.source.trim().toLowerCase() === S.source.trim().toLowerCase() && G.produit.trim().toLowerCase() === S.produit.trim().toLowerCase() && G.date === S.date).reduce((G, q) => G + q.amount, 0),
+                ae = E.filter(G => G.livraison === "Retour"),
+                re = C.reduce((G, q) => G + (q.commission || 0), 0),
+                ie = ae.reduce((G, q) => G + (q.commission || 0), 0),
+                U = L ? re / L : 0,
+                O = y.get(er(S.produit)) ?? null;
+            return {
+                row: S,
+                total: K,
+                conf: oe,
+                ann: Y,
+                liv: L,
+                ret: F,
+                enc: V,
+                achat: O,
+                ship: re,
+                retShip: ie,
+                confRate: K ? oe / K * 100 : null,
+                delRate: L + F ? L / (L + F) * 100 : null,
+                totRate: K ? L / K * 100 : null,
+                spend: H,
+                cpl: K ? H / K : null,
+                cplc: oe ? H / oe : null,
+                cpll: L ? H / L : null,
+                bep: L ? (H + ie) / L + U + (O ?? 0) + qc : U || null,
+                gain: L * S.prix - (O !== null ? L * O : 0) - re - ie - H - L * qc
+            }
+        },
+        G2 = () => {
+            const rows = [];
+            for (const P of z) {
+                const sl = (P.s || "").trim().toLowerCase(),
+                    pl = (P.n || "").trim().toLowerCase(),
+                    ds = new Set;
+                e.forEach(G => {
+                    G.originLead.trim().toLowerCase() === sl && G.produit.trim().toLowerCase() === pl && G.dateCreation && ds.add(String(G.dateCreation).slice(0, 10))
+                });
+                a.forEach(H => {
+                    H.source.trim().toLowerCase() === sl && H.produit.trim().toLowerCase() === pl && H.date && ds.add(String(H.date).slice(0, 10))
+                });
+                let dts = [...ds].filter(ir).sort().reverse();
+                if (!dts.length && P.d && ir(P.d)) dts = [P.d];
+                for (const D of dts) rows.push(N({
+                    source: P.s,
+                    produit: P.n,
+                    date: D,
+                    prix: P.p,
+                    key: P.s + "|" + P.n + "|" + D
+                }))
+            }
+            return rows.sort((S, E) => E.date.localeCompare(S.date))
+        },
+        v = ee.useMemo(() => G2().filter(S => S.row.source === i), [z, i, e, a, y, ir]),
+        A = ee.useMemo(() => G2(), [z, e, a, y, ir]),
+        D = () => {
+            if (!u.trim() || !g) return alert("عمّر: المنتوج + PRIX DE VENTE");
+            const Pn = u.trim(),
+                Px = Number(g) || 0,
+                rws = n.filter(r => r.source === i && r.produit.trim().toLowerCase() === Pn.toLowerCase());
+            rws.length ? rws.forEach(r => bj(r.id, {
+                prix: Px
+            })) : vj(i, Pn, f, Px);
+            try {
+                localStorage.setItem("perf_last_produit", Pn), localStorage.setItem("perf_last_prix", String(g));
+                const P = z.find(Q => Q.n.toLowerCase() === Pn.toLowerCase() && Q.s === i),
+                    J = P ? z.map(Q => Q === P ? {
+                        n: Q.n,
+                        p: Px,
+                        s: i,
+                        d: Q.d || f
+                    } : Q) : [...z, {
+                        n: Pn,
+                        p: Px,
+                        s: i,
+                        d: f
+                    }];
+                localStorage.setItem("perf_products_v1", JSON.stringify(J)), kz(J);
+                alert(P ? "⚠️ هاد المنتوج كاين أصلاً فهاد السورس — تحدّث الثمن فقط (ما كيتزادش مرتين)" : "✅ المنتوج تزاد — من دابا الحسابات اليومية ديالو كتطلع أوتوماتيك مع الفيلتر")
+            } catch {}
+        },
+        T = S => ({
+            total: S.reduce((E, C) => E + C.total, 0),
+            conf: S.reduce((E, C) => E + C.conf, 0),
+            liv: S.reduce((E, C) => E + C.liv, 0),
+            spend: S.reduce((E, C) => E + C.spend, 0),
+            gain: S.reduce((E, C) => E + C.gain, 0)
+        }),
+        k = T(v),
+        M = T(A),
+        X = "rounded-xl border border-slate-300 bg-white px-2.5 py-[7px] text-xs font-semibold outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100",
+        R = "sticky top-0 z-10 border-b border-slate-200 bg-slate-100 px-2 py-2 text-[9px] font-extrabold uppercase tracking-wide text-slate-600 whitespace-nowrap",
+        _ = ({
+            list: S,
+            showSource: E = !1
+        }) => s.jsxs("div", {
+            className: "overflow-x-auto",
+            children: [s.jsxs("table", {
+                className: "w-full border-collapse text-[11px]",
+                dir: "ltr",
+                children: [s.jsx("thead", {
+                    children: s.jsxs("tr", {
+                        children: [E && s.jsx("th", {
+                            className: R,
+                            children: "SOURCE"
+                        }), s.jsx("th", {
+                            className: R + " text-start",
+                            children: "Produit"
+                        }), s.jsx("th", {
+                            className: R + " text-start",
+                            children: "Date"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "totale order"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "confirmé"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "Annulé"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "Livré"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "Retour"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "en cours"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "confirmation rate"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "delivre rate"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "TOTAL RATE"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "cost per lead"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "cost per lead confirmé"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "cost per lead livrée"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "BREAK EVENT PRICE"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "PRIX D'achat"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "PRIX DE VENTE"
+                        }), s.jsx("th", {
+                            className: R,
+                            children: "GAIN/PERTE"
+                        }), s.jsx("th", {
+                            className: R
+                        })]
+                    })
+                }), s.jsx("tbody", {
+                    children: S.map(C => s.jsxs("tr", {
+                        className: "border-b border-slate-100 transition hover:bg-indigo-50/40",
+                        children: [E && s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsx("span", {
+                                className: "rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600",
+                                children: _l.find(L => L.key === C.row.source)?.label || C.row.source || "—"
+                            })
+                        }), s.jsx("td", {
+                            className: "max-w-40 truncate px-2 py-2 font-bold text-slate-700",
+                            title: C.row.produit,
+                            children: C.row.produit
+                        }), s.jsx("td", {
+                            className: "whitespace-nowrap px-2 py-2 font-semibold text-slate-400",
+                            children: C.row.date
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsx("span", {
+                                className: `rounded-lg px-2 py-1 text-xs font-extrabold ${C.total?"bg-blue-50 text-blue-700":"bg-red-50 text-red-500"}`,
+                                children: C.total
+                            })
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-blue-600",
+                            children: C.conf || "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-red-400",
+                            children: C.ann || "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-emerald-600",
+                            children: C.liv || "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-red-500",
+                            children: C.ret || "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-amber-500",
+                            children: C.enc || "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsx("span", {
+                                className: `rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${(C.confRate??0)>=50?"bg-emerald-100 text-emerald-700":"bg-amber-100 text-amber-700"}`,
+                                children: md(C.confRate)
+                            })
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsx("span", {
+                                className: `rounded-md px-1.5 py-0.5 text-[10px] font-extrabold ${(C.delRate??0)>=60?"bg-emerald-100 text-emerald-700":(C.delRate??0)>=40?"bg-amber-100 text-amber-700":"bg-red-100 text-red-700"}`,
+                                children: md(C.delRate)
+                            })
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-extrabold text-slate-700",
+                            children: md(C.totRate)
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-red-600",
+                            children: C.spend ? `${ja(C.cpl)} DH` : "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-red-600",
+                            children: C.spend && C.conf ? `${ja(C.cplc)} DH` : "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-bold text-red-600",
+                            children: C.spend && C.liv ? `${ja(C.cpll)} DH` : "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center font-extrabold text-violet-700",
+                            children: C.bep !== null ? `${ja(C.bep)} DH` : "—"
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            title: C.achat !== null ? "تمن الشراء — من صفحة pièce" : "المنتوج ما موجودش فـ صفحة pièce",
+                            children: C.achat !== null ? s.jsxs("span", {
+                                className: "rounded-lg bg-orange-50 px-2 py-1 text-xs font-extrabold text-orange-600",
+                                children: [C.achat, " DH"]
+                            }) : s.jsx("span", {
+                                className: "text-[10px] font-bold text-red-400",
+                                children: "ما كاينش"
+                            })
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsx("input", {
+                                type: "number",
+                                value: C.row.prix,
+                                onChange: L => {
+                                    const Pv = Number(L.target.value) || 0,
+                                        Pr = z.find(Q => Q.n.toLowerCase() === C.row.produit.toLowerCase() && Q.s === C.row.source);
+                                    if (Pr) {
+                                        const J2 = z.map(Q => Q === Pr ? {
+                                            ...Q,
+                                            p: Pv
+                                        } : Q);
+                                        localStorage.setItem("perf_products_v1", JSON.stringify(J2)), kz(J2)
+                                    }
+                                    n.filter(r => r.source === C.row.source && r.produit.trim().toLowerCase() === C.row.produit.toLowerCase()).forEach(r => bj(r.id, {
+                                        prix: Pv
+                                    }))
+                                },
+                                title: "PRIX DE VENTE — قابل للتعديل",
+                                className: "w-16 rounded-lg border border-slate-200 px-1 py-1 text-center text-[11px] font-bold text-slate-700 outline-none focus:border-indigo-400"
+                            })
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsxs("span", {
+                                title: `الحساب:
 (${C.liv} × ${C.row.prix} PRIX DE VENTE) = ${ja(C.liv*C.row.prix)} DH
 − (${C.liv} × ${C.achat??0} PRIX D'achat) = ${ja(C.liv*(C.achat??0))} DH
 − شحن Livré = ${ja(Mj(C))} DH
@@ -44451,30 +44525,34 @@ function Fj() {
 − التأكيدات (${C.liv} × ${qc} DH) = ${ja(C.liv*qc)} DH
 ═══════
 GAIN/PERTE = ${ja(C.gain)} DH`,
-                            className: `cursor-help rounded-lg px-2 py-1 text-xs font-extrabold ${C.gain>=0?"bg-emerald-100 text-emerald-700":"bg-red-100 text-red-700"}`,
-                            children: [ja(C.gain), " DH"]
-                        })
-                    }), s.jsx("td", {
-                        className: "px-2 py-2 text-center",
-                        children: s.jsx("button", {
-                            onClick: () => confirm("مسح السطر؟") && yj(C.row.id),
-                            className: "grid h-6 w-6 place-items-center rounded-lg text-slate-300 transition hover:bg-red-50 hover:text-red-600",
-                            children: "✕"
-                        })
-                    })]
-                }, C.row.id))
+                                className: `cursor-help rounded-lg px-2 py-1 text-xs font-extrabold ${C.gain>=0?"bg-emerald-100 text-emerald-700":"bg-red-100 text-red-700"}`,
+                                children: [ja(C.gain), " DH"]
+                            })
+                        }), s.jsx("td", {
+                            className: "px-2 py-2 text-center",
+                            children: s.jsx("button", {
+                                onClick: () => confirm("مسح المنتوج نهائياً من Dashboard؟") && (() => {
+                                    const J3 = z.filter(Q => !(Q.n.toLowerCase() === C.row.produit.toLowerCase() && Q.s === C.row.source));
+                                    localStorage.setItem("perf_products_v1", JSON.stringify(J3)), kz(J3);
+                                    n.filter(r => r.source === C.row.source && r.produit.trim().toLowerCase() === C.row.produit.toLowerCase()).forEach(r => yj(r.id))
+                                })(),
+                                className: "grid h-6 w-6 place-items-center rounded-lg text-slate-300 transition hover:bg-red-50 hover:text-red-600",
+                                children: "✕"
+                            })
+                        })]
+                    }, C.row.key))
+                })]
+            }), !S.length && s.jsxs("div", {
+                className: "p-8 text-center",
+                children: [s.jsx("div", {
+                    className: "mb-2 text-3xl",
+                    children: "📊"
+                }), s.jsx("p", {
+                    className: "text-xs font-bold text-slate-500",
+                    children: "ما كاين حتى داطا فهاد الفترة — بدل الفيلتر ولا زيد منتوج جديد من الفورم فوق"
+                })]
             })]
-        }), !S.length && s.jsxs("div", {
-            className: "p-8 text-center",
-            children: [s.jsx("div", {
-                className: "mb-2 text-3xl",
-                children: "📊"
-            }), s.jsx("p", {
-                className: "text-xs font-bold text-slate-500",
-                children: "ما كاين حتى حساب فهاد الفترة — بدل الفيلتر (الكل ولا Custom) ولا زيد حساب جديد من الفورم فوق"
-            })]
-        })]
-    });
+        });
     return s.jsx("div", {
         dir: "rtl",
         className: "h-full overflow-auto bg-slate-50 p-4 text-sm",
@@ -44491,7 +44569,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                         children: "Dashboard performance"
                     }), s.jsx("p", {
                         className: "text-[11px] text-slate-500",
-                        children: "زيد حساب (منتوج + تاريخ + ثمن) — كل سطر كيبان بالتاريخ ديالو، والفيلتر كيعرض الفترة اللي بغيتي (الباقي أوتوماتيك من CRM)"
+                        children: "زيد كل منتوج مرة وحدة (بالسورس ديالو) — الحسابات اليومية كتطلع أوتوماتيك من CRM والفيلتر كيعرض الفترة اللي بغيتي"
                     })]
                 })]
             }), s.jsx("nav", {
@@ -44579,13 +44657,17 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                         children: "＋"
                     }), s.jsxs("b", {
                         className: "text-sm font-extrabold text-slate-800",
-                        children: ["زيد حساب فـ ", _l.find(S => S.key === i)?.label]
+                        children: ["زيد منتوج جديد فـ ", _l.find(S => S.key === i)?.label]
                     }), s.jsx("span", {
                         className: "text-[10px] font-semibold text-indigo-500",
-                        children: "— المنتوج كيتكتب مرة وحدة وكل حساب بالتاريخ ديالو ⚡"
+                        children: "— كل منتوج كيتزاد مرة وحدة، والحسابات اليومية كتحسب أوتوماتيك ⚡"
                     })]
                 }), s.jsxs("div", {
-                    className: "grid gap-2 sm:grid-cols-2 lg:grid-cols-4",
+                    style: {
+                        display: "grid",
+                        gap: 8,
+                        gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))"
+                    },
                     children: [s.jsxs("label", {
                         className: "text-[10px] font-bold text-slate-500",
                         children: ["📦 Produit", s.jsx("input", {
@@ -44597,14 +44679,6 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                                 P && P.p > 0 && !g && b(String(P.p))
                             },
                             placeholder: "نظارة القراءة...",
-                            className: X + " mt-0.5 w-full"
-                        })]
-                    }), s.jsxs("label", {
-                        className: "text-[10px] font-bold text-slate-500",
-                        children: ["📅 التاريخ", s.jsx("input", {
-                            type: "date",
-                            value: m,
-                            onChange: S => h(S.target.value),
                             className: X + " mt-0.5 w-full"
                         })]
                     }), s.jsxs("label", {
@@ -44650,7 +44724,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                         children: _l.find(S => S.key === i)?.label
                     }), s.jsx("span", {
                         className: "ms-auto text-[10px] text-slate-400",
-                        children: "⚡ كل سطر = حساب بتاريخو — الفيلتر كيعرض الفترة المختارة (اليوم/أمس/الأسبوع/الشهر/الكل/Custom)"
+                        children: "⚡ كل سطر = يوم — الحسابات كتحسب أوتوماتيك من طلبيات و ADS ديال داك اليوم"
                     })]
                 }), s.jsx(_, {
                     list: v
@@ -44667,7 +44741,7 @@ GAIN/PERTE = ${ja(C.gain)} DH`,
                         children: "GLOBAL — كل المصادر"
                     }), s.jsxs("span", {
                         className: "rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold",
-                        children: [A.length, " منتوج"]
+                        children: [A.length, " حساب"]
                     }), s.jsxs("span", {
                         className: "ms-auto flex flex-wrap gap-3 text-[10px] font-bold",
                         children: [s.jsxs("span", {

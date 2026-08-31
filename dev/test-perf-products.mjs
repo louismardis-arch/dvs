@@ -20,17 +20,20 @@ let bad = 0;
 const checks = [
   ['perf_products_v1', "قائمة المنتوجات المحفوظة موجودة"],
   ['P&&P.p>0&&!g&&b(String(P.p))', "التعبئة الأوتوماتيكية للثمن عند اختيار منتوج"],
-  ['const J=P?z.map(Q=>Q===P?{n:Q.n,p:Number(g)||0,s:i,d:m}:Q):[...z,{n:u.trim(),p:Number(g)||0,s:i,d:m}]', "تسجيل المنتوج الجديد فالقائمة عند الإضافة"],
-  ['v=ee.useMemo(()=>n.filter(S=>S.source===i&&ir(S.date)).map(N)', "الجدول ديال المصدر: السطور + الفيلتر، كل سطر بالتاريخ"],
-  ['A=ee.useMemo(()=>n.filter(S=>ir(S.date)).map(N)', "الجدول العام: كل المصادر، كل سطر بالتاريخ"],
+  ['rws.length?rws.forEach(r=>bj(r.id,{prix:Px})):vj(i,Pn,f,Px)', "v3.15: المنتوج كيتزاد مرة وحدة (تحديث إلا كان — بلا سطر جديد)"],
+  ['G2=()=>{const rows=[];for(const P of z)', "الجدول ديال المصدر: الأيام كيتولدو أوتوماتيك من داطا CRM"],
+  ['A=ee.useMemo(()=>G2()', "الجدول العام: كل المصادر، الأيام أوتوماتيك"],
   ['children:"📅 فيلتر الأيام:"}),s.jsx(yp,{})', "label فيلتر الأيام + نفس أزرار فيلتر CRM بجانبو (رقم 2)"],
   ['n.period||"today"', "الافتراضي ديال الفيلتر = اليوم (رقم 3)"],
-  ['📅 التاريخ', "خانة تاريخ الانطلاق فالفورم"],
+  ['"perf_products_v1"', "المنتوجات محفوظين فاللائحة (perf_products_v1)"],
 ];
 for (const [needle, label] of checks) {
   if (!html.includes(needle)) { console.error("❌ ناقص:", label); bad++; }
   else console.log("✅", label);
 }
+/* v3.15: خانة التاريخ خاصها تكون تحيّدات من الفورم */
+if (html.includes('value:m,onChange:S=>h(S.target.value)')) { console.error("❌ خانة 📅 التاريخ باقية فالفورم — خاصها تتحيّد!"); bad++; }
+else console.log("✅ خانة 📅 التاريخ تحيّدات — كيبقا غير المنتوج + الثمن + السورس");
 
 /* 2) محاكاة حية: المنتوج مرة وحدة → فالقائمة → الثمن أوتوماتيك */
 const mem = {};
