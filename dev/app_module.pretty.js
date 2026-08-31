@@ -33817,8 +33817,8 @@ function t_() {
                                 Ce = se.statut,
                                 tt = Be === "Retour",
                                 Le = Ce === "Annulé",
-                                Fe = Be === "Livrée" ? "#34c759" : Be === "Retour" ? "#ff2b2b" : Be === "Out Of Stock" ? "#3c78d8" : Be === "Expédier vers" || Be === "Expédié" ? "#f6b26b" : Ce === "Annulé" ? "#ff2b2b" : Ce === "Rappel" ? "#ffff00" : be % 2 ? "#f8f9fa" : "#ffffff",
-                                ze = tt || Le ? "line-through" : "none",
+                                Fe = Be === "Livrée" ? "#34c759" : Be === "Retour" ? "#ff2b2b" : Be === "Out Of Stock" ? "#3c78d8" : Be === "Expédier vers" || Be === "Expédié" ? "#f6b26b" : Ce === "Rappel" ? "#ffff00" : be % 2 ? "#f8f9fa" : "#ffffff",
+                                ze = tt || Le ? "line-through #dc2626 2px" : "none",
                                 Ea = {
                                     background: Fe,
                                     textDecoration: ze
@@ -37096,7 +37096,7 @@ function w_() {
 
 function B2(e, n) {
     return {
-        bg: e.livraison === "Livrée" ? "#34c759" : e.livraison === "Retour" ? "#ff2b2b" : e.livraison === "Out Of Stock" ? "#3c78d8" : e.livraison === "Expédier vers" ? "#f6b26b" : e.statut === "Annulé" ? "#ff2b2b" : e.statut === "Rappel" ? "#ffff00" : n % 2 ? "#f8f9fa" : "#ffffff",
+        bg: e.livraison === "Livrée" ? "#34c759" : e.livraison === "Retour" ? "#ff2b2b" : e.livraison === "Out Of Stock" ? "#3c78d8" : e.livraison === "Expédier vers" ? "#f6b26b" : e.statut === "Rappel" ? "#ffff00" : n % 2 ? "#f8f9fa" : "#ffffff",
         strike: e.livraison === "Retour" || e.statut === "Annulé"
     }
 }
@@ -37285,7 +37285,7 @@ function I2({
                 return s.jsxs("div", {
                     className: `overflow-hidden rounded-xl border shadow-sm ${b(H)?"border-amber-300":"border-slate-200"}`,
                     style: {
-                        textDecoration: ie ? "line-through" : "none"
+                        textDecoration: ie ? "line-through #dc2626 2px" : "none"
                     },
                     children: [b(H) && s.jsx("div", {
                         className: "flex items-center gap-2 bg-amber-50 px-2.5 py-1.5 text-[10px] font-bold text-amber-800",
@@ -37304,7 +37304,7 @@ function I2({
                             placeholder: "Nom & Prénom",
                             className: "min-w-0 flex-1 border-0 bg-transparent px-1 text-sm font-bold outline-none",
                             style: {
-                                textDecoration: ie ? "line-through" : "none"
+                                textDecoration: ie ? "line-through #dc2626 2px" : "none"
                             }
                         }), H.statut && s.jsx("span", {
                             className: "shrink-0 rounded-full bg-white/80 px-2 py-0.5 text-[9px] font-bold text-slate-700",
@@ -37486,7 +37486,7 @@ function I2({
                                 strike: ie
                             } = B2(H, ae), U = "h-full w-full border-0 bg-transparent px-1 py-1 outline-none", O = {
                                 background: re,
-                                textDecoration: ie ? "line-through" : "none"
+                                textDecoration: ie ? "line-through #dc2626 2px" : "none"
                             };
                             return s.jsxs("tr", {
                                 style: {

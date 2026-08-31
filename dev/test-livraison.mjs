@@ -90,9 +90,17 @@ for (const st of statuses) {
 }
 if (!bad) console.log("✅ الحالات التسعة كاملين:", statuses.join(" | "));
 
-/* v3.17: Commandes — سطر Annulé ما بقاش بحمرة كاملة، ولا strikethrough بخط أحمر */
-if (html.includes('T.statut==="Annulé"?"#fee2e2"')) { console.error("❌ v3.17: الخلفية الحمراء ديال سطر Annulé فـ Commandes باقية!"); bad++; }
-else console.log("✅ v3.17: سطر Annulé فـ Commandes ما بقاش بحمرة كاملة");
+/* v3.17/v3.18: سطر Annulé فـ Commandes — بلا خلفية حمراء، غير strikethrough بخط أحمر */
+if (html.includes('T.statut==="Annulé"?"#fee2e2"')) { console.error("❌ v3.17: الخلفية الحمراء ديال سطر Annulé فـ Zv باقية!"); bad++; }
+else console.log("✅ v3.17: سطر Annulé فـ Zv (suivi confirmation) ما بقاش بحمرة كاملة");
+if (html.includes('Ce==="Annulé"?"#ff2b2b"')) { console.error("❌ v3.18: الخلفية الحمراء ديال Annulé فالجدول الرئيسي ديال Commandes باقية!"); bad++; }
+else console.log("✅ v3.18: الجدول الرئيسي ديال Commandes — Annulé ما بقاش بحمرة (#ff2b2b)");
+if (html.includes('e.statut==="Annulé"?"#ff2b2b"')) { console.error("❌ v3.18: الخلفية الحمراء ديال Annulé فصفحة Work Team باقية!"); bad++; }
+else console.log("✅ v3.18: صفحة Work Team (طلبيات البنات) — Annulé ما بقاش بحمرة");
+if (html.includes('ze=tt||Le?"line-through #dc2626 2px":"none"')) console.log("✅ v3.18: الضربة فجدول Commandes الرئيسي حمرا (#dc2626)");
+else { console.error("❌ v3.18: الضربة الحمرا ناقصة فجدول Commandes الرئيسي!"); bad++; }
+if (html.split('ie?"line-through #dc2626 2px":"none"').length - 1 === 3) console.log("✅ v3.18: الضربة الحمرا فصفحة Work Team (3 مواضع: كارت + اسم + جدول)");
+else { console.error("❌ v3.18: الضربة الحمرا ديال Work Team ناقصة!"); bad++; }
 if (html.includes('textDecoration:T.statut==="Annulé"?"line-through":"none"')) console.log("✅ v3.17: سطر Annulé فـ Commandes كيتخرق بخط أحمر (strikethrough)");
 else { console.error("❌ v3.17: strikethrough ديال Commandes ناقص!"); bad++; }
 if (html.includes('tr[data-ann="1"] td{text-decoration:line-through')) console.log("✅ v3.17: CSS الضرب الأحمر ديال الحقول (input/select)");
