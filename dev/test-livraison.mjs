@@ -146,6 +146,14 @@ else { console.error("❌ v3.22: خيار الكتابة اليدوية ناقص
 if (html.includes('catal0=ee.useMemo') && html.includes('afrizon_catalog_v1')) console.log("✅ v3.22: suivi confirmation كتقرا الكاطالوغ ديال PRODUITS (afrizon_catalog_v1)");
 else { console.error("❌ v3.22: suivi confirmation ما كتقراش الكاطالوغ!"); bad++; }
 
+/* v3.23: البنات غير كيختارو من اللائحة — بلا حق الإضافة اليدوية؛ الإضافة للإدمنز فقط */
+if (html.includes('m=kr()?.currentUser?.role==="admin"')) console.log("✅ v3.23: Pk كيعرف الدور — البنت (user) select فقط، الإدمن (admin) عنده الخيار اليدوي");
+else { console.error("❌ v3.23: فحص الدور فـ Pk ناقص!"); bad++; }
+if (html.includes('g?s.jsx("option",{value:e,children:e+" (منتوج قديم)"}):null')) console.log("✅ v3.23: المنتوجات القديمة ديال الطلبيات كيبقاو محفوظين (خيار محمي)");
+else { console.error("❌ v3.23: حماية المنتوجات القديمة ناقصة!"); bad++; }
+if (html.split('✏️ منتوج آخر — اكتبو يدوياً').length - 1 === 1) console.log("✅ v3.23: الخيار اليدوي باقي مرة وحدة فقط (فالفرع ديال الإدمن)");
+else { console.error("❌ v3.23: الخيار اليدوي ماشي فبلاصتو (خاصو يكون غير للإدمن)!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");

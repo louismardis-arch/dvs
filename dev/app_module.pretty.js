@@ -37108,7 +37108,27 @@ function Pk({
     style: c
 }) {
     const o = [...new Set((n || []).map(t => t && t.nom || "").filter(Boolean))].sort(),
+        m = kr()?.currentUser?.role === "admin",
         [f, u] = ee.useState(() => !!e && !o.includes(e));
+    if (!m) {
+        const g = e && !o.includes(e);
+        return s.jsx("select", {
+            value: o.includes(e) ? e : g ? e : "",
+            onChange: t => a(t.target.value),
+            className: (i || "") + " cursor-pointer",
+            style: c,
+            children: [s.jsx("option", {
+                value: "",
+                children: "— اختار المنتوج —"
+            }), ...o.map(v => s.jsx("option", {
+                value: v,
+                children: v
+            }, v)), g ? s.jsx("option", {
+                value: e,
+                children: e + " (منتوج قديم)"
+            }) : null]
+        })
+    }
     if (f) return s.jsx("input", {
         value: e,
         onChange: t => {
