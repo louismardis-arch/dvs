@@ -108,6 +108,12 @@ else { console.error("❌ v3.17: CSS ديال الضرب الأحمر ناقص!"
 if (html.includes('"data-ann":T.statut==="Annulé"?"1":"0"')) console.log("✅ v3.17: وسم data-ann كيتزاد على سطر Annulé (جدولين: قراءة + تعديل)");
 else { console.error("❌ v3.17: وسم data-ann ناقص!"); bad++; }
 
+/* v3.19: إصلاح كراش Dashboard performance — الفرز ديال الصفوف كان كيقرا E.date (undefined) بلاصة E.row.date */
+if (html.includes('E.row.date.localeCompare(S.row.date)')) console.log("✅ v3.19: الفرز فـ Dashboard performance كيقرا E.row.date (التاريخ معرّف دابا)");
+else { console.error("❌ v3.19: الفرز المصحح ناقص فـ Dashboard performance!"); bad++; }
+if (html.includes('rows.sort((S,E)=>E.date.localeCompare(S.date))')) { console.error("❌ v3.19: السطر القديم ديال الكراش باقي (E.date.localeCompare)!"); bad++; }
+else console.log("✅ v3.19: السطر اللي كان كيضرب صفحة Dashboard performance (E.date.localeCompare) تّمحات");
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");

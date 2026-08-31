@@ -44313,7 +44313,7 @@ function Fj() {
                     key: P.s + "|" + P.n + "|" + D
                 }))
             }
-            return rows.sort((S, E) => E.date.localeCompare(S.date))
+            return rows.sort((S, E) => E.row.date.localeCompare(S.row.date))
         },
         v = ee.useMemo(() => G2().filter(S => S.row.source === i), [z, i, e, a, y, ir]),
         A = ee.useMemo(() => G2(), [z, e, a, y, ir]),
