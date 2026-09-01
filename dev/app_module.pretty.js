@@ -33136,7 +33136,7 @@ function t_() {
     }], []), ae = se => H.find(be => be.key === se), re = ee.useMemo(() => {
         try {
             const se = localStorage.getItem("afrizon_catalog_v1");
-            if (se) return JSON.parse(se)
+            if (se) return PkN(JSON.parse(se))
         } catch {}
         return []
     }, []), ie = ee.useMemo(() => e.filter(se => h(se.dateCreation)), [e, h]), U = ee.useMemo(() => $v(e), [e]), O = ee.useMemo(() => ZT(U), [U]), G = Ll(), q = ee.useMemo(() => {
@@ -34746,7 +34746,7 @@ function c_() {
     } = kr(), a = n?.role === "admin", [i, c] = ee.useState("catalog"), [f, u] = ee.useState(() => {
         try {
             const _ = localStorage.getItem(ld);
-            if (_) return JSON.parse(_)
+            if (_) return PkN(JSON.parse(_))
         } catch {}
         return s_.map(_ => ({
             nom: _[0],
@@ -34803,7 +34803,15 @@ function c_() {
         },
         T = _ => {
             if (_.preventDefault(), !m.nom.trim()) return alert("اسم المنتج مطلوب");
-            u(g === null ? S => [...S, m] : S => S.map((E, C) => C === g ? m : E)), h(d), b(null), w(!1)
+            const nm = m.nom.trim();
+            if (f.some(E => (E.nom || "").trim().toLowerCase() === nm.toLowerCase())) return alert("⚠️ هاد المنتوج كاين أصلاً فالكاطالوغ — عدّل المنتوج الموجود بدل ما تزيدو مرة أخرى");
+            u(g === null ? S => [...S, {
+                ...m,
+                nom: nm
+            }] : S => S.map((E, C) => C === g ? {
+                ...m,
+                nom: nm
+            } : E)), h(d), b(null), w(!1)
         },
         k = _ => {
             h(f[_]), b(_), w(!0)
@@ -35328,7 +35336,7 @@ function Zv({
     } = Xt(), d = Ll(), [m, h] = ee.useState(""), catal0 = ee.useMemo(() => {
         try {
             const P = localStorage.getItem("afrizon_catalog_v1");
-            if (P) return JSON.parse(P)
+            if (P) return PkN(JSON.parse(P))
         } catch {}
         return []
     }, []), g = (T, k, M) => {
@@ -36990,6 +36998,20 @@ function w_() {
     }, []), e
 }
 
+function PkN(e) {
+    if (!Array.isArray(e)) return [];
+    const m = new Map;
+    return e.forEach(t => {
+        const k = (t && t.nom || "").trim();
+        if (!k) return;
+        const key = k.toLowerCase();
+        m.has(key) || m.set(key, {
+            ...t,
+            nom: k
+        })
+    }), [...m.values()]
+}
+
 function Pk({
     value: e,
     list: n,
@@ -36997,13 +37019,14 @@ function Pk({
     className: i,
     style: c
 }) {
-    const o = [...new Set((n || []).map(t => t && t.nom || "").filter(Boolean))].sort(),
+    const v0 = (e || "").trim(),
+        o = [...new Map((n || []).filter(t => t && t.nom).map(t => [t.nom.trim().toLowerCase(), t.nom.trim()])).values()].sort(),
         m = kr()?.currentUser?.role === "admin",
-        [f, u] = ee.useState(() => !!e && !o.includes(e));
+        [f, u] = ee.useState(() => !!v0 && !o.includes(v0));
     if (!m) {
-        const g = e && !o.includes(e);
+        const g = !!v0 && !o.includes(v0);
         return s.jsx("select", {
-            value: o.includes(e) ? e : g ? e : "",
+            value: o.includes(v0) ? v0 : g ? v0 : "",
             onChange: t => a(t.target.value),
             className: (i || "") + " cursor-pointer",
             style: c,
@@ -37014,13 +37037,13 @@ function Pk({
                 value: v,
                 children: v
             }, v)), g ? s.jsx("option", {
-                value: e,
-                children: e + " (منتوج قديم)"
+                value: v0,
+                children: v0 + " (منتوج قديم)"
             }) : null]
         })
     }
     if (f) return s.jsx("input", {
-        value: e,
+        value: v0,
         onChange: t => {
             const v = t.target.value;
             v === "" ? (u(!1), a("")) : a(v)
@@ -37030,7 +37053,7 @@ function Pk({
         placeholder: "✏️ اكتبي إسم المنتوج..."
     });
     return s.jsx("select", {
-        value: o.includes(e) ? e : "",
+        value: o.includes(v0) ? v0 : "",
         onChange: t => {
             const v = t.target.value;
             v === "__pk__" ? u(!0) : (u(!1), a(v))
@@ -37082,7 +37105,7 @@ function I2({
         N = ee.useMemo(() => {
             try {
                 const H = localStorage.getItem("afrizon_catalog_v1");
-                if (H) return JSON.parse(H)
+                if (H) return PkN(JSON.parse(H))
             } catch {}
             return []
         }, []),

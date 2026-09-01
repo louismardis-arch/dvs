@@ -149,7 +149,7 @@ else { console.error("❌ v3.22: suivi confirmation ما كتقراش الكاط
 /* v3.23: البنات غير كيختارو من اللائحة — بلا حق الإضافة اليدوية؛ الإضافة للإدمنز فقط */
 if (html.includes('m=kr()?.currentUser?.role==="admin"')) console.log("✅ v3.23: Pk كيعرف الدور — البنت (user) select فقط، الإدمن (admin) عنده الخيار اليدوي");
 else { console.error("❌ v3.23: فحص الدور فـ Pk ناقص!"); bad++; }
-if (html.includes('g?s.jsx("option",{value:e,children:e+" (منتوج قديم)"}):null')) console.log("✅ v3.23: المنتوجات القديمة ديال الطلبيات كيبقاو محفوظين (خيار محمي)");
+if (html.includes('g?s.jsx("option",{value:v0,children:v0+" (منتوج قديم)"}):null')) console.log("✅ v3.23: المنتوجات القديمة ديال الطلبيات كيبقاو محفوظين (خيار محمي)");
 else { console.error("❌ v3.23: حماية المنتوجات القديمة ناقصة!"); bad++; }
 if (html.split('✏️ منتوج آخر — اكتبو يدوياً').length - 1 === 1) console.log("✅ v3.23: الخيار اليدوي باقي مرة وحدة فقط (فالفرع ديال الإدمن)");
 else { console.error("❌ v3.23: الخيار اليدوي ماشي فبلاصتو (خاصو يكون غير للإدمن)!"); bad++; }
@@ -181,6 +181,14 @@ if (html.includes('Catalogue (${f.length})')) console.log("✅ v3.26: تبويب
 else { console.error("❌ v3.26: تبويب Catalogue ناقص!"); bad++; }
 if (!html.includes('i==="stats"&&') && !html.includes('i==="mois"&&') && !html.includes('i==="zones"&&')) console.log("✅ v3.26: أقسام stats/mois/zones تّحيدو من الكود نهائياً");
 else { console.error("❌ v3.26: شي قسم من الأقسام الثلاثة مازال فالكود!"); bad++; }
+
+/* v3.27: إسم المنتوج كيبان مرة وحدة فقط — منع التكرار + تنظيف الكاطالوغ */
+if (html.includes('function PkN(e){')) console.log("✅ v3.27: موحّد الكاطالوغ PkN كاين (trim + dedup حسب الحالة والمسافات)");
+else { console.error("❌ v3.27: موحّد الكاطالوغ PkN ناقص!"); bad++; }
+if (html.includes('...new Map((n||[]).filter(t=>t&&t.nom)')) console.log("✅ v3.27: لائحة المنتوجات فالـ picker كتبان مرة وحدة (dedup قوي)");
+else { console.error("❌ v3.27: dedup ديال الـ picker ناقص!"); bad++; }
+if (html.includes('كاين أصلاً فالكاطالوغ')) console.log("✅ v3.27: منع إضافة منتوج مكرر فصفحة PRODUITS");
+else { console.error("❌ v3.27: منع التكرار فالإضافة ناقص!"); bad++; }
 
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
