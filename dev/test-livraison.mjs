@@ -254,7 +254,18 @@ else { console.error("❌ v3.33: زر الخروج مازال فالفوتر!");
 if (!html.includes('خروج — تسجيل الخروج')) console.log("✅ v3.33: ما بقاش زر خروج مكرر فبطاقة المستخدم (admin icon تّحاد)");
 else { console.error("❌ v3.33: الزر المكرر مازال كاين!"); bad++; }
 if (html.includes('تسجيل الخروج من الحساب')) console.log("✅ v3.33: زر الخروج الاحترافي ديال البنات ما تبدلش (v3.24)");
-else { console.error("❌ v3.33: زر الخروج ديال البنات ناقص!"); bad++; }
+
+/* v3.34: حيّدنا الشريط التحتي ديال الإحصائيات فـ COMONDES — الطلبيات كتاخد الصفحة كاملة */
+if (!html.includes('"CMD:",ht.cmd') && !html.includes('"DH · Pièces:"')) console.log("✅ v3.34: الشريط التحتي (CMD:/Confirmé:/Livrée:/Retour:/Annulé:/CA:/Pièces:) تّحاد من COMONDES");
+else { console.error("❌ v3.34: الشريط مازال كاين!"); bad++; }
+if (!html.includes('[q.length,"/",ie.length," lignes"]')) console.log("✅ v3.34: عداد lignes ديال الشريط التحتي تّحاد هو الآخر");
+else { console.error("❌ v3.34: عداد lignes مازال كاين!"); bad++; }
+if (html.includes('w==="COMONDES"&&s.jsx(t_,{})')) console.log("✅ v3.34: صفحة COMONDES باقية بنفس الـ route (الجدول والبحث والفلترة كما هما)");
+else { console.error("❌ v3.34: صفحة COMONDES نقصت!"); bad++; }
+if (html.includes('" lignes · CA "')) console.log("✅ v3.34: الـ toolbar الفوقاني (⏱ اليوم ... lignes · CA) ما تمسّش — حيّدنا غير الشريط التحتي المطلوب");
+else { console.error("❌ v3.34: الـ toolbar الفوقاني نقص!"); bad++; }
+
+if (!html.includes('تسجيل الخروج من الحساب')) { console.error("❌ v3.33: زر الخروج ديال البنات ناقص!"); bad++; }
 
 if (!(html.includes('"Work Team":"👥"') && html.includes('Ranking:"🏆"') && html.includes('"Live Activity":"🔴"') && html.includes('Heatmap:"🔥"'))) { console.error("❌ v3.31: شي أيقونة ديال TEAM ناقصة!"); bad++; }
 

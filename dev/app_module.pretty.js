@@ -34129,13 +34129,6 @@ function t_() {
                     children: "لا توجد نتائج للبحث"
                 })]
             })
-        }), s.jsxs("div", {
-            className: "shrink-0 flex flex-wrap items-center justify-between gap-2 border-t border-slate-300 bg-[#e8e8e8] px-3 py-1 text-[11px] text-slate-600",
-            children: [s.jsxs("span", {
-                children: [q.length, "/", ie.length, " lignes"]
-            }), s.jsxs("span", {
-                children: ["CMD:", ht.cmd, " · Confirmé:", ht.conf, " · Livrée:", ht.liv, " · Retour:", ht.ret, " · Annulé:", ht.ann, " · CA:", j2(ht.ca), " DH · Pièces:", ht.pcs]
-            })]
         }), k && s.jsx("div", {
             className: "fixed bottom-16 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-2xl",
             children: k
