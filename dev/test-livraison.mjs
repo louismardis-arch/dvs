@@ -193,7 +193,7 @@ else { console.error("❌ v3.27: منع التكرار فالإضافة ناقص
 /* v3.28: زر Bilan + Mini-menu كيجمع الصفحات الثلاثة (تّحيدو من التبويبات) */
 if (html.includes('[Db,Vb]=ee.useState(!1)')) console.log("✅ v3.28: حالة فتح/إغلاق الـ Mini-menu كاينة");
 else { console.error("❌ v3.28: حالة الـ dropdown ناقصة!"); bad++; }
-if (html.includes('children:[h.filter(C=>!["Dashboard performance","suivi confirmation","statistique"].includes(C)).map(C=>')) console.log("✅ v3.28: الصفحات الثلاثة تّحيدو من الـMenu الرئيسي (filter قبل الـ tabs)");
+if (html.includes('children:(C=>[C[0],C[C.length-1],...C.slice(1,-1)])([...h.filter(C=>!["Dashboard performance","suivi confirmation","statistique"].includes(C)).map(C=>')) console.log("✅ v3.28/v3.29: الصفحات الثلاثة تّحيدو من التبويبات (filter) + زر Bilan مبلاصى حدا COMONDES (reorder)");
 else { console.error("❌ v3.28: التبويبات مازالين كيعرضو الصفحات الثلاثة!"); bad++; }
 if (html.includes('title:"Bilan"')) console.log("✅ v3.28: زر Bilan الرئيسي كاين فالـMenu");
 else { console.error("❌ v3.28: زر Bilan ناقص!"); bad++; }

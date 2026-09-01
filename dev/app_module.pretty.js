@@ -46446,7 +46446,7 @@ function Vj() {
                         scrollbarWidth: "none",
                         msOverflowStyle: "none"
                     },
-                    children: [h.filter(C => !["Dashboard performance", "suivi confirmation", "statistique"].includes(C)).map(C => {
+                    children: (C => [C[0], C[C.length - 1], ...C.slice(1, -1)])([...h.filter(C => !["Dashboard performance", "suivi confirmation", "statistique"].includes(C)).map(C => {
                         const L = w === C,
                             F = Pj.includes(C),
                             Y = ag[C] || (e.includes(C) ? "👤" : "📑"),
@@ -46488,7 +46488,7 @@ function Vj() {
                             className: "text-[9px] opacity-80",
                             children: Db ? "▲" : "▼"
                         })]
-                    })]
+                    })])
                 }), Db && s.jsx("div", {
                     className: "fixed inset-0 z-40",
                     onClick: () => Vb(!1)
