@@ -891,3 +891,32 @@ https://الدومين-ديالك/api.php?action=backups&token=c6e04cb5de9088be0
 jsdom — فلترة الصفوف + كوست الصف العام + الملخص + KPIs
 + الرجوع للكل) + regressions كاملين (digylog 42 +
 livraison 124 + villes 41 + perf 47) كاملين خضرين.
+
+────────────────────────────────────────────────────────
+✅ فيريفيكاسيون شامل لجميع الصفحات (v3.36)
+────────────────────────────────────────────────────────
+درنا اختبار شامل جديد dev/test-verify-all-pages.mjs
+(42 فحص — jsdom بداطا واقعية) كيدوز على جميع الصفحات
+ويتأكد أن الحسابات الأوتوماتيكية صحيحة وبلا أخطاء:
+
+  الصفحات المفحوصة (20+): COMONDES · LES RENV · LES
+  OBJECTIFS · RECLAMATION · suivi rentabilité · Sheet129 ·
+  Dashboard performance · suivi confirmation · statistique ·
+  PRODUITS · pièce · Les villes · LIVRAISON · Work Times ·
+  Work Team · Ranking · Live Activity · Heatmap · CRM Ads ·
+  Salaire · Historique · إدارة المستخدمين + دخول بحساب بنت
+
+  أمثلة على الأرقام المفحوصة (7 طلبيات تجريبية):
+  • COMONDES: CA = 750 DH (مجموع Livrée فقط — بلا Retour/Annulé)
+  • suivi confirmation: CONF RATE 75% + C.A 600 DH
+  • statistique: bénéfice 335 DH (CA − شراء − توصيل − ADS − charges)
+  • PRODUITS: Tx 100% · Pièces 3 · CA 600 أوتوماتيك
+  • Les villes: رسوم التوصيل 145 DH · مبيعات 950 DH
+  • LIVRAISON: frais من Les villes (Agadir 25 / Tanger 40 / Casa 30)
+  • Work Team + Ranking: CA total 750 DH
+  • CRM Ads: كوست الصف العام 75 DH (300÷4) · متوسط 62.50 DH
+  • Salaire: مريم 424 DH (3×8 + 50×8) · المجموع 432 DH
+  • صفر أخطاء render عبر جميع الصفحات + دخول البنت بلا أخطاء
+
+  التشغيل: node dev/test-verify-all-pages.mjs
+  (مع باقي الاختبارات: 9 مجموعات كاملة — كاملين خضرين)
