@@ -2,7 +2,7 @@
 /**
  * ✅ تست ديال صورة الهوم پايج (v3.35b)
  * المطلوب: الصورة الجديدة فالهوم پايج (صفحة تسجيل الدخول) بلاصت الرسمة SVG القديمة.
- * الآلية: <img src="home-hero.png"> مع fallback ذكي:
+ * الآلية: <img src="home-hero.jpg"> مع fallback ذكي:
  *   • إلا الملف موجود فجذر الموقع → الصورة كتعرض
  *   • إلا ماشي موجود (خطأ تحميل) → الرسمة SVG القديمة كترجع (بلا broken image)
  * التشغيل: node dev/test-homepage-image.mjs
@@ -50,9 +50,9 @@ const h1 = window.document.querySelector("h1");
 ok(h1 && h1.textContent === "Paraveda", "صفحة الدخول كتعرض (h1 Paraveda)");
 
 /* 1) فالحالة الافتراضية: img موجود + SVG الرسمة مخفية */
-const img = window.document.querySelector('img[src="home-hero.png"]');
+const img = window.document.querySelector('img[src="home-hero.jpg"]');
 const svgNow = window.document.querySelectorAll('svg[aria-label="Paraveda CRM"]');
-ok(!!img, "img ديال home-hero.png موجود");
+ok(!!img, "img ديال home-hero.jpg موجود");
 ok(svgNow.length === 0, "الرسمة SVG القديمة مخفية إلا الصورة خدامة", `svg=${svgNow.length}`);
 
 /* 2) إلا فشل تحميل الصورة (ملف ماشي موجود) → الرسمة كترجع */
@@ -60,7 +60,7 @@ if (img) {
   img.dispatchEvent(new window.Event("error"));
   await new Promise(r => setTimeout(r, 150));
   const svgAfter = window.document.querySelectorAll('svg[aria-label="Paraveda CRM"]');
-  const imgAfter = window.document.querySelector('img[src="home-hero.png"]');
+  const imgAfter = window.document.querySelector('img[src="home-hero.jpg"]');
   ok(svgAfter.length === 1, "بعد خطأ التحميل: الرسمة SVG رجعات", `svg=${svgAfter.length}`);
   ok(!imgAfter, "بعد خطأ التحميل: img تّمحي (بلا صورة مكسورة)", `img=${imgAfter ? 1 : 0}`);
 }
