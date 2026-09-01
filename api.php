@@ -42,6 +42,7 @@ $KEYS = array(
   "afrizon_avances_v1","afrizon_adspend_v1","afrizon_perfrows_v1","afrizon_livraison_v1",
   "afrizon_history_v1","afrizon_villes_v2","afrizon_catalog_v1",
   "sheet_pièce","afrizon_team_photos_v1","tabs_list_v1","custom_sheets_v1",
+  "afrizon_digylog_v1",
 );
 
 /* ---- إعدادات (يمكن تعديلها) ---- */
@@ -355,6 +356,185 @@ function crm_maybe_wipe_demo(&$data) {
 }
 
 /* ===================================================================== */
+/* دمج Digylog (شركة التوصيل) — تغيير Suivie فقط                         */
+/* ===================================================================== */
+
+/* نداء HTTP خارجي (curl إن وُجد، وإلا streams) — PHP 7.2+ */
+function crm_http_json($url, $method = 'GET', $body = null, $headers = array()) {
+  global $CRM_DIGYLOG_MOCK;
+  if (is_array($CRM_DIGYLOG_MOCK) && array_key_exists('code', $CRM_DIGYLOG_MOCK)) {
+    $mk = $CRM_DIGYLOG_MOCK['body'];
+    return array((int)$CRM_DIGYLOG_MOCK['code'], is_string($mk) ? $mk : json_encode($mk), '');
+  }
+  $h = array_merge(array('Accept: application/json', 'Content-Type: application/json', 'Referer: https://apiseller.digylog.com'), $headers);
+  $timeout = 20;
+  if (function_exists('curl_init')) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, array(
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_TIMEOUT => $timeout,
+      CURLOPT_CONNECTTIMEOUT => 12,
+      CURLOPT_HTTPHEADER => $h,
+      CURLOPT_SSL_VERIFYPEER => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_MAXREDIRS => 3,
+    ));
+    if ($method === 'POST') { curl_setopt($ch, CURLOPT_POST, true); curl_setopt($ch, CURLOPT_POSTFIELDS, $body === null ? '' : $body); }
+    $out = curl_exec($ch);
+    $code = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $err  = curl_error($ch);
+    curl_close($ch);
+    if ($out === false) return array(0, '', $err);
+    return array($code, (string)$out, '');
+  }
+  $opts = array('http' => array('method' => $method, 'header' => implode("\r\n", $h) . "\r\n", 'timeout' => $timeout, 'ignore_errors' => true));
+  if ($method === 'POST' && $body !== null) { $opts['http']['content'] = $body; }
+  $fp = @fopen($url, 'rb', false, stream_context_create($opts));
+  if ($fp === false) return array(0, '', 'stream-http-failed');
+  $out = stream_get_contents($fp);
+  $md = stream_get_meta_data($fp);
+  @fclose($fp);
+  $code = 0;
+  $wh = (isset($md['wrapper_data']) && is_array($md['wrapper_data'])) ? $md['wrapper_data'] : array();
+  foreach ($wh as $ln) { if (is_string($ln) && preg_match('#^HTTP/\S+\s+(\d+)#', $ln, $m)) { $code = (int)$m[1]; break; } }
+  return array($code, (string)$out, '');
+}
+
+function crm_is_list($a) { return is_array($a) && (count($a) === 0 || array_keys($a) === range(0, count($a) - 1)); }
+
+/* تحويل حالة Digylog → قيمة Suivie في الـ CRM (أو null = ما نبدلوش) */
+function crm_digylog_map_status($raw) {
+  if ($raw === null || $raw === '') return null;
+  if (is_array($raw)) {
+    foreach (array('name','label','title','code','status','state') as $k) {
+      if (isset($raw[$k]) && is_scalar($raw[$k])) { $m = crm_digylog_map_status($raw[$k]); if ($m !== null) return $m; }
+    }
+    return null;
+  }
+  $s = strtolower((string)$raw);
+  $s = strtr($s, array('é'=>'e','è'=>'e','ê'=>'e','ë'=>'e','à'=>'a','â'=>'a','ç'=>'c','ï'=>'i','î'=>'i','ô'=>'o','û'=>'u','ù'=>'u'));
+  if (strpos($s, 'livree') !== false || strpos($s, 'livre ') !== false || strpos($s, 'deliver') !== false || $s === 'livre') return 'Livrée';
+  if (strpos($s, 'retour') !== false || strpos($s, 'return') !== false) return 'Retour';
+  if (strpos($s, 'refus') !== false || strpos($s, 'reject') !== false) return 'Refusé';
+  if (strpos($s, 'annul') !== false || strpos($s, 'cancel') !== false) return 'Annulé';
+  if (strpos($s, 'stock') !== false || strpos($s, 'rupture') !== false) return 'Out Of Stock';
+  if (strpos($s, 'en cours de livraison') !== false || strpos($s, 'en livraison') !== false || strpos($s, 'out for delivery') !== false || strpos($s, 'en route') !== false || strpos($s, 'transit') !== false) return 'En livraison';
+  if (strpos($s, 'expedi') !== false || strpos($s, 'shipped') !== false || strpos($s, 'enleve') !== false || strpos($s, 'ramass') !== false || strpos($s, 'envoye') !== false) return 'Expédié';
+  return null;
+}
+
+/* رقم الطلبية داخل عنصر Digylog */
+function crm_digylog_item_num($it) {
+  if (!is_array($it)) return null;
+  foreach (array('num','numero','order_num','order_number','tracking','tracking_num','tracking_number','barcode','reference','ref','colis') as $k) {
+    if (isset($it[$k]) && is_scalar($it[$k]) && (string)$it[$k] !== '') return trim((string)$it[$k]);
+  }
+  return null;
+}
+
+/* حالة عنصر Digylog (خريطة أول مفتاح معروف) */
+function crm_digylog_item_status($it) {
+  if (!is_array($it)) return null;
+  foreach (array('status','state','etat','statut','situation','order_status','delivery_status','last_status','statut_livraison','statut_colis') as $k) {
+    if (isset($it[$k])) { $m = crm_digylog_map_status($it[$k]); if ($m !== null) return $m; }
+  }
+  foreach (array('tracking','delivery','shipment','last_event','event') as $k) {
+    if (isset($it[$k]) && is_array($it[$k])) { $m = crm_digylog_map_status($it[$k]); if ($m !== null) return $m; }
+  }
+  return null;
+}
+
+/* استخراج لائحة الطلبيات من رد Digylog (أي شكل شائع) */
+function crm_digylog_find_orders($resp) {
+  $j = json_decode($resp, true);
+  if (!is_array($j)) return null;
+  $cands = array();
+  if (crm_is_list($j)) $cands[] = $j;
+  foreach (array('data','orders','items','list','result','results','rows','parcels','colis') as $k) {
+    if (isset($j[$k]) && is_array($j[$k])) {
+      if (crm_is_list($j[$k])) $cands[] = $j[$k];
+      elseif (isset($j[$k]['data']) && crm_is_list($j[$k]['data'])) $cands[] = $j[$k]['data'];
+    }
+  }
+  $best = null;
+  foreach ($cands as $c) { if ($best === null || count($c) > count($best)) $best = $c; }
+  return $best;
+}
+
+/* تطبيق حالات Digylog على طلبيات الـ CRM (المطابقة بـ idCmd == num) */
+function crm_digylog_apply(&$orders, $items, &$log) {
+  if (!is_array($orders)) $orders = array();
+  if (!is_array($items)) $items = array();
+  $byNum = array();
+  foreach ($orders as $idx => $o) {
+    if (!is_array($o)) continue;
+    $n = isset($o['idCmd']) ? strtolower(trim((string)$o['idCmd'])) : '';
+    if ($n !== '') { if (!isset($byNum[$n])) $byNum[$n] = array(); $byNum[$n][] = $idx; }
+  }
+  $updated = array();
+  foreach ($items as $it) {
+    $num = crm_digylog_item_num($it);
+    $st  = crm_digylog_item_status($it);
+    if ($num === null || $st === null) continue;
+    $nk = strtolower(trim($num));
+    if (!isset($byNum[$nk])) continue;
+    foreach ($byNum[$nk] as $idx) {
+      $o   = $orders[$idx];
+      $cur = isset($o['livraison']) ? (string)$o['livraison'] : '';
+      $stt = isset($o['statut']) ? (string)$o['statut'] : '';
+      if ($st === 'Annulé') {
+        if ($stt === 'Annulé') continue;
+        $o['statut'] = 'Annulé';
+      } else {
+        if ($cur === $st && $stt !== 'Annulé') continue;
+        $o['livraison'] = $st;
+        if ($stt === 'Annulé') $o['statut'] = 'Confirmé';
+      }
+      $orders[$idx] = $o;
+      $updated[] = array('idCmd' => isset($o['idCmd']) ? $o['idCmd'] : $num, 'suivie' => $st);
+    }
+  }
+  $log = $updated;
+  return count($updated);
+}
+
+/* كتابة الطلبيات بعد التحديث (نفس آليات النسخة المحصّنة) */
+function crm_digylog_write_orders(&$data, $orders, $event) {
+  if (crm_atomic_write(crm_data_path(), json_encode($data, JSON_UNESCAPED_UNICODE)) === false) return false;
+  $meta = crm_read_meta();
+  $meta['counts']['write']++;
+  $meta['last_write'] = time();
+  $meta['last_write_ip'] = crm_ip();
+  crm_write_meta($meta);
+  crm_audit($event, count($orders) . ' orders written');
+  return true;
+}
+
+/* مستقبل الـ webhook ديال Digylog (POST أو GET) — محمي بـ secret */
+function crm_digylog_webhook_handle($in) {
+  $lock = crm_lock();
+  $data = crm_read_data(true, true);
+  $cfg = (isset($data['afrizon_digylog_v1']['d']) && is_array($data['afrizon_digylog_v1']['d'])) ? $data['afrizon_digylog_v1']['d'] : array();
+  $sec = isset($cfg['webhook']) ? (string)$cfg['webhook'] : '';
+  $secret = isset($in['secret']) ? (string)$in['secret'] : '';
+  if ($sec === '' || $secret === '' || !hash_equals($sec, $secret)) { crm_unlock($lock); return array('ok'=>false, 'err'=>'secret'); }
+  $num = isset($in['num']) && is_scalar($in['num']) ? (string)$in['num'] : '';
+  $rawSt = isset($in['status']) ? $in['status'] : (isset($in['state']) ? $in['state'] : (isset($in['statut']) ? $in['statut'] : null));
+  $st = crm_digylog_map_status($rawSt);
+  if ($num === '' || $st === null) { crm_unlock($lock); return array('ok'=>false, 'err'=>'bad-params', 'num'=>$num, 'status'=>$rawSt); }
+  $orders = (isset($data['afrizon_orders_v5']['d']) && is_array($data['afrizon_orders_v5']['d'])) ? $data['afrizon_orders_v5']['d'] : array();
+  $log = array();
+  $n = crm_digylog_apply($orders, array(array('num'=>$num, 'status'=>$st)), $log);
+  if ($n > 0) {
+    crm_backup_current('digylog-webhook');
+    $data['afrizon_orders_v5'] = array('t' => crm_now_ms(), 'd' => $orders);
+    if (!crm_digylog_write_orders($data, $orders, 'digylog_webhook ' . $num . ' -> ' . $st)) { crm_unlock($lock); return array('ok'=>false, 'err'=>'write'); }
+  }
+  crm_unlock($lock);
+  return array('ok'=>true, 'num'=>$num, 'suivie'=>$st, 'updated'=>$n);
+}
+
+/* ===================================================================== */
 /* المعالجة الرئيسية                                                     */
 /* ===================================================================== */
 
@@ -417,6 +597,14 @@ try {
         'audit_tail'=>$auditTail,
         'note'=>'status/secure endpoint — v2 hardened sync',
       ));
+    }
+
+    /* Webhook ديال Digylog عبر GET (للشركات اللي كتبعتو بـ GET) — محمي بـ secret */
+    if ($action === 'digylog_webhook') {
+      $in = array('secret' => isset($_GET['secret']) ? $_GET['secret'] : '', 'num' => isset($_GET['num']) ? $_GET['num'] : '', 'status' => isset($_GET['status']) ? $_GET['status'] : null);
+      $r = crm_digylog_webhook_handle($in);
+      $code = isset($r['ok']) && $r['ok'] ? 200 : ((isset($r['err']) && $r['err'] === 'secret') ? 403 : 400);
+      crm_out($r, $code);
     }
 
     // القراءة العادية (كما في النسخة القديمة)
@@ -482,6 +670,56 @@ try {
       crm_audit('restore', 'restored ' . $file);
       crm_unlock($lock);
       crm_out(array('ok'=>true, 'restored'=>$file));
+    }
+
+    /* ===== دمج Digylog: اختبار + مزامنة Suivie + webhook ===== */
+    if (isset($b['action']) && $b['action'] === 'digylog_webhook') {
+      crm_out(crm_digylog_webhook_handle($b), (isset($b['secret']) && $b['secret'] !== '') ? 200 : 400);
+    }
+
+    if (isset($b['action']) && ($b['action'] === 'digylog_test' || $b['action'] === 'digylog_sync')) {
+      $lock = crm_lock();
+      $data = crm_read_data(true, true);
+      $cfg = (isset($data['afrizon_digylog_v1']['d']) && is_array($data['afrizon_digylog_v1']['d'])) ? $data['afrizon_digylog_v1']['d'] : array();
+      $token = isset($cfg['token']) ? (string)$cfg['token'] : '';
+      if ($token === '') { crm_unlock($lock); crm_out(array('ok'=>false, 'err'=>'no-token', 'msg'=>'حط توكن Digylog فالإعدادات أولاً'), 400); }
+
+      if ($b['action'] === 'digylog_test') {
+        $testUrl = (isset($b['testUrl']) && is_string($b['testUrl']) && $b['testUrl'] !== '') ? $b['testUrl'] : (isset($cfg['testUrl']) && $cfg['testUrl'] !== '' ? $cfg['testUrl'] : 'https://api.digylog.com/api/v2/seller/networks');
+        list($code, $body, $err) = crm_http_json($testUrl, 'GET', null, array('Authorization: Bearer ' . $token));
+        crm_unlock($lock);
+        if ($code === 0) crm_out(array('ok'=>false, 'err'=>'http', 'msg'=>'ما قدرناش نوصلو لـ Digylog: ' . $err));
+        $j = json_decode($body, true);
+        $networks = array();
+        if (is_array($j)) {
+          foreach (array('data','networks','items','result','results') as $k) { if (isset($j[$k]) && is_array($j[$k])) { $networks = $j[$k]; break; } }
+          if (count($networks) === 0 && crm_is_list($j)) $networks = $j;
+        }
+        crm_out(array('ok'=>($code >= 200 && $code < 300), 'http'=>$code, 'networks'=>$networks, 'sample'=>substr($body, 0, 400)));
+      }
+
+      /* digylog_sync */
+      $ordersUrl = (isset($cfg['ordersUrl']) && is_string($cfg['ordersUrl']) && $cfg['ordersUrl'] !== '') ? $cfg['ordersUrl'] : 'https://api.digylog.com/api/v2/seller/orders';
+      list($code, $body, $err) = crm_http_json($ordersUrl, 'GET', null, array('Authorization: Bearer ' . $token));
+      if ($code === 405) {
+        $pl = json_encode(array('network' => isset($cfg['network']) ? $cfg['network'] : 1, 'store' => isset($cfg['store']) ? $cfg['store'] : 'store1'));
+        list($code, $body, $err) = crm_http_json($ordersUrl, 'POST', $pl, array('Authorization: Bearer ' . $token));
+      }
+      if ($code === 0) { crm_unlock($lock); crm_out(array('ok'=>false, 'err'=>'http', 'msg'=>'ما قدرناش نوصلو لـ Digylog: ' . $err)); }
+      if ($code < 200 || $code >= 300) { crm_unlock($lock); crm_out(array('ok'=>false, 'err'=>'digylog-http-'.$code, 'msg'=>'Digylog رجع HTTP '.$code, 'sample'=>substr($body, 0, 400))); }
+      $items = crm_digylog_find_orders($body);
+      if ($items === null) { crm_unlock($lock); crm_out(array('ok'=>false, 'err'=>'shape', 'msg'=>'ما قدرناش نقراو رد Digylog — تأكد من Orders URL', 'sample'=>substr($body, 0, 400))); }
+
+      $orders = (isset($data['afrizon_orders_v5']['d']) && is_array($data['afrizon_orders_v5']['d'])) ? $data['afrizon_orders_v5']['d'] : array();
+      $log = array();
+      $n = crm_digylog_apply($orders, $items, $log);
+      if ($n > 0) {
+        crm_backup_current('digylog-sync');
+        $data['afrizon_orders_v5'] = array('t' => crm_now_ms(), 'd' => $orders);
+        if (!crm_digylog_write_orders($data, $orders, 'digylog_sync updated ' . $n)) { crm_unlock($lock); crm_out(array('ok'=>false, 'err'=>'write'), 500); }
+      }
+      crm_unlock($lock);
+      crm_out(array('ok'=>true, 'synced'=>$n, 'updated'=>$log, 'checked'=>count($items)));
     }
 
     if (!isset($b['key']) || !isset($b['t']) || !isset($b['d'])) {
