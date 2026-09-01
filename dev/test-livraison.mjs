@@ -247,8 +247,14 @@ for (const gone of ['＋ صفحة', '👤＋ بنت', 'on:w==="CRM Ads"', 'on:w=
   if (!html.includes(gone)) console.log(`✅ v3.32: تّحاد من الفوتر: ${gone}`);
   else { console.error(`❌ v3.32: مازال فالفوتر: ${gone}`); bad++; }
 }
-if (html.includes('title:"تسجيل الخروج"')) console.log("✅ v3.32: زر تسجيل الخروج باقي فالفوتر (ما تبدلش)");
-else { console.error("❌ v3.32: زر تسجيل الخروج ناقص!"); bad++; }
+if (html.includes('children:[s.jsx("button",{onClick:f,title:"تسجيل الخروج",className:"grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-red-300 bg-white text-red-600')) console.log("✅ v3.33: زر تسجيل الخروج ولّى أول عنصر فالـ header (أقصى اليمين — قبل الشعار)");
+else { console.error("❌ v3.33: زر تسجيل الخروج ماشي فالبلاصة الجديدة!"); bad++; }
+if (!html.includes('ml-auto grid h-9 w-9')) console.log("✅ v3.33: زر تسجيل الخروج تّحاد من الفوتر (بقات غير نسخة التطبيق)");
+else { console.error("❌ v3.33: زر الخروج مازال فالفوتر!"); bad++; }
+if (!html.includes('خروج — تسجيل الخروج')) console.log("✅ v3.33: ما بقاش زر خروج مكرر فبطاقة المستخدم (admin icon تّحاد)");
+else { console.error("❌ v3.33: الزر المكرر مازال كاين!"); bad++; }
+if (html.includes('تسجيل الخروج من الحساب')) console.log("✅ v3.33: زر الخروج الاحترافي ديال البنات ما تبدلش (v3.24)");
+else { console.error("❌ v3.33: زر الخروج ديال البنات ناقص!"); bad++; }
 
 if (!(html.includes('"Work Team":"👥"') && html.includes('Ranking:"🏆"') && html.includes('"Live Activity":"🔴"') && html.includes('Heatmap:"🔥"'))) { console.error("❌ v3.31: شي أيقونة ديال TEAM ناقصة!"); bad++; }
 

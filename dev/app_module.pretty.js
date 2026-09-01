@@ -46429,14 +46429,7 @@ function Vj() {
             }), m && s.jsx("span", {
                 className: "rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-indigo-600",
                 children: "Admin"
-            }), m ? s.jsx("button", {
-                onClick: f,
-                title: "خروج — تسجيل الخروج",
-                className: "grid h-6 w-6 place-items-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-600 hover:scale-110",
-                children: s.jsx(eg, {
-                    className: "h-3.5 w-3.5"
-                })
-            }) : s.jsxs("button", {
+            }), m ? null : s.jsxs("button", {
                 onClick: f,
                 title: "تسجيل الخروج من الحساب",
                 className: "flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-l from-rose-500 to-red-600 px-3.5 py-2 text-[11px] font-extrabold text-white shadow-md shadow-rose-300/60 transition-all duration-150 hover:from-rose-600 hover:to-red-700 hover:shadow-lg hover:scale-[1.03] active:scale-[0.95]",
@@ -46451,7 +46444,14 @@ function Vj() {
             className: "shrink-0 border-b border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)]",
             children: [s.jsxs("div", {
                 className: "flex items-center gap-3 px-4 pt-2.5",
-                children: [s.jsx(S, {}), s.jsx("div", {
+                children: [s.jsx("button", {
+                    onClick: f,
+                    title: "تسجيل الخروج",
+                    className: "grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-red-300 bg-white text-red-600 shadow-sm transition-all duration-150 hover:border-red-400 hover:bg-red-50 hover:shadow hover:scale-105 active:scale-[0.94]",
+                    children: s.jsx(eg, {
+                        className: "h-4.5 w-4.5"
+                    })
+                }), s.jsx(S, {}), s.jsx("div", {
                     className: "hidden h-6 w-px bg-slate-200 md:block"
                 }), s.jsxs("div", {
                     className: "hidden min-w-0 items-center gap-1.5 text-[11px] md:flex",
@@ -46727,14 +46727,7 @@ function Vj() {
             style: {
                 scrollbarWidth: "thin"
             },
-            children: [s.jsx("button", {
-                onClick: f,
-                title: "تسجيل الخروج",
-                className: "ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-red-300 bg-white text-red-600 shadow-sm transition-all duration-150 hover:border-red-400 hover:bg-red-50 hover:shadow hover:scale-105 active:scale-[0.94]",
-                children: s.jsx(eg, {
-                    className: "h-4.5 w-4.5"
-                })
-            }), s.jsx("span", {
+            children: [s.jsx("span", {
                 className: "shrink-0 px-1 text-[9px] font-bold text-slate-300",
                 title: "نسخة التطبيق",
                 children: "v2.0"
