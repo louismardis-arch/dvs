@@ -45206,7 +45206,14 @@ function eg({
         })]
     })
 }
-const Uj = ["suivi confirmation"],
+const Gz = {
+        Bilan: ["Dashboard performance", "suivi confirmation", "statistique"],
+        Articles: ["PRODUITS", "pièce"],
+        SHIPING: ["Les villes", "LIVRAISON"],
+        TEAM: ["Work Times", "Work Team", "Ranking", "Live Activity", "Heatmap"]
+    },
+    Gk = ["Dashboard performance", "suivi confirmation", "statistique", "PRODUITS", "pièce", "Les villes", "LIVRAISON", "Work Times"],
+    Uj = ["suivi confirmation"],
     zj = ["COMONDES", "Dashboard performance", "LES RENV", "PRODUITS", "LES OBJECTIFS", "suivi confirmation", "pièce", "RECLAMATION", "statistique", "suivi rentabilité", "Sheet129", "Les villes", "Work Times", "LIVRAISON"],
     Pj = ["Dashboard performance", "LES RENV", "LES OBJECTIFS", "suivi confirmation", "RECLAMATION", "suivi rentabilité", "Work Times", "LIVRAISON"],
     tg = ["COMONDES", "PRODUITS", "Work Team", "Les villes", "Work Times", "Dashboard performance", "suivi confirmation", "pièce", "statistique", "suivi rentabilité", "LIVRAISON"],
@@ -45224,7 +45231,11 @@ const Uj = ["suivi confirmation"],
         Sheet129: "📄",
         "Les villes": "🏙️",
         "Work Times": "⏰",
-        "LIVRAISON": "🚚"
+        "LIVRAISON": "🚚",
+        "Work Team": "👥",
+        Ranking: "🏆",
+        "Live Activity": "🔴",
+        Heatmap: "🔥"
     },
     Gj = {
         COMONDES: "blue",
@@ -45240,7 +45251,11 @@ const Uj = ["suivi confirmation"],
         Sheet129: "slate",
         "Les villes": "teal",
         "Work Times": "amber",
-        "LIVRAISON": "orange"
+        "LIVRAISON": "orange",
+        "Work Team": "blue",
+        Ranking: "amber",
+        "Live Activity": "red",
+        Heatmap: "orange"
     },
     pd = "tabs_list_v1",
     gd = "custom_sheets_v1",
@@ -46252,7 +46267,7 @@ function Vj() {
             if (C) return JSON.parse(C)
         } catch {}
         return {}
-    }), [w, N] = ee.useState("COMONDES"), [v, A] = ee.useState(null), [Db, Vb] = ee.useState(!1), [Bq, Bk] = ee.useState(null), D = ee.useRef(null);
+    }), [w, N] = ee.useState("COMONDES"), [v, A] = ee.useState(null), [Db, Vb] = ee.useState(null), [Bq, Bk] = ee.useState(null), D = ee.useRef(null);
     ee.useEffect(() => {
         const C = c?.username || null;
         if (C && D.current !== C) {
@@ -46446,7 +46461,7 @@ function Vj() {
                         scrollbarWidth: "none",
                         msOverflowStyle: "none"
                     },
-                    children: (C => [C[0], C[C.length - 1], ...C.slice(1, -1)])([...h.filter(C => !["Dashboard performance", "suivi confirmation", "statistique"].includes(C)).map(C => {
+                    children: (C => [C[0], C[C.length - 4], C[C.length - 3], C[C.length - 2], C[C.length - 1], ...C.slice(1, -4)])([...h.filter(C => !Gk.includes(C)).map(C => {
                         const L = w === C,
                             F = Pj.includes(C),
                             Y = ag[C] || (e.includes(C) ? "👤" : "📑"),
@@ -46482,10 +46497,10 @@ function Vj() {
                                 top: R.bottom + 4,
                                 left: R.left
                             });
-                            Vb(!Db)
+                            Vb(Db === "Bilan" ? null : "Bilan")
                         },
                         title: "Bilan",
-                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db||["Dashboard performance","suivi confirmation","statistique"].includes(w)?Ao.indigo.on:Ao.indigo.base}`,
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db==="Bilan"||Gz.Bilan.includes(w)?Ao.indigo.on:Ao.indigo.base}`,
                         children: [s.jsx("span", {
                             className: "text-[12px] leading-none",
                             children: "📊"
@@ -46493,12 +46508,72 @@ function Vj() {
                             children: "Bilan"
                         }), s.jsx("span", {
                             className: "text-[9px] opacity-80",
-                            children: Db ? "▲" : "▼"
+                            children: Db === "Bilan" ? "▲" : "▼"
+                        })]
+                    }), s.jsxs("div", {
+                        onClick: V => {
+                            const R = V.currentTarget.getBoundingClientRect();
+                            Bk({
+                                top: R.bottom + 4,
+                                left: R.left
+                            });
+                            Vb(Db === "Articles" ? null : "Articles")
+                        },
+                        title: "Articles",
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db==="Articles"||Gz.Articles.includes(w)?Ao.blue.on:Ao.blue.base}`,
+                        children: [s.jsx("span", {
+                            className: "text-[12px] leading-none",
+                            children: "📦"
+                        }), s.jsx("span", {
+                            children: "Articles"
+                        }), s.jsx("span", {
+                            className: "text-[9px] opacity-80",
+                            children: Db === "Articles" ? "▲" : "▼"
+                        })]
+                    }), s.jsxs("div", {
+                        onClick: V => {
+                            const R = V.currentTarget.getBoundingClientRect();
+                            Bk({
+                                top: R.bottom + 4,
+                                left: R.left
+                            });
+                            Vb(Db === "SHIPING" ? null : "SHIPING")
+                        },
+                        title: "SHIPING",
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db==="SHIPING"||Gz.SHIPING.includes(w)?Ao.orange.on:Ao.orange.base}`,
+                        children: [s.jsx("span", {
+                            className: "text-[12px] leading-none",
+                            children: "🚚"
+                        }), s.jsx("span", {
+                            children: "SHIPING"
+                        }), s.jsx("span", {
+                            className: "text-[9px] opacity-80",
+                            children: Db === "SHIPING" ? "▲" : "▼"
+                        })]
+                    }), s.jsxs("div", {
+                        onClick: V => {
+                            const R = V.currentTarget.getBoundingClientRect();
+                            Bk({
+                                top: R.bottom + 4,
+                                left: R.left
+                            });
+                            Vb(Db === "TEAM" ? null : "TEAM")
+                        },
+                        title: "TEAM",
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db==="TEAM"||Gz.TEAM.includes(w)?Ao.emerald.on:Ao.emerald.base}`,
+                        children: [s.jsx("span", {
+                            className: "text-[12px] leading-none",
+                            children: "👥"
+                        }), s.jsx("span", {
+                            children: "TEAM"
+                        }), s.jsx("span", {
+                            className: "text-[9px] opacity-80",
+                            children: Db === "TEAM" ? "▲" : "▼"
                         })]
                     })])
                 }), Db && s.jsx("div", {
                     className: "fixed inset-0 z-40",
-                    onClick: () => Vb(!1)
+                    onClick: () => Vb(null)
                 }), Db && Bq && s.jsxs("div", {
                     style: {
                         position: "fixed",
@@ -46508,12 +46583,12 @@ function Vj() {
                     className: "z-50 w-56 rounded-xl border border-slate-200 bg-white p-1 shadow-lg",
                     children: [s.jsx("div", {
                         className: "px-2 pb-1 pt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400",
-                        children: "Bilan"
-                    }), ...(["Dashboard performance", "suivi confirmation", "statistique"].map(C => {
+                        children: Db
+                    }), ...((Gz[Db] || []).map(C => {
                         const K2 = Ao[Gj[C]] ?? Ao.slate;
                         return s.jsxs("button", {
                             onClick: () => {
-                                N(C), Vb(!1)
+                                N(C), Vb(null)
                             },
                             className: `flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${w===C?K2.on:K2.base}`,
                             children: [s.jsx("span", {
@@ -46607,35 +46682,6 @@ function Vj() {
                 children: "👤＋ بنت"
             }), s.jsx(rg, {}), s.jsx("span", {
                 className: "mr-1 hidden shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400 lg:block",
-                children: "Équipe"
-            }), s.jsx($r, {
-                color: "indigo",
-                on: w === "Work Team",
-                onClick: () => N("Work Team"),
-                title: "Notre équipe",
-                children: "👥 Work Team"
-            }), s.jsx($r, {
-                color: "amber",
-                on: w === "Ranking",
-                onClick: () => N("Ranking"),
-                title: "Classement des filles (Admin)",
-                children: "🏆 Ranking"
-            }), s.jsxs($r, {
-                color: "red",
-                on: w === "Live Activity",
-                onClick: () => N("Live Activity"),
-                title: "نشاط الفريق مباشر (Admin)",
-                children: [s.jsx("i", {
-                    className: `h-2 w-2 shrink-0 animate-pulse rounded-full ${w==="Live Activity"?"bg-white":"bg-red-500"}`
-                }), " Live Activity"]
-            }), s.jsx($r, {
-                color: "orange",
-                on: w === "Heatmap",
-                onClick: () => N("Heatmap"),
-                title: "ساعات العمل والأداء (Admin)",
-                children: "🔥 Heatmap"
-            }), s.jsx(rg, {}), s.jsx("span", {
-                className: "mr-1 hidden shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400 lg:block",
                 children: "Gestion"
             }), s.jsx($r, {
                 color: "violet",
@@ -46649,12 +46695,6 @@ function Vj() {
                 onClick: () => N("Salaire"),
                 title: "سالير البنات — محسوب أوتوماتيك",
                 children: "💵 Salaire"
-            }), s.jsx($r, {
-                color: "orange",
-                on: w === "LIVRAISON",
-                onClick: () => N("LIVRAISON"),
-                title: "إدارة التوصيل وحالات الشحن",
-                children: "🚚 Livraison"
             }), s.jsx($r, {
                 color: "violet",
                 on: w === "إدارة المستخدمين",

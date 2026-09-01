@@ -41,7 +41,6 @@ const checks = [
   ['children: "🚚"', "أيقونة 🚚"],
   ['children: "LIVRAISON"', "عنوان الصفحة"],
   ['w==="LIVRAISON"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(Liv,{})})', "الرندر مربوط"],
-  ['s.jsx($r,{color:"orange",on:w==="LIVRAISON"', "زر الفوتر 🚚 Livraison"],
   ['g(C=>C.includes("LIVRAISON")?C:[...C,"LIVRAISON"])', "التبويب كيتزاد أوتوماتيك عند المستخدمين القدام"],
   ['"LIVRAISON":"🚚"', "الأيقونة فخريطة الصفحات"],
   ['"afrizon_livraison_v1"', "المفتاح كيبقا مقبول فالمزامنة (توافق مع الداتا القديمة)"],
@@ -191,13 +190,13 @@ if (html.includes('كاين أصلاً فالكاطالوغ')) console.log("✅ 
 else { console.error("❌ v3.27: منع التكرار فالإضافة ناقص!"); bad++; }
 
 /* v3.28: زر Bilan + Mini-menu كيجمع الصفحات الثلاثة (تّحيدو من التبويبات) */
-if (html.includes('[Db,Vb]=ee.useState(!1)')) console.log("✅ v3.28: حالة فتح/إغلاق الـ Mini-menu كاينة");
+if (html.includes('[Db,Vb]=ee.useState(null),[Bq,Bk]=ee.useState(null),D=ee.useRef(null)')) console.log("✅ v3.28/v3.31: حالة الـ Mini-menu كاينة (مفتاح المجموعة + موضع الزر)");
 else { console.error("❌ v3.28: حالة الـ dropdown ناقصة!"); bad++; }
-if (html.includes('children:(C=>[C[0],C[C.length-1],...C.slice(1,-1)])([...h.filter(C=>!["Dashboard performance","suivi confirmation","statistique"].includes(C)).map(C=>')) console.log("✅ v3.28/v3.29: الصفحات الثلاثة تّحيدو من التبويبات (filter) + زر Bilan مبلاصى حدا COMONDES (reorder)");
+if (html.includes('children:(C=>[C[0],C[C.length-4],C[C.length-3],C[C.length-2],C[C.length-1],...C.slice(1,-4)])([...h.filter(C=>!Gk.includes(C)).map(C=>')) console.log("✅ v3.28/v3.31: الصفحات الثمانية تّحيدو من التبويبات (filter Gk) + أزرار المجموعات الأربعة من بعد COMONDES (reorder)");
 else { console.error("❌ v3.28: التبويبات مازالين كيعرضو الصفحات الثلاثة!"); bad++; }
 if (html.includes('title:"Bilan"')) console.log("✅ v3.28: زر Bilan الرئيسي كاين فالـMenu");
 else { console.error("❌ v3.28: زر Bilan ناقص!"); bad++; }
-if (html.includes('statistique"].map(C=>{const K2=Ao[Gj[C]]')) console.log("✅ v3.28: Mini-menu فيه 3 أزرار (Dashboard performance / suivi confirmation / statistique)");
+if (html.includes('...((Gz[Db]||[]).map(C=>{const K2=Ao[Gj[C]]')) console.log("✅ v3.28/v3.31: الـ Mini-menu كيرندر أزرار المجموعة المفتوحة من Gz (من بعد عنوان ديالها)");
 else { console.error("❌ v3.28: أزرار الـ Mini-menu ناقصين!"); bad++; }
 if (html.includes('w==="Dashboard performance"&&s.jsx(Fj,{})') && html.includes('w==="suivi confirmation"&&s.jsx(m_,{})') && html.includes('w==="statistique"&&s.jsx(Ij,{})')) console.log("✅ v3.28: الصفحات الثلاثة مازالين كاينين بنفس الـ routes (بلا duplication)");
 else { console.error("❌ v3.28: شي صفحة من الثلاثة نقصت!"); bad++; }
@@ -209,6 +208,28 @@ if (html.includes('currentTarget.getBoundingClientRect()')) console.log("✅ v3.
 else { console.error("❌ v3.30: حساب الموضع ناقص!"); bad++; }
 if (html.includes('Db&&Bq&&s.jsxs("div",{style:{position:"fixed",top:Bq.top,left:Bq.left}')) console.log("✅ v3.30: الـ Mini-menu مربوط تحت زر Bilan مباشرة (fixed بموضع الزر — ماشي أقصى اليمين)");
 else { console.error("❌ v3.30: الـ Mini-menu مازال مربوط بـ right-3!"); bad++; }
+
+/* v3.31: نفس فكرة Bilan على 3 مجموعات: Articles / SHIPING / TEAM */
+if (html.includes('const Gz={Bilan:["Dashboard performance","suivi confirmation","statistique"],Articles:["PRODUITS","pièce"],SHIPING:["Les villes","LIVRAISON"],TEAM:["Work Times","Work Team","Ranking","Live Activity","Heatmap"]')) console.log("✅ v3.31: تعريف المجموعات Gz كاين (Bilan/Articles/SHIPING/TEAM)");
+else { console.error("❌ v3.31: تعريف المجموعات Gz ناقص!"); bad++; }
+for (const t of ['title:"Bilan"', 'title:"Articles"', 'title:"SHIPING"', 'title:"TEAM"']) {
+  if (html.includes(t)) console.log(`✅ v3.31: الزر الرئيسي ${t} كاين فالـMenu`);
+  else { console.error(`❌ v3.31: الزر ${t} ناقص!`); bad++; }
+}
+if (html.includes('children:Db}),...((Gz[Db]||[]).map')) console.log("✅ v3.31: الـ Mini-menu كيعرض عنوان المجموعة المفتوحة (children:Db)");
+else { console.error("❌ v3.31: عنوان المجموعة فالـ Mini-menu ناقص!"); bad++; }
+const v331Routes = ['w==="PRODUITS"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(c_,{})})', 'w==="Les villes"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx($_,{})})', 'w==="LIVRAISON"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(Liv,{})})', 'w==="Work Times"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(W_,{})})', 'w==="Work Team"&&s.jsx(C_,{onOpen:C=>N(C),onRanking:()=>N("Ranking"),onLive:()=>N("Live Activity")})', 'w==="Ranking"&&s.jsx(M_,{})', 'w==="Live Activity"&&s.jsx(P_,{})', 'w==="Heatmap"&&s.jsx(X_,{})'];
+if (v331Routes.every(r => html.includes(r))) console.log("✅ v3.31: الصفحات الثمانية للمجموعات مازالين كاينين بنفس الـ routes (بلا duplication)");
+if (html.includes('pièce:Cj') && html.includes('R&&s.jsx(n_,{name:w,data:R})')) console.log("✅ v3.31: صفحة pièce مازالة كترندر عبر الـ fallback ديال الـ sheets المخصصة (pièce:Cj)");
+else { console.error("❌ v3.31: صفحة pièce نقصت من الـ fallback!"); bad++; }
+if (!v331Routes.every(r => html.includes(r))) { console.error("❌ v3.31: شي صفحة من المجموعات نقصت!"); bad++; }
+if (!html.includes('Équipe')) console.log("✅ v3.31: قسم Équipe (Work Team/Ranking/Live Activity/Heatmap) تّحاد من الفوتر");
+else { console.error("❌ v3.31: قسم Équipe مازال فالفوتر!"); bad++; }
+if (!html.includes('🚚 Livraison')) console.log("✅ v3.31: زر 🚚 Livraison تّحاد من الفوتر (بقى غير داخل SHIPING)");
+else { console.error("❌ v3.31: زر Livraison مازال فالفوتر!"); bad++; }
+if (html.includes('"Work Team":"👥"') && html.includes('Ranking:"🏆"') && html.includes('"Live Activity":"🔴"') && html.includes('Heatmap:"🔥"')) console.log("✅ v3.31: الأيقونات ديال صفحات TEAM كاينين");
+else { console.error("❌ v3.31: شي أيقونة ديال TEAM ناقصة!"); bad++; }
+
 
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
