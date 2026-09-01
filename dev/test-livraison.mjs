@@ -166,8 +166,8 @@ if (html.includes('...g?[["history","🕘 Historique"]]:[]]')) console.log("✅ 
 else { console.error("❌ v3.25: شرط الإدمن ديال Historique ناقص!"); bad++; }
 if (html.includes('(g&&D==="history")')) console.log("✅ v3.25: عرض صفحة Historique محمي (ما كيترندر حتى للبنت)");
 else { console.error("❌ v3.25: حماية العرض ديال Historique ناقصة!"); bad++; }
-if (html.split('🕘 Historique').length - 1 === 2) console.log("✅ v3.25: 🕘 Historique باقية 2 مواضع فقط وكلاهما للإدمن (تبويب صفحة البنت للادمن + زرار الفوتر)");
-else { console.error("❌ v3.25: عدد مواضع Historique ماشي متوقع (خاص يكون 2)!"); bad++; }
+if (html.split('🕘 Historique').length - 1 === 1) console.log("✅ v3.25/v3.32: 🕘 Historique باقية موضع واحد فقط للإدمن (تبويب صفحة البنت — زرار الفوتر ولّى داخل مجموعة ADS)");
+else { console.error("❌ v3.25: عدد مواضع Historique ماشي متوقع (خاص يكون 1 بعد v3.32)!"); bad++; }
 
 /* v3.26: صفحة PRODUITS — حيّدنا التبويبات: Statistiques ventes / Produits du mois / Zones livraison (بقا غير Catalogue) */
 if (!html.includes('Statistiques ventes')) console.log("✅ v3.26: تبويب 'Statistiques ventes' تّحيد من صفحة PRODUITS");
@@ -192,7 +192,7 @@ else { console.error("❌ v3.27: منع التكرار فالإضافة ناقص
 /* v3.28: زر Bilan + Mini-menu كيجمع الصفحات الثلاثة (تّحيدو من التبويبات) */
 if (html.includes('[Db,Vb]=ee.useState(null),[Bq,Bk]=ee.useState(null),D=ee.useRef(null)')) console.log("✅ v3.28/v3.31: حالة الـ Mini-menu كاينة (مفتاح المجموعة + موضع الزر)");
 else { console.error("❌ v3.28: حالة الـ dropdown ناقصة!"); bad++; }
-if (html.includes('children:(C=>[C[0],C[C.length-4],C[C.length-3],C[C.length-2],C[C.length-1],...C.slice(1,-4)])([...h.filter(C=>!Gk.includes(C)).map(C=>')) console.log("✅ v3.28/v3.31: الصفحات الثمانية تّحيدو من التبويبات (filter Gk) + أزرار المجموعات الأربعة من بعد COMONDES (reorder)");
+if (html.includes('children:(C=>[C[0],C[C.length-6],C[C.length-5],C[C.length-4],C[C.length-3],C[C.length-2],C[C.length-1],...C.slice(1,-6)])([...h.filter(C=>!Gk.includes(C)).map(C=>')) console.log("✅ v3.28/v3.32: الصفحات الثمانية تّحيدو من التبويبات (filter Gk) + أزرار المجموعات الستة من بعد COMONDES (reorder)");
 else { console.error("❌ v3.28: التبويبات مازالين كيعرضو الصفحات الثلاثة!"); bad++; }
 if (html.includes('title:"Bilan"')) console.log("✅ v3.28: زر Bilan الرئيسي كاين فالـMenu");
 else { console.error("❌ v3.28: زر Bilan ناقص!"); bad++; }
@@ -228,7 +228,29 @@ else { console.error("❌ v3.31: قسم Équipe مازال فالفوتر!"); ba
 if (!html.includes('🚚 Livraison')) console.log("✅ v3.31: زر 🚚 Livraison تّحاد من الفوتر (بقى غير داخل SHIPING)");
 else { console.error("❌ v3.31: زر Livraison مازال فالفوتر!"); bad++; }
 if (html.includes('"Work Team":"👥"') && html.includes('Ranking:"🏆"') && html.includes('"Live Activity":"🔴"') && html.includes('Heatmap:"🔥"')) console.log("✅ v3.31: الأيقونات ديال صفحات TEAM كاينين");
-else { console.error("❌ v3.31: شي أيقونة ديال TEAM ناقصة!"); bad++; }
+
+/* v3.32: مجموعات ADS و Users Info بنفس فكرة Bilan */
+if (html.includes('ADS:["CRM Ads","Salaire","Historique"],"Users Info":["إدارة المستخدمين","بنت +","صفحة +"]')) console.log("✅ v3.32: تعريف مجموعات ADS و Users Info كاين فالـ Gz");
+else { console.error("❌ v3.32: تعريف ADS/Users Info ناقص!"); bad++; }
+for (const t of ['title:"ADS"', 'title:"Users Info"']) {
+  if (html.includes(t)) console.log(`✅ v3.32: الزر الرئيسي ${t} كاين فالـMenu`);
+  else { console.error(`❌ v3.32: الزر ${t} ناقص!`); bad++; }
+}
+if (html.includes('Gsq={"CRM Ads":"CRM",Salaire:"SALAIRE","إدارة المستخدمين":"Users"}')) console.log("✅ v3.32: خريطة العرض Gsq كاينة (CRM/SALAIRE/Users فالميني مينيو)");
+else { console.error("❌ v3.32: خريطة العرض Gsq ناقصة!"); bad++; }
+if (html.includes('onClick:()=>{C==="بنت +"?T():C==="صفحة +"?k():N(C);Vb(null)}')) console.log("✅ v3.32: عناصر الأكشن (بنت + → T / صفحة + → k) مربوطين بنفس الإجراءات الأصلية");
+else { console.error("❌ v3.32: ربط الأكشنات ناقص!"); bad++; }
+const v332Routes = ['w==="CRM Ads"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(oj,{})})', 'w==="Salaire"&&s.jsx("div",{className:"h-full overflow-auto",children:s.jsx(gj,{})})', 'w==="Historique"&&s.jsx(Wv,{})', 'w==="إدارة المستخدمين"&&s.jsx(E_,{})'];
+if (v332Routes.every(r => html.includes(r))) console.log("✅ v3.32: صفحات CRM Ads / Salaire / Historique / إدارة المستخدمين مازالين كاينين بنفس الـ routes");
+else { console.error("❌ v3.32: شي صفحة من ADS/Users Info نقصت!"); bad++; }
+for (const gone of ['＋ صفحة', '👤＋ بنت', 'on:w==="CRM Ads"', 'on:w==="Salaire"', 'on:w==="إدارة المستخدمين"', 'color:"slate",on:w==="Historique"']) {
+  if (!html.includes(gone)) console.log(`✅ v3.32: تّحاد من الفوتر: ${gone}`);
+  else { console.error(`❌ v3.32: مازال فالفوتر: ${gone}`); bad++; }
+}
+if (html.includes('title:"تسجيل الخروج"')) console.log("✅ v3.32: زر تسجيل الخروج باقي فالفوتر (ما تبدلش)");
+else { console.error("❌ v3.32: زر تسجيل الخروج ناقص!"); bad++; }
+
+if (!(html.includes('"Work Team":"👥"') && html.includes('Ranking:"🏆"') && html.includes('"Live Activity":"🔴"') && html.includes('Heatmap:"🔥"'))) { console.error("❌ v3.31: شي أيقونة ديال TEAM ناقصة!"); bad++; }
 
 
 /* 2) api.php: المفتاح مقبول عند السيرفر */

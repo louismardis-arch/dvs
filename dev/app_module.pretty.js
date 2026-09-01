@@ -45210,9 +45210,16 @@ const Gz = {
         Bilan: ["Dashboard performance", "suivi confirmation", "statistique"],
         Articles: ["PRODUITS", "pièce"],
         SHIPING: ["Les villes", "LIVRAISON"],
-        TEAM: ["Work Times", "Work Team", "Ranking", "Live Activity", "Heatmap"]
+        TEAM: ["Work Times", "Work Team", "Ranking", "Live Activity", "Heatmap"],
+        ADS: ["CRM Ads", "Salaire", "Historique"],
+        "Users Info": ["إدارة المستخدمين", "بنت +", "صفحة +"]
     },
     Gk = ["Dashboard performance", "suivi confirmation", "statistique", "PRODUITS", "pièce", "Les villes", "LIVRAISON", "Work Times"],
+    Gsq = {
+        "CRM Ads": "CRM",
+        Salaire: "SALAIRE",
+        "إدارة المستخدمين": "Users"
+    },
     Uj = ["suivi confirmation"],
     zj = ["COMONDES", "Dashboard performance", "LES RENV", "PRODUITS", "LES OBJECTIFS", "suivi confirmation", "pièce", "RECLAMATION", "statistique", "suivi rentabilité", "Sheet129", "Les villes", "Work Times", "LIVRAISON"],
     Pj = ["Dashboard performance", "LES RENV", "LES OBJECTIFS", "suivi confirmation", "RECLAMATION", "suivi rentabilité", "Work Times", "LIVRAISON"],
@@ -45235,7 +45242,13 @@ const Gz = {
         "Work Team": "👥",
         Ranking: "🏆",
         "Live Activity": "🔴",
-        Heatmap: "🔥"
+        Heatmap: "🔥",
+        "CRM Ads": "💸",
+        Salaire: "💵",
+        Historique: "🕘",
+        "إدارة المستخدمين": "🔐",
+        "بنت +": "👤",
+        "صفحة +": "📄"
     },
     Gj = {
         COMONDES: "blue",
@@ -45255,7 +45268,13 @@ const Gz = {
         "Work Team": "blue",
         Ranking: "amber",
         "Live Activity": "red",
-        Heatmap: "orange"
+        Heatmap: "orange",
+        "CRM Ads": "violet",
+        Salaire: "emerald",
+        Historique: "slate",
+        "إدارة المستخدمين": "violet",
+        "بنت +": "blue",
+        "صفحة +": "emerald"
     },
     pd = "tabs_list_v1",
     gd = "custom_sheets_v1",
@@ -46461,7 +46480,7 @@ function Vj() {
                         scrollbarWidth: "none",
                         msOverflowStyle: "none"
                     },
-                    children: (C => [C[0], C[C.length - 4], C[C.length - 3], C[C.length - 2], C[C.length - 1], ...C.slice(1, -4)])([...h.filter(C => !Gk.includes(C)).map(C => {
+                    children: (C => [C[0], C[C.length - 6], C[C.length - 5], C[C.length - 4], C[C.length - 3], C[C.length - 2], C[C.length - 1], ...C.slice(1, -6)])([...h.filter(C => !Gk.includes(C)).map(C => {
                         const L = w === C,
                             F = Pj.includes(C),
                             Y = ag[C] || (e.includes(C) ? "👤" : "📑"),
@@ -46570,6 +46589,46 @@ function Vj() {
                             className: "text-[9px] opacity-80",
                             children: Db === "TEAM" ? "▲" : "▼"
                         })]
+                    }), s.jsxs("div", {
+                        onClick: V => {
+                            const R = V.currentTarget.getBoundingClientRect();
+                            Bk({
+                                top: R.bottom + 4,
+                                left: R.left
+                            });
+                            Vb(Db === "ADS" ? null : "ADS")
+                        },
+                        title: "ADS",
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db==="ADS"||Gz.ADS.includes(w)?Ao.violet.on:Ao.violet.base}`,
+                        children: [s.jsx("span", {
+                            className: "text-[12px] leading-none",
+                            children: "💸"
+                        }), s.jsx("span", {
+                            children: "ADS"
+                        }), s.jsx("span", {
+                            className: "text-[9px] opacity-80",
+                            children: Db === "ADS" ? "▲" : "▼"
+                        })]
+                    }), s.jsxs("div", {
+                        onClick: V => {
+                            const R = V.currentTarget.getBoundingClientRect();
+                            Bk({
+                                top: R.bottom + 4,
+                                left: R.left
+                            });
+                            Vb(Db === "Users Info" ? null : "Users Info")
+                        },
+                        title: "Users Info",
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db==="Users Info"||Gz["Users Info"].includes(w)?Ao.red.on:Ao.red.base}`,
+                        children: [s.jsx("span", {
+                            className: "text-[12px] leading-none",
+                            children: "🔐"
+                        }), s.jsx("span", {
+                            children: "Users Info"
+                        }), s.jsx("span", {
+                            className: "text-[9px] opacity-80",
+                            children: Db === "Users Info" ? "▲" : "▼"
+                        })]
                     })])
                 }), Db && s.jsx("div", {
                     className: "fixed inset-0 z-40",
@@ -46588,7 +46647,8 @@ function Vj() {
                         const K2 = Ao[Gj[C]] ?? Ao.slate;
                         return s.jsxs("button", {
                             onClick: () => {
-                                N(C), Vb(null)
+                                C === "بنت +" ? T() : C === "صفحة +" ? k() : N(C);
+                                Vb(null)
                             },
                             className: `flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${w===C?K2.on:K2.base}`,
                             children: [s.jsx("span", {
@@ -46596,7 +46656,7 @@ function Vj() {
                                 children: ag[C]
                             }), s.jsx("span", {
                                 className: "flex-1 text-left",
-                                children: C
+                                children: Gsq[C] || C
                             }), w === C && s.jsx("span", {
                                 className: "text-[9px]",
                                 children: "✓"
@@ -46667,47 +46727,7 @@ function Vj() {
             style: {
                 scrollbarWidth: "thin"
             },
-            children: [s.jsx("span", {
-                className: "mr-1 hidden shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400 lg:block",
-                children: "Créer"
-            }), s.jsx($r, {
-                color: "emerald",
-                onClick: k,
-                title: "إضافة صفحة",
-                children: "＋ صفحة"
-            }), s.jsx($r, {
-                color: "blue",
-                onClick: T,
-                title: "إضافة بنت وصفحتها المربوطة",
-                children: "👤＋ بنت"
-            }), s.jsx(rg, {}), s.jsx("span", {
-                className: "mr-1 hidden shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400 lg:block",
-                children: "Gestion"
-            }), s.jsx($r, {
-                color: "violet",
-                on: w === "CRM Ads",
-                onClick: () => N("CRM Ads"),
-                title: "تكاليف الإعلانات والكوست لكل طلبية",
-                children: "💸 CRM"
-            }), s.jsx($r, {
-                color: "emerald",
-                on: w === "Salaire",
-                onClick: () => N("Salaire"),
-                title: "سالير البنات — محسوب أوتوماتيك",
-                children: "💵 Salaire"
-            }), s.jsx($r, {
-                color: "violet",
-                on: w === "إدارة المستخدمين",
-                onClick: () => N("إدارة المستخدمين"),
-                title: "إدارة المستخدمين",
-                children: "🔐 Users"
-            }), s.jsx($r, {
-                color: "slate",
-                on: w === "Historique",
-                onClick: () => N("Historique"),
-                title: "سجل التعديلات",
-                children: "🕘 Historique"
-            }), s.jsx("button", {
+            children: [s.jsx("button", {
                 onClick: f,
                 title: "تسجيل الخروج",
                 className: "ml-auto grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-red-300 bg-white text-red-600 shadow-sm transition-all duration-150 hover:border-red-400 hover:bg-red-50 hover:shadow hover:scale-105 active:scale-[0.94]",
