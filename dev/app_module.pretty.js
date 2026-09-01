@@ -46252,7 +46252,7 @@ function Vj() {
             if (C) return JSON.parse(C)
         } catch {}
         return {}
-    }), [w, N] = ee.useState("COMONDES"), [v, A] = ee.useState(null), [Db, Vb] = ee.useState(!1), D = ee.useRef(null);
+    }), [w, N] = ee.useState("COMONDES"), [v, A] = ee.useState(null), [Db, Vb] = ee.useState(!1), [Bq, Bk] = ee.useState(null), D = ee.useRef(null);
     ee.useEffect(() => {
         const C = c?.username || null;
         if (C && D.current !== C) {
@@ -46476,7 +46476,14 @@ function Vj() {
                             })]
                         }, C)
                     }), s.jsxs("div", {
-                        onClick: () => Vb(!Db),
+                        onClick: V => {
+                            const R = V.currentTarget.getBoundingClientRect();
+                            Bk({
+                                top: R.bottom + 4,
+                                left: R.left
+                            });
+                            Vb(!Db)
+                        },
                         title: "Bilan",
                         className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db||["Dashboard performance","suivi confirmation","statistique"].includes(w)?Ao.indigo.on:Ao.indigo.base}`,
                         children: [s.jsx("span", {
@@ -46492,11 +46499,13 @@ function Vj() {
                 }), Db && s.jsx("div", {
                     className: "fixed inset-0 z-40",
                     onClick: () => Vb(!1)
-                }), Db && s.jsxs("div", {
+                }), Db && Bq && s.jsxs("div", {
                     style: {
-                        top: "100%"
+                        position: "fixed",
+                        top: Bq.top,
+                        left: Bq.left
                     },
-                    className: "absolute right-3 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white p-1 shadow-lg",
+                    className: "z-50 w-56 rounded-xl border border-slate-200 bg-white p-1 shadow-lg",
                     children: [s.jsx("div", {
                         className: "px-2 pb-1 pt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400",
                         children: "Bilan"

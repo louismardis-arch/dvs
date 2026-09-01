@@ -204,6 +204,12 @@ else { console.error("❌ v3.28: شي صفحة من الثلاثة نقصت!"); 
 if (html.includes('fixed inset-0 z-40')) console.log("✅ v3.28: كليك برا الـ Mini-menu كيسدو (backdrop)");
 else { console.error("❌ v3.28: backdrop ديال الإغلاق ناقص!"); bad++; }
 
+/* v3.30: الـ Mini-menu كيخرج مباشرة تحت زر Bilan (بلا انزياح لليمين) */
+if (html.includes('currentTarget.getBoundingClientRect()')) console.log("✅ v3.30: موضع زر Bilan كيتحسب بالضبط (getBoundingClientRect)");
+else { console.error("❌ v3.30: حساب الموضع ناقص!"); bad++; }
+if (html.includes('Db&&Bq&&s.jsxs("div",{style:{position:"fixed",top:Bq.top,left:Bq.left}')) console.log("✅ v3.30: الـ Mini-menu مربوط تحت زر Bilan مباشرة (fixed بموضع الزر — ماشي أقصى اليمين)");
+else { console.error("❌ v3.30: الـ Mini-menu مازال مربوط بـ right-3!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");
