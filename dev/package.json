@@ -1,0 +1,10 @@
+{
+  "name": "paraveda-crm-dev-tests",
+  "private": true,
+  "description": "تبعيات اختبارات التطوير ديال Paraveda CRM (jsdom/react) — ماشي جزء من تطبيق الإنتاج",
+  "dependencies": {
+    "jsdom": "^24.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

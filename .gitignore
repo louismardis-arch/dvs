@@ -1,3 +1,6 @@
 # داطا وقت التشغيل (محلية) — ماشي جزء من المشروع
 crm-paraveda-data-7f3a/
 php-errors.log
+
+# تبعيات اختبارات dev (jsdom/react) — مشي جزء من التطبيق
+dev/node_modules/
