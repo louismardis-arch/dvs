@@ -170,6 +170,18 @@ else { console.error("❌ v3.25: حماية العرض ديال Historique نا�
 if (html.split('🕘 Historique').length - 1 === 2) console.log("✅ v3.25: 🕘 Historique باقية 2 مواضع فقط وكلاهما للإدمن (تبويب صفحة البنت للادمن + زرار الفوتر)");
 else { console.error("❌ v3.25: عدد مواضع Historique ماشي متوقع (خاص يكون 2)!"); bad++; }
 
+/* v3.26: صفحة PRODUITS — حيّدنا التبويبات: Statistiques ventes / Produits du mois / Zones livraison (بقا غير Catalogue) */
+if (!html.includes('Statistiques ventes')) console.log("✅ v3.26: تبويب 'Statistiques ventes' تّحيد من صفحة PRODUITS");
+else { console.error("❌ v3.26: تبويب Statistiques ventes مازال كاين!"); bad++; }
+if (!html.includes('Produits du mois')) console.log("✅ v3.26: تبويب 'Produits du mois' تّحيد");
+else { console.error("❌ v3.26: تبويب Produits du mois مازال كاين!"); bad++; }
+if (!html.includes('Zones livraison')) console.log("✅ v3.26: تبويب 'Zones livraison' تّحيد");
+else { console.error("❌ v3.26: تبويب Zones livraison مازال كاين!"); bad++; }
+if (html.includes('Catalogue (${f.length})')) console.log("✅ v3.26: تبويب Catalogue باقي وهو الوحيد فصفحة PRODUITS");
+else { console.error("❌ v3.26: تبويب Catalogue ناقص!"); bad++; }
+if (!html.includes('i==="stats"&&') && !html.includes('i==="mois"&&') && !html.includes('i==="zones"&&')) console.log("✅ v3.26: أقسام stats/mois/zones تّحيدو من الكود نهائياً");
+else { console.error("❌ v3.26: شي قسم من الأقسام الثلاثة مازال فالكود!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");

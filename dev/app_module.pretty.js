@@ -34825,7 +34825,7 @@ function c_() {
             children: [s.jsx("h2", {
                 className: "text-lg font-bold",
                 children: "📦 PRODUITS"
-            }), R("catalog", `Catalogue (${f.length})`), R("stats", `Statistiques ventes (${A.length})`), R("mois", `Produits du mois (${k2.length})`), R("zones", `Zones livraison (${D2.length})`), a ? s.jsx("span", {
+            }), R("catalog", `Catalogue (${f.length})`), a ? s.jsx("span", {
                 className: "rounded-md bg-blue-50 px-2 py-1 text-[11px] font-bold text-blue-700",
                 children: "✏️ Admin"
             }) : s.jsx("span", {
@@ -35053,116 +35053,6 @@ function c_() {
                     className: "p-8 text-center text-slate-400",
                     children: "لا توجد منتجات"
                 })]
-            })]
-        }), i === "stats" && s.jsx("div", {
-            className: "overflow-auto",
-            children: s.jsxs("table", {
-                className: "w-full border-collapse text-xs",
-                children: [s.jsx("thead", {
-                    children: s.jsxs("tr", {
-                        children: [s.jsx("th", {
-                            className: Li,
-                            children: "Produit"
-                        }), s.jsx("th", {
-                            className: _r,
-                            children: "CMD"
-                        }), s.jsx("th", {
-                            className: _r,
-                            children: "Livrée"
-                        }), s.jsx("th", {
-                            className: _r,
-                            children: "Retour"
-                        }), s.jsx("th", {
-                            className: _r,
-                            children: "Tx livraison"
-                        }), s.jsx("th", {
-                            className: Li,
-                            children: "CA"
-                        }), s.jsx("th", {
-                            className: _r,
-                            children: "Pièces"
-                        })]
-                    })
-                }), s.jsx("tbody", {
-                    children: A.map(_ => s.jsxs("tr", {
-                        className: "odd:bg-white even:bg-[#f8f9fa]",
-                        children: [s.jsx("td", {
-                            className: Vc,
-                            children: _.nom
-                        }), s.jsx("td", {
-                            className: na,
-                            children: _.total
-                        }), s.jsx("td", {
-                            className: `${na} text-emerald-700`,
-                            children: _.liv
-                        }), s.jsx("td", {
-                            className: `${na} text-rose-600`,
-                            children: _.ret
-                        }), s.jsx("td", {
-                            className: na,
-                            children: i_(_.liv, _.liv + _.ret)
-                        }), s.jsxs("td", {
-                            className: `${na} font-bold`,
-                            children: [l_(_.ca), " DH"]
-                        }), s.jsx("td", {
-                            className: na,
-                            children: _.pcs
-                        })]
-                    }, _.nom))
-                })]
-            })
-        }), i === "mois" && s.jsxs("div", {
-            className: "overflow-auto max-w-2xl",
-            children: [s.jsx("h3", {
-                className: "mb-2 font-bold text-sm",
-                children: "LES PRODUITS DE MOIS"
-            }), s.jsxs("table", {
-                className: "w-full border-collapse text-xs",
-                children: [s.jsx("thead", {
-                    children: s.jsxs("tr", {
-                        children: [s.jsx("th", {
-                            className: _r,
-                            style: {
-                                width: 40
-                            },
-                            children: "#"
-                        }), s.jsx("th", {
-                            className: _r,
-                            style: {
-                                width: 110
-                            },
-                            children: "Date"
-                        }), s.jsx("th", {
-                            className: Li,
-                            children: "Produit"
-                        })]
-                    })
-                }), s.jsx("tbody", {
-                    children: k2.map((_, S) => s.jsxs("tr", {
-                        className: "odd:bg-white even:bg-[#f8f9fa]",
-                        children: [s.jsx("td", {
-                            className: na + " text-slate-400",
-                            children: S + 1
-                        }), s.jsx("td", {
-                            className: na,
-                            children: _[0] || "—"
-                        }), s.jsx("td", {
-                            className: Vc,
-                            children: _[1]
-                        })]
-                    }, S))
-                })]
-            })]
-        }), i === "zones" && s.jsxs("div", {
-            children: [s.jsx("h3", {
-                className: "mb-2 font-bold text-sm",
-                children: "Zones de livraison (Expédier vers)"
-            }), s.jsx("div", {
-                className: "flex flex-wrap gap-2",
-                children: D2.map((_, S) => s.jsx("span", {
-                    className: "rounded-full border border-slate-300 bg-white px-3 py-1 text-xs",
-                    children: _
-                }, S))
             })]
         })]
     })
