@@ -118,7 +118,7 @@ if (html.includes('pf==="all"||S.row.produit.trim().toLowerCase()===pf.trim().to
 else { console.error("❌ v3.20: فيلتر المنتوج pf ناقص!"); bad++; }
 if (html.includes('gp==="all"||S.row.produit.trim().toLowerCase()===gp.trim().toLowerCase()')) console.log("✅ v3.20: فيلتر المنتوج فـ GLOBAL (gp) مطبق");
 else { console.error("❌ v3.20: فيلتر GLOBAL gp ناقص!"); bad++; }
-if (html.split('🔍 المنتوج:').length - 1 === 2) console.log("✅ v3.20: كاينين جوج selects ديال المنتوج (السورس + GLOBAL)");
+if (html.split('🔍 المنتوج:').length - 1 === 3) console.log("✅ v3.20: كاينين 3 selects ديال المنتوج (السورس + GLOBAL + CRM v3.36)");
 else { console.error("❌ v3.20: selects ديال المنتوج ناقصين!"); bad++; }
 if (html.split('📈 ربح ').length - 1 === 2) console.log("✅ v3.20: بادج الربح الطوطال ديال المنتوج (فالسورس + فـ GLOBAL)");
 else { console.error("❌ v3.20: بادج الربح ناقص!"); bad++; }
