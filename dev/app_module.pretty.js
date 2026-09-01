@@ -46252,7 +46252,7 @@ function Vj() {
             if (C) return JSON.parse(C)
         } catch {}
         return {}
-    }), [w, N] = ee.useState("COMONDES"), [v, A] = ee.useState(null), D = ee.useRef(null);
+    }), [w, N] = ee.useState("COMONDES"), [v, A] = ee.useState(null), [Db, Vb] = ee.useState(!1), D = ee.useRef(null);
     ee.useEffect(() => {
         const C = c?.username || null;
         if (C && D.current !== C) {
@@ -46446,7 +46446,7 @@ function Vj() {
                         scrollbarWidth: "none",
                         msOverflowStyle: "none"
                     },
-                    children: h.map(C => {
+                    children: [h.filter(C => !["Dashboard performance", "suivi confirmation", "statistique"].includes(C)).map(C => {
                         const L = w === C,
                             F = Pj.includes(C),
                             Y = ag[C] || (e.includes(C) ? "👤" : "📑"),
@@ -46475,7 +46475,50 @@ function Vj() {
                                 children: "✕"
                             })]
                         }, C)
-                    })
+                    }), s.jsxs("div", {
+                        onClick: () => Vb(!Db),
+                        title: "Bilan",
+                        className: `group relative flex h-8 shrink-0 cursor-pointer select-none items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${Db||["Dashboard performance","suivi confirmation","statistique"].includes(w)?Ao.indigo.on:Ao.indigo.base}`,
+                        children: [s.jsx("span", {
+                            className: "text-[12px] leading-none",
+                            children: "📊"
+                        }), s.jsx("span", {
+                            children: "Bilan"
+                        }), s.jsx("span", {
+                            className: "text-[9px] opacity-80",
+                            children: Db ? "▲" : "▼"
+                        })]
+                    })]
+                }), Db && s.jsx("div", {
+                    className: "fixed inset-0 z-40",
+                    onClick: () => Vb(!1)
+                }), Db && s.jsxs("div", {
+                    style: {
+                        top: "100%"
+                    },
+                    className: "absolute right-3 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white p-1 shadow-lg",
+                    children: [s.jsx("div", {
+                        className: "px-2 pb-1 pt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400",
+                        children: "Bilan"
+                    }), ...(["Dashboard performance", "suivi confirmation", "statistique"].map(C => {
+                        const K2 = Ao[Gj[C]] ?? Ao.slate;
+                        return s.jsxs("button", {
+                            onClick: () => {
+                                N(C), Vb(!1)
+                            },
+                            className: `flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-[11px] font-bold text-white transition-all duration-150 active:scale-[0.96] ${w===C?K2.on:K2.base}`,
+                            children: [s.jsx("span", {
+                                className: "text-[12px] leading-none",
+                                children: ag[C]
+                            }), s.jsx("span", {
+                                className: "flex-1 text-left",
+                                children: C
+                            }), w === C && s.jsx("span", {
+                                className: "text-[9px]",
+                                children: "✓"
+                            })]
+                        }, C)
+                    }))]
                 }), s.jsx("div", {
                     className: "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"
                 })]

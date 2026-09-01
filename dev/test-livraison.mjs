@@ -190,6 +190,20 @@ else { console.error("❌ v3.27: dedup ديال الـ picker ناقص!"); bad++
 if (html.includes('كاين أصلاً فالكاطالوغ')) console.log("✅ v3.27: منع إضافة منتوج مكرر فصفحة PRODUITS");
 else { console.error("❌ v3.27: منع التكرار فالإضافة ناقص!"); bad++; }
 
+/* v3.28: زر Bilan + Mini-menu كيجمع الصفحات الثلاثة (تّحيدو من التبويبات) */
+if (html.includes('[Db,Vb]=ee.useState(!1)')) console.log("✅ v3.28: حالة فتح/إغلاق الـ Mini-menu كاينة");
+else { console.error("❌ v3.28: حالة الـ dropdown ناقصة!"); bad++; }
+if (html.includes('children:[h.filter(C=>!["Dashboard performance","suivi confirmation","statistique"].includes(C)).map(C=>')) console.log("✅ v3.28: الصفحات الثلاثة تّحيدو من الـMenu الرئيسي (filter قبل الـ tabs)");
+else { console.error("❌ v3.28: التبويبات مازالين كيعرضو الصفحات الثلاثة!"); bad++; }
+if (html.includes('title:"Bilan"')) console.log("✅ v3.28: زر Bilan الرئيسي كاين فالـMenu");
+else { console.error("❌ v3.28: زر Bilan ناقص!"); bad++; }
+if (html.includes('statistique"].map(C=>{const K2=Ao[Gj[C]]')) console.log("✅ v3.28: Mini-menu فيه 3 أزرار (Dashboard performance / suivi confirmation / statistique)");
+else { console.error("❌ v3.28: أزرار الـ Mini-menu ناقصين!"); bad++; }
+if (html.includes('w==="Dashboard performance"&&s.jsx(Fj,{})') && html.includes('w==="suivi confirmation"&&s.jsx(m_,{})') && html.includes('w==="statistique"&&s.jsx(Ij,{})')) console.log("✅ v3.28: الصفحات الثلاثة مازالين كاينين بنفس الـ routes (بلا duplication)");
+else { console.error("❌ v3.28: شي صفحة من الثلاثة نقصت!"); bad++; }
+if (html.includes('fixed inset-0 z-40')) console.log("✅ v3.28: كليك برا الـ Mini-menu كيسدو (backdrop)");
+else { console.error("❌ v3.28: backdrop ديال الإغلاق ناقص!"); bad++; }
+
 /* 2) api.php: المفتاح مقبول عند السيرفر */
 if (!api.includes('"afrizon_livraison_v1"')) { console.error("❌ api.php ما فيهش المفتاح!"); bad++; }
 else console.log("✅ api.php كيقبل المفتاح afrizon_livraison_v1 (توافق)");
